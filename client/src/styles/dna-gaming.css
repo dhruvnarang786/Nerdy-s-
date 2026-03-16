@@ -1,0 +1,953 @@
+.gaming-dna-wrapper {
+    padding: 2rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.gaming-dashboard {
+    background: #1a1e27;
+    border-radius: 20px;
+    overflow: hidden;
+    color: #e2e8f0;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    max-width: 1250px;
+    margin: 0 auto;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.gaming-hero-banner {
+    height: 300px;
+    background-image: url('https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=2000&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center 20%;
+    position: relative;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 100%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 100%);
+}
+
+.gaming-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(26, 30, 39, 0.2), rgba(26, 30, 39, 1));
+}
+
+.gaming-nav {
+    position: absolute;
+    top: 1.5rem;
+    left: 2rem;
+    right: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 20;
+}
+
+.gaming-nav-links {
+    display: flex;
+    gap: 2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+.gaming-nav-links span.active {
+    color: #4ade80;
+    border-bottom: 2px solid #4ade80;
+    padding-bottom: 0.25rem;
+}
+
+.gaming-profile-header {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.5rem;
+    padding: 0 3rem;
+    margin-top: -100px;
+    position: relative;
+    z-index: 10;
+}
+
+.gaming-avatar-wrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: #1a1e27;
+    padding: 6px;
+}
+
+.gaming-avatar-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    border-top-color: #4ade80;
+    border-left-color: #4ade80;
+    transform: rotate(-45deg);
+}
+
+.gaming-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #0ea5e9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.gaming-user-info h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    line-height: 1.2;
+}
+
+.gaming-friends-pill {
+    background: rgba(74, 222, 128, 0.2);
+    color: #4ade80;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.gaming-status {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.gaming-status strong {
+    color: #e2e8f0;
+}
+
+.gaming-level {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+    font-weight: 600;
+}
+
+/* Base Layout */
+.gaming-main {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 3rem;
+    padding: 2.5rem 3rem 4rem;
+}
+
+@media (max-width: 1024px) {
+    .gaming-main {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Left Column */
+.gaming-bio {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+}
+
+.gaming-socials {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.gaming-social-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
+.gaming-social-item strong {
+    color: #e2e8f0;
+    display: block;
+    margin-bottom: 0.1rem;
+}
+
+.gaming-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 1.25rem;
+}
+
+/* Activity Card */
+.gaming-activity-card {
+    background: linear-gradient(to right, #e11d48, #be123c);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(225, 29, 72, 0.3);
+}
+
+.gaming-activity-card img {
+    width: 70px;
+    height: 100px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    z-index: 2;
+    object-fit: cover;
+    flex-shrink: 0;
+    display: block !important;
+}
+
+.gaming-activity-cover-placeholder {
+    width: 70px;
+    height: 100px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    z-index: 2;
+}
+
+.gaming-activity-details {
+    z-index: 2;
+}
+
+.gaming-activity-tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.25rem;
+}
+
+.gaming-activity-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.1;
+}
+
+.gaming-activity-meta {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+    margin-bottom: 1rem;
+}
+
+.gaming-activity-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.gaming-activity-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Top Games */
+.gaming-top-games {
+    display: flex;
+    gap: 1rem;
+}
+
+.gaming-top-game {
+    flex: 1;
+    aspect-ratio: 3/4;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s;
+}
+
+.gaming-top-game:hover {
+    transform: translateY(-5px);
+}
+
+/* ============================================================
+   RANKS ROW — hover glow + tooltip popup
+   ============================================================ */
+.gaming-ranks-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    padding: 0 1rem;
+}
+
+.gaming-rank-item {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.25s ease;
+}
+
+.gaming-rank-item:hover {
+    transform: translateY(-6px) scale(1.08);
+}
+
+/* glow ring that appears on hover */
+.gaming-rank-item::before {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--rank-glow, rgba(14, 165, 233, 0.35)) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.gaming-rank-item:hover::before {
+    opacity: 1;
+}
+
+/* Tooltip bubble */
+.gaming-rank-tooltip {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.85);
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 0.6rem 1rem;
+    white-space: nowrap;
+    font-size: 0.78rem;
+    color: #e2e8f0;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 50;
+}
+
+.gaming-rank-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+.gaming-rank-item:hover .gaming-rank-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+}
+
+.gaming-rank-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    transition: box-shadow 0.3s ease;
+}
+
+.gaming-rank-item:hover .gaming-rank-icon {
+    box-shadow: 0 0 22px var(--rank-glow, rgba(14, 165, 233, 0.5));
+}
+
+.gaming-rank-title {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #94a3b8;
+    margin: 0;
+}
+
+.gaming-rank-sub {
+    font-size: 0.7rem;
+    color: #e2e8f0;
+    font-weight: 600;
+}
+
+/* ============================================================
+   LATEST ACHIEVEMENTS — motivational badge cards
+   ============================================================ */
+.gaming-achievements-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    margin-bottom: 3rem;
+}
+
+@media (max-width: 900px) {
+    .gaming-achievements-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Keyframes */
+@keyframes badge-shimmer {
+    0% {
+        background-position: -200% center;
+    }
+
+    100% {
+        background-position: 200% center;
+    }
+}
+
+@keyframes badge-pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 var(--badge-glow, rgba(74, 222, 128, 0.4));
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px transparent;
+    }
+}
+
+@keyframes badge-float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+@keyframes sparkle {
+
+    0%,
+    100% {
+        opacity: 0;
+        transform: scale(0.4) rotate(0deg);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1) rotate(180deg);
+    }
+}
+
+.gaming-achievement-card {
+    background: #1e2533;
+    border-radius: 18px;
+    padding: 1.4rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.gaming-achievement-card::before {
+    /* top-edge shimmer line */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--badge-color, #0ea5e9), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.gaming-achievement-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px var(--badge-glow, rgba(14, 165, 233, 0.2));
+}
+
+.gaming-achievement-card:hover::before {
+    opacity: 1;
+}
+
+/* Active (unlocked) state */
+.gaming-achievement-card.unlocked {
+    background: linear-gradient(145deg, #1e2c20, #1a2535);
+    border-color: var(--badge-color, #4ade80);
+    animation: badge-pulse 2.5s ease-in-out infinite;
+}
+
+.gaming-achievement-card.unlocked .gaming-badge-icon-wrap {
+    animation: badge-float 3s ease-in-out infinite;
+}
+
+/* Badge icon wrapper */
+.gaming-badge-icon-wrap {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    position: relative;
+    background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.15), transparent 60%),
+        var(--badge-bg, rgba(14, 165, 233, 0.15));
+    box-shadow: 0 4px 16px var(--badge-glow, rgba(14, 165, 233, 0.3)),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    border: 1px solid var(--badge-color, #0ea5e9);
+    transition: box-shadow 0.3s ease;
+}
+
+.gaming-achievement-card:hover .gaming-badge-icon-wrap {
+    box-shadow: 0 0 30px var(--badge-glow, rgba(14, 165, 233, 0.6)),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Sparkle dots (unlocked only) */
+.gaming-badge-sparkle {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--badge-color, #4ade80);
+    opacity: 0;
+}
+
+.gaming-achievement-card.unlocked .gaming-badge-sparkle {
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+/* Progress ring over the icon */
+.gaming-badge-progress-svg {
+    position: absolute;
+    inset: -6px;
+    width: calc(100% + 12px);
+    height: calc(100% + 12px);
+    transform: rotate(-90deg);
+}
+
+.gaming-badge-ring-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.06);
+}
+
+.gaming-badge-ring-fill {
+    fill: none;
+    stroke: var(--badge-color, #0ea5e9);
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Label & progress text */
+.gaming-achiever-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-bottom: 0.5rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.gaming-badge-progress-text {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--badge-color, #0ea5e9);
+    margin-top: 0.25rem;
+    line-height: 1;
+}
+
+.gaming-badge-max-text {
+    font-size: 0.65rem;
+    color: #64748b;
+    margin-top: 0.1rem;
+}
+
+/* Shimmer overlay on unlock */
+.gaming-achievement-card.unlocked::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg,
+            transparent 30%,
+            rgba(255, 255, 255, 0.06) 50%,
+            transparent 70%);
+    background-size: 200% 100%;
+    animation: badge-shimmer 3s linear infinite;
+    pointer-events: none;
+}
+
+/* Lock icon for locked achievements */
+.gaming-badge-lock {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    color: #64748b;
+}
+
+/* Unlocked check badge */
+.gaming-badge-check {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--badge-color, #4ade80);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0f172a;
+    font-size: 0.6rem;
+    font-weight: 900;
+    box-shadow: 0 2px 8px var(--badge-glow, rgba(74, 222, 128, 0.5));
+}
+
+/* Motivational tagline shown on hover */
+.gaming-badge-motivation {
+    font-size: 0.68rem;
+    color: var(--badge-color, #0ea5e9);
+    margin-top: 0.5rem;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.3s ease, max-height 0.3s ease;
+    font-style: italic;
+}
+
+.gaming-achievement-card:hover .gaming-badge-motivation {
+    opacity: 1;
+    max-height: 2rem;
+}
+
+/* ============================================================
+   STATS ROW
+   ============================================================ */
+.gaming-stats-row {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 3rem;
+}
+
+.gaming-stat-chart {
+    height: 150px;
+    width: 100%;
+}
+
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+    stroke: rgba(255, 255, 255, 0.05);
+}
+
+/* Tabs */
+.gaming-nav-links span {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.gaming-nav-links span:hover {
+    color: #e2e8f0;
+}
+
+/* Modal */
+.gaming-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.gaming-modal {
+    background: #1a1e27;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 16px;
+    width: 400px;
+    max-width: 90vw;
+}
+
+.gaming-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.gaming-btn {
+    background: #4ade80;
+    color: #0f172a;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+.gaming-btn:hover {
+    background: #22c55e;
+}
+
+/* Heatmap */
+.heatmap-container {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 6px;
+    margin-top: 0.5rem;
+}
+
+.heatmap-month-labels {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.heatmap-month-label {
+    font-size: 0.7rem;
+    color: #64748b;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.heatmap-cell {
+    height: 28px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    position: relative;
+    transition: background 0.2s;
+}
+
+.heatmap-cell.level-1 {
+    background: rgba(74, 222, 128, 0.3);
+}
+
+.heatmap-cell.level-2 {
+    background: rgba(74, 222, 128, 0.6);
+}
+
+.heatmap-cell.level-3 {
+    background: rgba(74, 222, 128, 0.9);
+}
+
+/* Friend Cards */
+.friends-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.friend-card {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.friend-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #0ea5e9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.25rem;
+    color: white;
+}
+
+.friend-add-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+/* Badge Gallery */
+.badge-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1.5rem;
+}
+
+.badge-item {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 1.5rem 1rem;
+    border-radius: 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    opacity: 0.5;
+    filter: grayscale(1);
+    transition: all 0.3s;
+}
+
+.badge-item.earned {
+    opacity: 1;
+    filter: grayscale(0);
+    border-color: rgba(74, 222, 128, 0.3);
+    box-shadow: 0 0 20px rgba(74, 222, 128, 0.1);
+}
+
+.badge-icon-wrap {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Edit Button */
+.gaming-edit-btn {
+    background: rgba(74, 222, 128, 0.1);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.1);
+    flex-shrink: 0;
+    margin-left: 1rem;
+}
+
+.gaming-edit-btn:hover {
+    background: rgba(74, 222, 128, 0.3);
+    box-shadow: 0 0 15px rgba(74, 222, 128, 0.4);
+    transform: scale(1.05);
+}
+
+/* Stat Summary Cards */
+.dna-stats-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 900px) {
+    .dna-stats-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.dna-stat-card {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.dna-stat-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.dna-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.dna-stat-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #e2e8f0;
+    line-height: 1;
+}
+
+.dna-stat-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* Heatmap count badge */
+.heatmap-count {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.8);
+}
