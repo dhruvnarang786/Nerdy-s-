@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, BookOpen, AlertCircle, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
+import GoogleLoginButton from '@/components/ui/GoogleLoginButton';
 import '@/styles/pages.css';
 
 const REQUIREMENTS = [
@@ -12,34 +13,64 @@ const REQUIREMENTS = [
     { label: 'One special character (!@#$…)', test: (p: string) => /[^A-Za-z0-9]/.test(p) },
 ];
 
+function isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 export function Register() {
     const { register } = useAuth();
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
+    const [emailTouched, setEmailTouched] = useState(false);
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [passwordFocused, setPasswordFocused] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [warmingUp, setWarmingUp] = useState(false);
+    const warmupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const allMet = REQUIREMENTS.every(r => r.test(password));
+    const emailValid = isValidEmail(email);
+
+    useEffect(() => () => {
+        if (warmupTimer.current) clearTimeout(warmupTimer.current);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+
+        if (!emailValid) {
+            setError('Please enter a valid email address.');
+            setEmailTouched(true);
+            return;
+        }
         if (!allMet) {
             setError('Please meet all password requirements.');
             return;
         }
+
         setLoading(true);
-        const result = await register(username, email, password);
-        if (result.success) {
-            navigate('/');
-        } else {
-            setError(result.error || 'Registration failed. Please try again.');
+        setWarmingUp(false);
+        warmupTimer.current = setTimeout(() => setWarmingUp(true), 5000);
+
+        try {
+            const result = await register(username, email, password);
+            if (result.success) {
+                navigate('/');
+            } else {
+                setError(result.error || 'Registration failed. Please try again.');
+            }
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : 'Could not connect to server.';
+            setError(msg);
+        } finally {
+            if (warmupTimer.current) clearTimeout(warmupTimer.current);
+            setLoading(false);
+            setWarmingUp(false);
         }
-        setLoading(false);
     };
 
     return (
@@ -60,6 +91,12 @@ export function Register() {
                     </div>
                 )}
 
+                <GoogleLoginButton onSuccess={() => navigate('/')} />
+
+                <div className="auth-divider">
+                    <span className="auth-divider-text">or continue with email</span>
+                </div>
+
                 <form onSubmit={handleSubmit} className="auth-form">
                     <div className="form-group">
                         <label className="form-label">
@@ -73,6 +110,7 @@ export function Register() {
                             value={username}
                             onChange={e => setUsername(e.target.value)}
                             required
+                            autoComplete="username"
                         />
                     </div>
                     <div className="form-group">
@@ -82,12 +120,17 @@ export function Register() {
                         </label>
                         <input
                             type="email"
-                            className="form-input"
+                            className={`form-input ${emailTouched && !emailValid ? 'form-input-error' : ''}`}
                             placeholder="you@example.com"
                             value={email}
                             onChange={e => setEmail(e.target.value)}
+                            onBlur={() => setEmailTouched(true)}
                             required
+                            autoComplete="email"
                         />
+                        {emailTouched && !emailValid && email.length > 0 && (
+                            <p className="form-field-error">Please enter a valid email address.</p>
+                        )}
                     </div>
                     <div className="form-group">
                         <label className="form-label">
@@ -104,6 +147,7 @@ export function Register() {
                                 onFocus={() => setPasswordFocused(true)}
                                 onBlur={() => setPasswordFocused(false)}
                                 required
+                                autoComplete="new-password"
                             />
                             <button
                                 type="button"
@@ -116,7 +160,6 @@ export function Register() {
                             </button>
                         </div>
 
-                        {/* Password requirements — show when focused or password has content */}
                         {(passwordFocused || password.length > 0) && (
                             <ul className="password-requirements">
                                 {REQUIREMENTS.map(req => {
@@ -139,7 +182,12 @@ export function Register() {
                         className="btn btn-primary btn-full"
                         disabled={loading || !allMet}
                     >
-                        {loading ? 'Creating account...' : 'Create Account'}
+                        {loading ? (
+                            <span className="auth-btn-loading">
+                                <span className="auth-spinner" />
+                                {warmingUp ? 'Server warming up…' : 'Creating account…'}
+                            </span>
+                        ) : 'Create Account'}
                     </button>
                 </form>
 

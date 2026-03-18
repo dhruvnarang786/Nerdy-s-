@@ -1,4 +1,5 @@
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const REQUEST_TIMEOUT_MS = 20000; // 20 seconds — accounts for Render cold start
 
 function getToken(): string | null {
     return localStorage.getItem('nerdys_token');
@@ -23,16 +24,30 @@ async function request<T>(
     };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
-    const res = await fetch(`${BASE_URL}${path}`, {
-        ...options,
-        headers,
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-    if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: res.statusText }));
-        throw new Error(err.error || 'Request failed');
+    try {
+        const res = await fetch(`${BASE_URL}${path}`, {
+            ...options,
+            headers,
+            signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({ error: res.statusText }));
+            throw new Error(err.error || 'Request failed');
+        }
+        return res.json();
+    } catch (err: unknown) {
+        clearTimeout(timeoutId);
+        if (err instanceof Error && err.name === 'AbortError') {
+            throw new Error('Server is starting up, please try again in a moment.');
+        }
+        throw err;
     }
-    return res.json();
 }
 
 export const api = {

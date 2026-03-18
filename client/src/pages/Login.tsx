@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, BookOpen, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
+import GoogleLoginButton from '@/components/ui/GoogleLoginButton';
 import '@/styles/pages.css';
 
 export function Login() {
@@ -12,18 +13,38 @@ export function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [warmingUp, setWarmingUp] = useState(false);
+    const warmupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Clean up timers on unmount
+    useEffect(() => () => {
+        if (warmupTimer.current) clearTimeout(warmupTimer.current);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setLoading(true);
-        const success = await login(email, password);
-        if (success) {
-            navigate('/');
-        } else {
-            setError('Invalid email or password. Please check your credentials.');
+        setWarmingUp(false);
+
+        // Show "warming up" hint after 5 seconds
+        warmupTimer.current = setTimeout(() => setWarmingUp(true), 5000);
+
+        try {
+            const success = await login(email, password);
+            if (success) {
+                navigate('/');
+            } else {
+                setError('Invalid email or password. Please check your credentials.');
+            }
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : 'Could not connect to server.';
+            setError(msg);
+        } finally {
+            if (warmupTimer.current) clearTimeout(warmupTimer.current);
+            setLoading(false);
+            setWarmingUp(false);
         }
-        setLoading(false);
     };
 
     return (
@@ -44,6 +65,12 @@ export function Login() {
                     </div>
                 )}
 
+                <GoogleLoginButton onSuccess={() => navigate('/')} />
+
+                <div className="auth-divider">
+                    <span className="auth-divider-text">or continue with email</span>
+                </div>
+
                 <form onSubmit={handleSubmit} className="auth-form">
                     <div className="form-group">
                         <label className="form-label">
@@ -57,6 +84,7 @@ export function Login() {
                             value={email}
                             onChange={e => setEmail(e.target.value)}
                             required
+                            autoComplete="email"
                         />
                     </div>
                     <div className="form-group">
@@ -72,6 +100,7 @@ export function Login() {
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
                                 required
+                                autoComplete="current-password"
                             />
                             <button
                                 type="button"
@@ -89,7 +118,12 @@ export function Login() {
                         className="btn btn-primary btn-full"
                         disabled={loading}
                     >
-                        {loading ? 'Signing in...' : 'Sign In'}
+                        {loading ? (
+                            <span className="auth-btn-loading">
+                                <span className="auth-spinner" />
+                                {warmingUp ? 'Server warming up…' : 'Signing in…'}
+                            </span>
+                        ) : 'Sign In'}
                     </button>
                 </form>
 

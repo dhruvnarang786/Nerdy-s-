@@ -10,6 +10,7 @@ interface User {
 interface AuthContextType {
     user: User | null;
     login: (email: string, password: string) => Promise<boolean>;
+    loginWithGoogle: (credential: string) => Promise<boolean>;
     register: (username: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
     logout: () => void;
     isAuthenticated: boolean;
@@ -34,8 +35,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const login = async (email: string, password: string): Promise<boolean> => {
+        const { user, token } = await api.post<{ user: User; token: string }>('/api/auth/login', { email, password });
+        setToken(token);
+        setUser(user);
+        return true;
+    };
+
+    const loginWithGoogle = async (credential: string): Promise<boolean> => {
         try {
-            const { user, token } = await api.post<{ user: User; token: string }>('/api/auth/login', { email, password });
+            const { user, token } = await api.post<{ user: User; token: string }>('/api/auth/google', { credential });
             setToken(token);
             setUser(user);
             return true;
@@ -65,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         <AuthContext.Provider value={{
             user,
             login,
+            loginWithGoogle,
             register,
             logout,
             isAuthenticated: !!user,
