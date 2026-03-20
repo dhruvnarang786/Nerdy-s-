@@ -15,6 +15,7 @@ import aiRoutes from './routes/aiRoutes.js';
 import dnaRoutes from './routes/dna.js';
 import profileRoutes from './routes/profile.js';
 import friendsRoutes from './routes/friends.js';
+import booksRoutes from './routes/books.js';
 import { setupSocketHandlers } from './socket/chat.js';
 
 const { Pool } = pg;
@@ -46,7 +47,10 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/dna', dnaRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/friends', friendsRoutes);
+app.use('/api/books', booksRoutes);
 
+// Health check / keep-alive endpoint
+app.get('/ping', (_req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
 app.get('/', (_req, res) => res.json({ message: "Nerdy's API is running 📚" }));
 
 // Socket.io
@@ -82,6 +86,17 @@ async function main() {
     httpServer.listen(PORT, () => {
         console.log(`🚀 Server running on http://localhost:${PORT}`);
         console.log(`🔌 Socket.io ready for live chat`);
+
+        // Keep-alive: ping ourselves every 14 minutes to prevent Render free-tier sleep
+        const selfUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+        setInterval(async () => {
+            try {
+                await fetch(`${selfUrl}/ping`);
+                console.log('💓 Keep-alive ping sent');
+            } catch (e) {
+                // Silently ignore ping errors
+            }
+        }, 14 * 60 * 1000); // every 14 minutes
     });
 }
 

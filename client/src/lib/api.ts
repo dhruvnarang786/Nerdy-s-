@@ -1,6 +1,4 @@
 
-const GOOGLE_BOOKS_API_URL = 'https://www.googleapis.com/books/v1/volumes';
-
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export interface Book {
@@ -15,11 +13,11 @@ export interface Book {
     genre: string[];
 }
 
-// Inter-app Backend API Helper
+// Backend API helper (for auth, logs, favorites etc.)
 export const api = {
     get: async (endpoint: string) => {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:5000${endpoint}`, {
+        const token = localStorage.getItem('nerdys_token') || localStorage.getItem('token');
+        const res = await fetch(`${BASE_URL}${endpoint}`, {
             headers: {
                 'Content-Type': 'application/json',
                 ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -28,8 +26,8 @@ export const api = {
         if (!res.ok) throw new Error(await res.text());
         return { data: await res.json() };
     },
-    post: async (endpoint: string, body: any) => {
-        const token = localStorage.getItem('token');
+    post: async (endpoint: string, body: unknown) => {
+        const token = localStorage.getItem('nerdys_token') || localStorage.getItem('token');
         const res = await fetch(`${BASE_URL}${endpoint}`, {
             method: 'POST',
             headers: {
@@ -43,67 +41,42 @@ export const api = {
     }
 };
 
-export async function fetchTrendingBooks(): Promise<Book[]> {
+// ─── Book API calls — all proxied through our backend ───────────────────────
+// This avoids college/corporate networks that block googleapis.com directly.
+
+export async function searchBooks(query: string): Promise<Book[]> {
+    if (!query) return [];
     try {
-        const res = await fetch(`${BASE_URL}/api/books/trending`);
-        if (!res.ok) throw new Error('Failed to fetch trending');
+        const res = await fetch(`${BASE_URL}/api/books/search?q=${encodeURIComponent(query)}&maxResults=20`);
+        if (!res.ok) return [];
         return await res.json();
-    } catch (e) {
-        console.error(e);
+    } catch (error) {
+        console.error('Error searching books:', error);
         return [];
     }
 }
 
-export async function fetchBookDetails(id: string): Promise<Book | null> {
+export async function fetchTrendingBooks(query = 'bestselling fiction', maxResults = 15): Promise<Book[]> {
     try {
-        const res = await fetch(`${BASE_URL}/api/books/${id}`);
-        if (!res.ok) throw new Error('Failed to fetch book details');
+        const res = await fetch(`${BASE_URL}/api/books/trending?query=${encodeURIComponent(query)}&maxResults=${maxResults}`);
+        if (!res.ok) return [];
         return await res.json();
     } catch (e) {
         console.error(e);
-        return null;
-    }
-}
-
-export async function searchBooks(query: string): Promise<Book[]> {
-    if (!query) return [];
-
-    try {
-        const response = await fetch(`${GOOGLE_BOOKS_API_URL}?q=${encodeURIComponent(query)}&maxResults=20`);
-        const data = await response.json();
-
-        if (!data.items) return [];
-
-        return data.items.map((item: any) => formatBookData(item));
-    } catch (error) {
-        console.error("Error searching books:", error);
         return [];
     }
 }
 
 export async function getBookDetails(id: string): Promise<Book | null> {
     try {
-        const response = await fetch(`${GOOGLE_BOOKS_API_URL}/${id}`);
-        const data = await response.json();
-
-        return formatBookData(data);
+        const res = await fetch(`${BASE_URL}/api/books/${id}`);
+        if (!res.ok) return null;
+        return await res.json();
     } catch (error) {
-        console.error("Error fetching book details:", error);
+        console.error('Error fetching book details:', error);
         return null;
     }
 }
 
-function formatBookData(item: any): Book {
-    const volumeInfo = item.volumeInfo;
-    return {
-        id: item.id,
-        title: volumeInfo.title || 'Unknown Title',
-        author: volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Unknown Author',
-        description: volumeInfo.description || 'No description available.',
-        coverUrl: volumeInfo.imageLinks?.thumbnail?.replace('http:', 'https:') || 'https://via.placeholder.com/128x192?text=No+Cover',
-        rating: volumeInfo.averageRating || 0,
-        publishedDate: volumeInfo.publishedDate || 'Unknown',
-        pages: volumeInfo.pageCount || 0,
-        genre: volumeInfo.categories || [],
-    };
-}
+// Alias for legacy calls
+export const fetchBookDetails = getBookDetails;

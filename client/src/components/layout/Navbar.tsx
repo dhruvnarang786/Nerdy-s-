@@ -109,6 +109,21 @@ export function Navbar() {
             {/* Mobile menu */}
             {isOpen && (
                 <div className="mobile-menu">
+                    {/* Mobile Search Bar */}
+                    <div className="mobile-search-wrap">
+                        <form onSubmit={handleSearch} className="mobile-search-form">
+                            <Search className="mobile-search-icon" />
+                            <input
+                                type="text"
+                                placeholder="Search books..."
+                                className="mobile-search-input"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                autoFocus
+                            />
+                            <button type="submit" className="mobile-search-btn">Search</button>
+                        </form>
+                    </div>
                     <div className="mobile-menu-links">
                         {navLinks.map((link) => (
                             <Link

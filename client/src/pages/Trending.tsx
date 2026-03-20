@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { searchBooks, type Book } from '@/lib/api';
+import { fetchTrendingBooks, type Book } from '@/lib/api';
 import { GenreScrollRow } from '@/components/ui/GenreScrollRow';
 import { Filter, TrendingUp } from 'lucide-react';
 import '@/styles/pages.css';
@@ -30,12 +30,13 @@ export function Trending() {
 
         GENRES.forEach(async ({ genre, query }) => {
             try {
-                const books = await searchBooks(query);
-                setGenreBooks(prev => ({ ...prev, [genre]: books.slice(0, 15) }));
+                const books = await fetchTrendingBooks(query, 15);
+                setGenreBooks(prev => ({ ...prev, [genre]: books }));
             } catch { /* ignore */ }
             setGenreLoading(prev => ({ ...prev, [genre]: false }));
         });
     }, []);
+
 
     const visibleGenres = activeFilter === 'all'
         ? GENRES
