@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { fetchTrendingBooks, type Book } from '@/lib/api';
+import { fetchTrendingBooks, getStarterBooks, type Book } from '@/lib/api';
 import { GenreScrollRow } from '@/components/ui/GenreScrollRow';
 import { Filter, TrendingUp } from 'lucide-react';
 import '@/styles/pages.css';
@@ -19,19 +19,31 @@ const GENRES = [
 type FilterOption = 'all' | string;
 
 export function Trending() {
-    const [genreBooks, setGenreBooks] = useState<Record<string, Book[]>>({});
+    const [genreBooks, setGenreBooks] = useState<Record<string, Book[]>>(() => {
+        const initial: Record<string, Book[]> = {};
+        GENRES.forEach(g => {
+            initial[g.genre] = getStarterBooks(g.genre);
+        });
+        return initial;
+    });
     const [genreLoading, setGenreLoading] = useState<Record<string, boolean>>({});
     const [activeFilter, setActiveFilter] = useState<FilterOption>('all');
 
     useEffect(() => {
         const init: Record<string, boolean> = {};
-        GENRES.forEach(g => { init[g.genre] = true; });
+        GENRES.forEach(g => {
+            if (!genreBooks[g.genre] || genreBooks[g.genre].length === 0) {
+                init[g.genre] = true;
+            }
+        });
         setGenreLoading(init);
 
         GENRES.forEach(async ({ genre, query }) => {
             try {
                 const books = await fetchTrendingBooks(query, 15);
-                setGenreBooks(prev => ({ ...prev, [genre]: books }));
+                if (books && books.length > 0) {
+                    setGenreBooks(prev => ({ ...prev, [genre]: books }));
+                }
             } catch { /* ignore */ }
             setGenreLoading(prev => ({ ...prev, [genre]: false }));
         });

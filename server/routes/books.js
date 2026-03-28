@@ -126,18 +126,23 @@ function formatBook(item) {
 
 // Fallback high-quality books in case API is down/rate-limited
 function getFallbackBooks(query = '', maxResults = 20) {
+    const getGoogleCover = (id) => `https://books.google.com/books/content?id=${id}&printsec=frontcover&img=1&zoom=1&source=gbs_api`;
+
     const fallbacks = [
-        { id: '1', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', description: 'A story of wealth, love, and the American Dream.', coverUrl: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=1000&auto=format&fit=crop', rating: 4.5, publishedDate: '1925', pages: 180, genre: ['Fiction', 'Classic'] },
-        { id: '2', title: '1984', author: 'George Orwell', description: 'A dystopian masterpiece about surveillance and control.', coverUrl: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?q=80&w=1000&auto=format&fit=crop', rating: 4.8, publishedDate: '1949', pages: 328, genre: ['Dystopian', 'Political Fiction'] },
-        { id: '3', title: 'The Hobbit', author: 'J.R.R. Tolkien', description: 'Experience the journey that started it all.', coverUrl: 'https://images.unsplash.com/photo-1621351183012-e2f9972dd9bf?q=80&w=1000&auto=format&fit=crop', rating: 4.9, publishedDate: '1937', pages: 310, genre: ['Fantasy', 'Adventure'] },
-        { id: '4', title: 'Project Hail Mary', author: 'Andy Weir', description: 'A lone astronaut must save humanity.', coverUrl: 'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=1000&auto=format&fit=crop', rating: 4.7, publishedDate: '2021', pages: 476, genre: ['Sci-Fi', 'Thriller'] },
-        { id: '5', title: 'Tomorrow, and Tomorrow, and Tomorrow', author: 'Gabrielle Zevin', description: 'Spanning thirty years, from Cambridge, Massachusetts, to Venice Beach, California, and lands in between and far beyond.', coverUrl: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=1000&auto=format&fit=crop', rating: 4.6, publishedDate: '2022', pages: 416, genre: ['Fiction', 'Contemporary'] },
-        { id: '6', title: 'The Night Circus', author: 'Erin Morgenstern', description: 'A magical competition between two young illusionists.', coverUrl: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=1000&auto=format&fit=crop', rating: 4.5, publishedDate: '2011', pages: 387, genre: ['Fantasy', 'Magical Realism'] },
-        { id: '7', title: 'Atomic Habits', author: 'James Clear', description: 'An easy and proven way to build good habits and break bad ones.', coverUrl: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=1000&auto=format&fit=crop', rating: 4.8, publishedDate: '2018', pages: 320, genre: ['Non-Fiction', 'Self-Help'] },
-        { id: '8', title: 'Dune', author: 'Frank Herbert', description: 'The epic sci-fi saga of Paul Atreides.', coverUrl: 'https://images.unsplash.com/photo-1506466010722-395aa2bef877?q=80&w=1000&auto=format&fit=crop', rating: 4.7, publishedDate: '1965', pages: 412, genre: ['Sci-Fi', 'Fantasy'] },
+        { id: 'hlb_sM1AN0gC', title: 'The Hunger Games', author: 'Suzanne Collins', description: 'A televised fight to the death.', coverUrl: getGoogleCover('hlb_sM1AN0gC'), rating: 4.3, publishedDate: '2008', pages: 374, genre: ['Fiction', 'YA'] },
+        { id: 'icKmd-tlvPMC', title: 'Journey to the Center of the Earth', author: 'Jules Verne', description: 'An expedition to the core.', coverUrl: getGoogleCover('icKmd-tlvPMC'), rating: 4.5, publishedDate: '1864', pages: 240, genre: ['Fiction', 'Classic'] },
+        { id: 'A-AS46wG0p8C', title: 'The Da Vinci Code', author: 'Dan Brown', description: 'A religious conspiracy.', coverUrl: getGoogleCover('A-AS46wG0p8C'), rating: 4.5, publishedDate: '2003', pages: 454, genre: ['Thriller', 'Mystery'] },
+        { id: 'kPmLDQAAQBAJ', title: 'The Martian', author: 'Andy Weir', description: 'Stranded on Mars.', coverUrl: getGoogleCover('kPmLDQAAQBAJ'), rating: 4.7, publishedDate: '2011', pages: 369, genre: ['Sci-Fi', 'Adventure'] },
+        { id: 'GZAoAQAAIAAJ', title: 'Harry Potter and the Deathly Hallows', author: 'J.K. Rowling', description: 'The final battle.', coverUrl: getGoogleCover('GZAoAQAAIAAJ'), rating: 4.9, publishedDate: '2007', pages: 759, genre: ['Fantasy', 'YA'] },
+        { id: 'SxPUCwAAQBAJ', title: 'Me Before You', author: 'Jojo Moyes', description: 'A love story.', coverUrl: getGoogleCover('SxPUCwAAQBAJ'), rating: 4.5, publishedDate: '2012', pages: 369, genre: ['Romance'] },
+        { id: 'd2WZDgAAQBAJ', title: 'Einstein: His Life and Universe', author: 'Walter Isaacson', description: 'Life of the physicist.', coverUrl: getGoogleCover('d2WZDgAAQBAJ'), rating: 4.8, publishedDate: '2007', pages: 715, genre: ['Biography'] },
+        { id: 'O1MInVXd_aoC', title: 'The Power of Habit', author: 'Charles Duhigg', description: 'Why we do what we do.', coverUrl: getGoogleCover('O1MInVXd_aoC'), rating: 4.6, publishedDate: '2012', pages: 371, genre: ['Self-Help'] },
+        { id: '6WGhDwAAQBAJ', title: 'Think and Grow Rich', author: 'Napoleon Hill', description: 'Success principles.', coverUrl: getGoogleCover('6WGhDwAAQBAJ'), rating: 4.7, publishedDate: '1937', pages: 384, genre: ['Self-Help'] },
+        { id: 'EvqJCGeqKhsC', title: 'Pride and Prejudice', author: 'Jane Austen', description: 'Classic romance.', coverUrl: getGoogleCover('EvqJCGeqKhsC'), rating: 4.7, publishedDate: '1813', pages: 432, genre: ['Fiction', 'Classic'] },
+        { id: 'P9cHEAAAQBAJ', title: 'The Silent Patient', author: 'Alex Michaelides', description: 'A woman\'s act of violence against her husband.', coverUrl: getGoogleCover('P9cHEAAAQBAJ'), rating: 4.7, publishedDate: '2019', pages: 336, genre: ['Thriller', 'Mystery'] },
+        { id: 'S0_XAwAAQBAJ', title: 'Project Hail Mary', author: 'Andy Weir', description: 'Lone astronaut mission.', coverUrl: getGoogleCover('S0_XAwAAQBAJ'), rating: 4.9, publishedDate: '2021', pages: 496, genre: ['Sci-Fi'] },
     ];
 
-    // Simple filter logic to make fallbacks slightly more relevant
     const lowerQ = query.toLowerCase();
     let results = fallbacks.filter(b =>
         b.title.toLowerCase().includes(lowerQ) ||
