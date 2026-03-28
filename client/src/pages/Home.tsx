@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, BookOpen, Heart, Star, Eye, TrendingUp, Users, Zap } from 'lucide-react';
 import CountUp from 'react-countup';
-import { searchBooks, getBookDetails, type Book } from '@/lib/api';
+import { searchBooks, getBookDetails, getStarterBooks, type Book } from '@/lib/api';
 import { GenreScrollRow } from '@/components/ui/GenreScrollRow';
 import { getFavorites, getAllLogs, getUserLogs } from '@/lib/storage';
 import { useAuth } from '@/lib/AuthContext';
@@ -53,7 +53,13 @@ export function Home() {
     const { user, isAuthenticated } = useAuth();
     const [heroBook, setHeroBook] = useState<Book | null>(null);
     const [showcaseBooks, setShowcaseBooks] = useState<Book[]>([]);
-    const [genreData, setGenreData] = useState<Record<string, Book[]>>({});
+    const [genreData, setGenreData] = useState<Record<string, Book[]>>(() => {
+        const initial: Record<string, Book[]> = {};
+        GENRE_CONFIG.forEach(g => {
+            initial[g.genre] = getStarterBooks(g.genre);
+        });
+        return initial;
+    });
     const [genreLoading, setGenreLoading] = useState<Record<string, boolean>>({});
     const [recentBooks, setRecentBooks] = useState<Book[]>([]);
     const [heroLoading, setHeroLoading] = useState(true);
@@ -123,14 +129,21 @@ export function Home() {
 
     // Fetch genres one by one for faster initial render
     useEffect(() => {
-        const initial: Record<string, boolean> = {};
-        GENRE_CONFIG.forEach(g => { initial[g.genre] = true; });
-        setGenreLoading(initial);
+        const initialLoading: Record<string, boolean> = {};
+        GENRE_CONFIG.forEach(g => {
+            // Only show loading skeleton if we have NO books (not even static ones)
+            if (!genreData[g.genre] || genreData[g.genre].length === 0) {
+                initialLoading[g.genre] = true;
+            }
+        });
+        setGenreLoading(initialLoading);
 
         GENRE_CONFIG.forEach(async ({ genre, query }) => {
             try {
                 const books = await searchBooks(query);
-                setGenreData(prev => ({ ...prev, [genre]: books.slice(0, 15) }));
+                if (books && books.length > 0) {
+                    setGenreData(prev => ({ ...prev, [genre]: books.slice(0, 15) }));
+                }
             } catch { /* ignore */ }
             setGenreLoading(prev => ({ ...prev, [genre]: false }));
         });

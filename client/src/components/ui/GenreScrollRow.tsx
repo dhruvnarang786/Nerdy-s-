@@ -38,21 +38,15 @@ export function GenreScrollRow({ genre, books, loading, emoji = '📚' }: GenreS
                 </div>
             </div>
 
-            {loading ? (
+            {books.length === 0 && loading ? (
                 <div className="genre-row-skeleton">
                     {Array.from({ length: 8 }).map((_, i) => (
                         <div key={i} className="genre-skeleton-card" />
                     ))}
                 </div>
             ) : books.length === 0 ? (
-                <div style={{
-                    padding: '2rem 1rem',
-                    textAlign: 'center',
-                    color: 'var(--text-muted, rgba(255,255,255,0.45))',
-                    fontSize: '0.9rem',
-                    fontStyle: 'italic',
-                }}>
-                    📚 Books loading as server wakes up — check back in a moment…
+                <div className="genre-no-books">
+                    No books found in this category.
                 </div>
             ) : (
                 <div className="genre-row-scroll" ref={scrollRef}>
