@@ -28,6 +28,14 @@ export function FloatingAIBot() {
                     <circle cx="26.5" cy="17.5" r="1.5" fill="#7c3aed" />
                     {/* Smile */}
                     <path d="M13 25 Q20 30 27 25" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.85" />
+
+                    {/* Waving Hand */}
+                    <g className="bot-hand-wave">
+                        <path d="M30 28 C32 26 35 26 37 28 L38 32 C38 34 36 36 34 36 L30 36 Z" fill="white" opacity="0.9" />
+                        <path d="M33 26 L33 24" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                        <path d="M35 26.5 L36 24.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                    </g>
+
                     {/* Sparkles */}
                     <path d="M7 8 L7.8 10 L10 10 L8.4 11.4 L9 13.5 L7 12.2 L5 13.5 L5.6 11.4 L4 10 L6.2 10 Z" fill="#f0abfc" opacity="0.8" />
                     <path d="M33 8 L33.5 9.5 L35 9.5 L33.9 10.4 L34.3 12 L33 11.1 L31.7 12 L32.1 10.4 L31 9.5 L32.5 9.5 Z" fill="#f0abfc" opacity="0.6" />

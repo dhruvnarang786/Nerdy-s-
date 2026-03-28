@@ -21,6 +21,17 @@ export function Login() {
         if (warmupTimer.current) clearTimeout(warmupTimer.current);
     }, []);
 
+    const isColdStartError = (msg: string) =>
+        msg.toLowerCase().includes('starting up') ||
+        msg.toLowerCase().includes('failed to fetch') ||
+        msg.toLowerCase().includes('network');
+
+    const handleRetry = () => {
+        if (email && password) {
+            handleSubmit(new Event('submit') as unknown as React.FormEvent);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
@@ -59,9 +70,36 @@ export function Login() {
                 </div>
 
                 {error && (
-                    <div className="auth-error">
+                    <div className="auth-error" style={isColdStartError(error) ? { background: 'rgba(212, 175, 55, 0.12)', border: '1px solid rgba(212, 175, 55, 0.4)', color: '#d4af37' } : undefined}>
                         <AlertCircle className="auth-error-icon" />
-                        <span>{error}</span>
+                        <div style={{ flex: 1 }}>
+                            {isColdStartError(error) ? (
+                                <>
+                                    <span>Our server is waking up (free hosting) — this usually takes ~30 seconds on first visit.</span>
+                                    <button
+                                        type="button"
+                                        onClick={handleRetry}
+                                        disabled={loading}
+                                        style={{
+                                            display: 'inline-block',
+                                            marginLeft: '0.5rem',
+                                            padding: '0.2rem 0.7rem',
+                                            borderRadius: '0.5rem',
+                                            border: '1px solid rgba(212, 175, 55, 0.5)',
+                                            background: 'rgba(212, 175, 55, 0.18)',
+                                            color: '#d4af37',
+                                            cursor: 'pointer',
+                                            fontSize: '0.85rem',
+                                            fontWeight: 600,
+                                        }}
+                                    >
+                                        {loading ? 'Retrying…' : 'Try Again'}
+                                    </button>
+                                </>
+                            ) : (
+                                <span>{error}</span>
+                            )}
+                        </div>
                     </div>
                 )}
 

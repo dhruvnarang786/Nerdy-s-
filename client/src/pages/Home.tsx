@@ -231,10 +231,10 @@ export function Home() {
             {/* ── WHAT NERDY'S LETS YOU DO ─────────────────────── */}
             {!isAuthenticated && (
                 <section className="lb-features-section page-container-inner">
-                    <h2 className="lb-features-heading">NERDY'S LETS YOU…</h2>
+                    <h2 className="lb-features-heading animate-fade-in-up">NERDY'S LETS YOU…</h2>
                     <div className="lb-features-grid">
-                        {FEATURE_CARDS.map(({ icon: Icon, title, desc, color }) => (
-                            <div key={title} className="lb-feature-card">
+                        {FEATURE_CARDS.map(({ icon: Icon, title, desc, color }, i) => (
+                            <div key={title} className="lb-feature-card premium-card animate-fade-in-up" style={{ animationDelay: `${(i + 1) * 150}ms` }}>
                                 <div className="lb-feature-icon-wrap" style={{ background: `${color}22`, border: `1px solid ${color}44` }}>
                                     <Icon className="lb-feature-icon" style={{ color }} />
                                 </div>

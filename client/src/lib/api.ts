@@ -41,13 +41,39 @@ export const api = {
     }
 };
 
+// ─── Retry helper for book API calls ──────────────────────────────────────────
+// Retries on network / timeout errors so the Trending + Home pages auto-recover
+// once Render finishes its cold start.
+
+async function fetchWithRetry(url: string, retries = 2, backoffMs = 3000): Promise<Response> {
+    for (let i = 0; i <= retries; i++) {
+        try {
+            const res = await fetch(url);
+            if (res.ok) return res;
+            // On server error (5xx), retry
+            if (res.status >= 500 && i < retries) {
+                await new Promise(r => setTimeout(r, backoffMs * (i + 1)));
+                continue;
+            }
+            return res; // 4xx → don't retry
+        } catch (err) {
+            if (i < retries) {
+                await new Promise(r => setTimeout(r, backoffMs * (i + 1)));
+                continue;
+            }
+            throw err;
+        }
+    }
+    return fetch(url); // fallback (should not reach here)
+}
+
 // ─── Book API calls — all proxied through our backend ───────────────────────
 // This avoids college/corporate networks that block googleapis.com directly.
 
 export async function searchBooks(query: string): Promise<Book[]> {
     if (!query) return [];
     try {
-        const res = await fetch(`${BASE_URL}/api/books/search?q=${encodeURIComponent(query)}&maxResults=20`);
+        const res = await fetchWithRetry(`${BASE_URL}/api/books/search?q=${encodeURIComponent(query)}&maxResults=20`);
         if (!res.ok) return [];
         return await res.json();
     } catch (error) {
@@ -58,7 +84,7 @@ export async function searchBooks(query: string): Promise<Book[]> {
 
 export async function fetchTrendingBooks(query = 'bestselling fiction', maxResults = 15): Promise<Book[]> {
     try {
-        const res = await fetch(`${BASE_URL}/api/books/trending?query=${encodeURIComponent(query)}&maxResults=${maxResults}`);
+        const res = await fetchWithRetry(`${BASE_URL}/api/books/trending?query=${encodeURIComponent(query)}&maxResults=${maxResults}`);
         if (!res.ok) return [];
         return await res.json();
     } catch (e) {
@@ -69,7 +95,7 @@ export async function fetchTrendingBooks(query = 'bestselling fiction', maxResul
 
 export async function getBookDetails(id: string): Promise<Book | null> {
     try {
-        const res = await fetch(`${BASE_URL}/api/books/${id}`);
+        const res = await fetchWithRetry(`${BASE_URL}/api/books/${id}`);
         if (!res.ok) return null;
         return await res.json();
     } catch (error) {

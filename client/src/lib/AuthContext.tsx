@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { api, setToken, clearToken } from '@/lib/apiClient';
+import { api, setToken, clearToken, wakeUpServer } from '@/lib/apiClient';
 
 interface User {
     id: number;
@@ -22,6 +22,11 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+
+    // Wake up the Render server as early as possible (fire-and-forget)
+    useEffect(() => {
+        wakeUpServer();
+    }, []);
 
     // Restore session on mount
     useEffect(() => {
