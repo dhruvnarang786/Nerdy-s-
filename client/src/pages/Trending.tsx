@@ -1,13 +1,14 @@
 
 import { useEffect, useState } from 'react';
-import { fetchTrendingBooks, getStarterBooks, type Book } from '@/lib/api';
+import { fetchTrendingBooks, type Book } from '@/lib/api';
+import { STARTER_BOOKS } from '@/lib/staticBooks';
 import { GenreScrollRow } from '@/components/ui/GenreScrollRow';
 import { Filter, TrendingUp } from 'lucide-react';
 import '@/styles/pages.css';
 
 const GENRES = [
     { genre: 'Fiction', emoji: '✨', query: 'subject:fiction bestselling' },
-    { genre: 'Mystery & Thriller', emoji: '🕵️', query: 'subject:mystery thriller popular' },
+    { genre: 'Mystery & Thriller', emoji: '🕵️', query: 'subject:mystery' },
     { genre: 'Science Fiction', emoji: '🚀', query: 'subject:science fiction' },
     { genre: 'Fantasy', emoji: '🧙', query: 'subject:fantasy popular' },
     { genre: 'Romance', emoji: '💕', query: 'subject:romance' },
@@ -19,28 +20,15 @@ const GENRES = [
 type FilterOption = 'all' | string;
 
 export function Trending() {
-    const [genreBooks, setGenreBooks] = useState<Record<string, Book[]>>(() => {
-        const initial: Record<string, Book[]> = {};
-        GENRES.forEach(g => {
-            initial[g.genre] = getStarterBooks(g.genre);
-        });
-        return initial;
-    });
+    const [genreBooks, setGenreBooks] = useState<Record<string, Book[]>>(STARTER_BOOKS);
     const [genreLoading, setGenreLoading] = useState<Record<string, boolean>>({});
     const [activeFilter, setActiveFilter] = useState<FilterOption>('all');
 
     useEffect(() => {
-        const init: Record<string, boolean> = {};
-        GENRES.forEach(g => {
-            if (!genreBooks[g.genre] || genreBooks[g.genre].length === 0) {
-                init[g.genre] = true;
-            }
-        });
-        setGenreLoading(init);
-
         GENRES.forEach(async ({ genre, query }) => {
+            setGenreLoading(prev => ({ ...prev, [genre]: true }));
             try {
-                const books = await fetchTrendingBooks(query, 15);
+                const { books } = await fetchTrendingBooks(query, 20, 0);
                 if (books && books.length > 0) {
                     setGenreBooks(prev => ({ ...prev, [genre]: books }));
                 }

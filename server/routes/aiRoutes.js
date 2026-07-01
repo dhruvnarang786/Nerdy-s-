@@ -1,5 +1,9 @@
 
 import express from 'express';
+import { BookService } from '../services/BookService.js';
+import { toApiFormat } from '../utils/normalizeBook.js';
+const bookProvider = new BookService();
+
 const router = express.Router();
 
 // ─── Mood Recommender ─────────────────────────────────────────────────────────
@@ -42,26 +46,10 @@ const TIME_TO_PAGES = {
 router.post('/recommend', async (req, res) => {
     const { mood, time } = req.body;
     const query = MOOD_TO_QUERY[mood] || mood || 'bestseller fiction';
-    const params = TIME_TO_PAGES[time] || 'maxResults=8';
+    const timeLimit = (TIME_TO_PAGES[time] && parseInt(TIME_TO_PAGES[time].match(/\d+/)?.[0] || '8')) || 8;
     try {
-        const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&${params}&orderBy=relevance&langRestrict=en`;
-        const response = await fetch(url);
-        const data = await response.json();
-        if (!data.items || data.items.length === 0) return res.json([]);
-        const books = data.items
-            .filter(item => item.volumeInfo?.imageLinks?.thumbnail)
-            .slice(0, 8)
-            .map(item => ({
-                id: item.id,
-                title: item.volumeInfo.title || 'Unknown Title',
-                author: item.volumeInfo.authors ? item.volumeInfo.authors.join(', ') : 'Unknown Author',
-                coverUrl: item.volumeInfo.imageLinks.thumbnail.replace('http:', 'https:'),
-                rating: item.volumeInfo.averageRating || 0,
-                description: item.volumeInfo.description || '',
-                publishedDate: item.volumeInfo.publishedDate || '',
-                pages: item.volumeInfo.pageCount || 0,
-                genre: item.volumeInfo.categories || [],
-            }));
+        const result = await bookProvider.search(query, timeLimit * 2, 0);
+        const books = result.books.slice(0, timeLimit).map(toApiFormat);
         res.json(books);
     } catch (error) {
         console.error('AI recommend error:', error);

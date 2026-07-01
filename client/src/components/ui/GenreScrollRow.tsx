@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { memo, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { type Book } from '@/lib/api';
 import { BookCard } from '@/components/ui/BookCard';
@@ -11,7 +11,7 @@ interface GenreScrollRowProps {
     emoji?: string;
 }
 
-export function GenreScrollRow({ genre, books, loading, emoji = '📚' }: GenreScrollRowProps) {
+export const GenreScrollRow = memo(function GenreScrollRow({ genre, books, loading, emoji = '📚' }: GenreScrollRowProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const scroll = (dir: 'left' | 'right') => {
@@ -60,4 +60,4 @@ export function GenreScrollRow({ genre, books, loading, emoji = '📚' }: GenreS
             )}
         </div>
     );
-}
+});
