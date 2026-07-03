@@ -2,7 +2,7 @@ import { OpenLibraryProvider } from '../providers/OpenLibraryProvider.js';
 import { GoogleBooksProvider } from '../providers/GoogleBooksProvider.js';
 import { deduplicateBooks } from '../utils/deduplicateBooks.js';
 
-const SUFFICIENT_RESULTS = 10;
+const SUFFICIENT_RESULTS = 5;
 const CACHE = new Map();
 const CACHE_TTL_MS = 10 * 60 * 1000;
 
