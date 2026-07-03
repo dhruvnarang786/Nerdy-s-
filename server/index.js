@@ -28,9 +28,15 @@ export const prisma = new PrismaClient({ adapter });
 const app = express();
 const httpServer = createServer(app);
 
+const allowedOrigins = [
+    process.env.CLIENT_URL,
+    'http://localhost:5173',
+    'https://nerdy-s-five.vercel.app',
+].filter(Boolean);
+
 const io = new Server(httpServer, {
     cors: {
-        origin: [process.env.CLIENT_URL, 'http://localhost:5173'],
+        origin: allowedOrigins,
         methods: ['GET', 'POST'],
         credentials: true,
     },
@@ -38,7 +44,7 @@ const io = new Server(httpServer, {
 
 // Middleware
 app.use(cors({
-    origin: [process.env.CLIENT_URL , 'http://localhost:5173'],
+    origin: allowedOrigins,
     credentials: true
 }));
 app.use(express.json());
