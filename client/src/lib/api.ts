@@ -45,7 +45,7 @@ export const api = {
 // may take up to 18s per request. The timeout must be generous enough to let the
 // server finish its external API calls before the client gives up.
 
-const FETCH_TIMEOUT_MS = 25000;
+const FETCH_TIMEOUT_MS = 60000;
 const MAX_RETRIES = 2;
 const BASE_BACKOFF_MS = 1500;
 
@@ -90,7 +90,8 @@ export async function searchBooks(query: string, startIndex = 0, maxResults = 20
         console.log(`[api] searchBooks "${query}" → ${data.books?.length ?? 0} results`);
         return data;
     } catch (error) {
-        console.error(`[api] searchBooks "${query}" failed — server unreachable?`, error);
+        const isAbort = error instanceof Error && error.name === 'AbortError';
+        console.warn(`[api] searchBooks "${query}" ${isAbort ? 'timed out' : 'failed'} — server unreachable or slow.`, error);
         return { books: [], totalItems: 0 };
     }
 }
@@ -106,7 +107,8 @@ export async function getBookDetails(id: string): Promise<Book | null> {
         }
         return await res.json();
     } catch (error) {
-        console.error(`[api] getBookDetails "${id}" failed — server unreachable?`, error);
+        const isAbort = error instanceof Error && error.name === 'AbortError';
+        console.warn(`[api] getBookDetails "${id}" ${isAbort ? 'timed out' : 'failed'} — server unreachable or slow.`, error);
         return null;
     }
 }

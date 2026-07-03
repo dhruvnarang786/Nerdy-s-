@@ -5,12 +5,12 @@ export interface GenreConfigItem {
 }
 
 export const GENRE_CONFIG: GenreConfigItem[] = [
-    { genre: 'Fiction', emoji: '✨', query: 'subject:fiction bestselling' },
-    { genre: 'Mystery & Thriller', emoji: '🕵️', query: 'subject:mystery' },
-    { genre: 'Science Fiction', emoji: '🚀', query: 'subject:science fiction' },
-    { genre: 'Fantasy', emoji: '🧙', query: 'subject:fantasy popular' },
-    { genre: 'Romance', emoji: '💕', query: 'subject:romance' },
-    { genre: 'History', emoji: '📜', query: 'subject:history nonfiction' },
-    { genre: 'Biography', emoji: '👤', query: 'subject:biography memoir' },
-    { genre: 'Self-Help', emoji: '💡', query: 'subject:self help personal development' },
+    { genre: 'Fiction', emoji: '✨', query: 'fiction bestsellers' },
+    { genre: 'Mystery & Thriller', emoji: '🕵️', query: 'mystery thriller' },
+    { genre: 'Science Fiction', emoji: '🚀', query: 'science fiction' },
+    { genre: 'Fantasy', emoji: '🧙', query: 'fantasy popular' },
+    { genre: 'Romance', emoji: '💕', query: 'romance novels' },
+    { genre: 'History', emoji: '📜', query: 'history nonfiction' },
+    { genre: 'Biography', emoji: '👤', query: 'biography memoir' },
+    { genre: 'Self-Help', emoji: '💡', query: 'self help personal development' },
 ];
