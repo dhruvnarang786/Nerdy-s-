@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, BookOpen, MessageSquare, Users, Library, Star, Target, ArrowRight, Bookmark, CheckCircle, Smartphone, Edit3 } from 'lucide-react';
+import { BookOpen, MessageSquare, Users, Library, Star, ArrowRight, Bookmark, CheckCircle, Edit3 } from 'lucide-react';
 import '@/styles/pages.css';
 import '@/styles/bento.css';
 const FEATURED_BOOKS = [
