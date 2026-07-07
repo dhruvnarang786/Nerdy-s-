@@ -9,6 +9,8 @@ import { GenreScrollRow } from '@/components/ui/GenreScrollRow';
 import { getFavorites, getAllLogs, getUserLogs } from '@/lib/storage';
 import { useAuth } from '@/lib/AuthContext';
 import '@/styles/pages.css';
+import { Landing } from './Landing';
+
 
 const FEATURE_CARDS = [
     { icon: Eye, title: 'Track every book', desc: 'Keep a diary of every book you read, starting from whenever you join.', color: '#7c3aed' },
@@ -126,6 +128,10 @@ export function Home() {
             setGenreLoading(prev => ({ ...prev, [genre]: false }));
         });
     }, []);
+
+    if (!isAuthenticated) {
+        return <Landing />;
+    }
 
     return (
         <div className="home-wrapper" style={{ position: 'relative', minHeight: '100vh' }}>

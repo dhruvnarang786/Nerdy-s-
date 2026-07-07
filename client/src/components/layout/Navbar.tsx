@@ -24,7 +24,13 @@ export function Navbar() {
         navigate('/');
     };
 
-    const navLinks = [
+    const publicNavLinks = [
+        { name: 'Home', href: '/' },
+        { name: 'About Us', href: '/about' },
+        { name: 'Profile / Dashboard', href: '/login' },
+    ];
+
+    const authNavLinks = [
         { name: 'Home', href: '/' },
         { name: 'Trending', href: '/trending' },
         { name: 'Favorites', href: '/favorites' },
@@ -32,6 +38,8 @@ export function Navbar() {
         { name: 'My Journal', href: '/journal' },
         { name: 'My DNA', href: '/dna' },
     ];
+
+    const activeNavLinks = isAuthenticated ? authNavLinks : publicNavLinks;
 
     return (
         <nav className="navbar animate-fade-in-up">
@@ -45,7 +53,7 @@ export function Navbar() {
                     </div>
 
                     <div className="navbar-links">
-                        {navLinks.map((link, index) => (
+                        {activeNavLinks.map((link, index) => (
                             <Link
                                 key={link.name}
                                 to={link.href}
@@ -125,7 +133,7 @@ export function Navbar() {
                         </form>
                     </div>
                     <div className="mobile-menu-links">
-                        {navLinks.map((link) => (
+                        {activeNavLinks.map((link) => (
                             <Link
                                 key={link.name}
                                 to={link.href}
