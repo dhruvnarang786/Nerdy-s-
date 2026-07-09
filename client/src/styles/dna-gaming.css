@@ -951,3 +951,47 @@
     font-weight: 700;
     color: rgba(255, 255, 255, 0.8);
 }
+
+/* Archetype & Narrative */
+.gaming-archetype-banner {
+    animation: fade-in-up 0.4s ease;
+}
+
+.gaming-narrative-box {
+    animation: fade-in-up 0.4s ease 0.1s both;
+}
+
+.gaming-narrative-box p {
+    position: relative;
+    padding-left: 1rem;
+}
+
+.gaming-narrative-box p::before {
+    content: '"';
+    position: absolute;
+    left: 0;
+    top: -0.2rem;
+    font-size: 1.5rem;
+    color: rgba(99, 102, 241, 0.4);
+    line-height: 1;
+}
+
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

@@ -1,6 +1,7 @@
 import express from 'express';
 import { prisma } from '../index.js';
 import { requireAuth } from '../middleware/auth.js';
+import { dnaEventService } from '../services/dna/index.js';
 
 const router = express.Router();
 
@@ -97,6 +98,10 @@ router.post('/', requireAuth, async (req, res) => {
                 userId: req.user.id,
             }
         });
+        // Emit DNA event for async recompute
+        try {
+            dnaEventService.emit('log.created', { userId: req.user.id, log });
+        } catch (_) { /* non-blocking */ }
         res.status(201).json({ log });
     } catch (err) {
         console.error(err);
@@ -112,6 +117,10 @@ router.delete('/:id', requireAuth, async (req, res) => {
             return res.status(403).json({ error: 'Not allowed' });
         }
         await prisma.bookLog.delete({ where: { id: Number(req.params.id) } });
+        // Emit DNA event
+        try {
+            dnaEventService.emit('log.deleted', { userId: req.user.id, log });
+        } catch (_) { /* non-blocking */ }
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: 'Server error' });

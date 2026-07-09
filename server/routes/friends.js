@@ -14,7 +14,6 @@ router.get('/', requireAuth, async (req, res) => {
                     select: {
                         id: true,
                         username: true,
-                        bio: true,
                         _count: {
                             select: { logs: true }
                         }

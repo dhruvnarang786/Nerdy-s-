@@ -16,6 +16,14 @@ model User {
   logs         BookLog[]
   favorites    Favorite[]
   messages     Message[]
+
+  dnaSnapshot     DNASnapshot?
+  badges          Badge[]
+  genreAffinities GenreAffinity[]
+  dnaEvents       DnaActivityEvent[]
+
+  friends  User[] @relation("UserFriends")
+  friendOf User[] @relation("UserFriends")
 }
 
 model BookLog {
@@ -64,4 +72,111 @@ model Message {
   roomId    Int
   room      ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ── My DNA Models ──
+
+/// One row per user. The single source of truth for all derived DNA state.
+/// Written during snapshot recomputation; read by every DNA API call.
+model DNASnapshot {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  version   Int      @default(1)
+  computedAt DateTime @default(now())
+  staleAfter DateTime
+
+  // Scalar stats (indexed for leaderboard queries)
+  totalLogs         Int    @default(0)
+  booksThisYear     Int    @default(0)
+  avgRating         Float  @default(0)
+  currentStreak     Int    @default(0)
+  bestStreak        Int    @default(0)
+  level             Int    @default(1)
+  xp                Int    @default(0)
+  totalFavorites    Int    @default(0)
+  spoilerRatio      Float  @default(0)
+
+  metrics       Json @default("{}")
+  heatmap       Json @default("{}")
+  trends        Json @default("{}")
+  personality   Json @default("{}")
+  narration     Json @default("{}")
+  badgeSummary  Json @default("{}")
+  genreSummary  Json @default("{}")
+
+  dataVersion    String @default("v1")
+  badgeDefVersion String @default("v1")
+
+  @@index([userId])
+  @@index([computedAt])
+  @@index([level])
+  @@index([currentStreak])
+  @@index([booksThisYear])
+}
+
+/// One row per user per badge tier. Updated on every snapshot recomputation.
+/// Badge definitions live in badges_v1.json, not in the database.
+model Badge {
+  id         Int      @id @default(autoincrement())
+  badgeId    String
+  family     String
+  tier       String
+  unlocked   Boolean  @default(false)
+  progress   Float    @default(0)
+  progressLabel String?
+  unlockedAt DateTime?
+  reason     String?
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId, family])
+  @@index([userId, unlocked])
+  @@index([badgeId, unlocked])
+}
+
+/// One row per user per genre. Updated on snapshot recomputation.
+model GenreAffinity {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  genre     String
+  affinity  Float    @default(0)
+  count     Int      @default(0)
+  trend     String   @default("stable")
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([userId, genre])
+  @@index([userId, affinity])
+  @@index([affinity])
+}
+
+/// Append-only event log. Every user action that affects DNA is recorded here.
+model DnaActivityEvent {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventType String
+  payload   Json
+  timestamp DateTime @default(now())
+  processedSnapshotVersion Int?
+
+  @@index([userId, timestamp])
+  @@index([eventType, timestamp])
+  @@index([timestamp])
+  @@index([userId, processedSnapshotVersion])
+}
+
+/// Lookup table mapping author names to countries of origin.
+model AuthorCountry {
+  id      Int      @id @default(autoincrement())
+  author  String   @unique
+  country String
+  provider String
+  resolvedAt DateTime
+  attempts Int    @default(0)
+
+  @@index([country])
 }

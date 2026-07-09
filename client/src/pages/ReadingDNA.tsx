@@ -2,26 +2,10 @@ import { useState, useEffect } from 'react';
 import { ResponsiveContainer, AreaChart, Area, RadarChart, PolarGrid, PolarAngleAxis, Radar, XAxis } from 'recharts';
 import { api } from '@/lib/apiClient';
 import { useAuth } from '@/lib/AuthContext';
-import { Check, Flame, Star, Moon, Sun, BookHeart, Library, Edit3, UserPlus, Shield, Zap, Lock } from 'lucide-react';
+import { useDnaSnapshot, useDnaRefresh } from '@/lib/dnaApi';
+import type { DnaSnapshot } from '@/lib/dnaApi';
+import { Check, Flame, Star, Moon, Sun, BookHeart, Library, Edit3, UserPlus, Shield, Zap, Lock, RefreshCw } from 'lucide-react';
 import '@/styles/dna-gaming.css';
-
-interface DNAStats {
-    stats: {
-        booksReadThisYear: number;
-        avgRating: string | number;
-        currentStreak: number;
-        totalLogs: number;
-        heatmap: number[];
-    };
-    badges: {
-        nightOwl: boolean;
-        weekendWarrior: boolean;
-        sevenDayStreak: boolean;
-        thirtyDayStreak: boolean;
-    };
-    genres: { name: string; value: number }[];
-    recentBooks?: { id: string; title: string; author: string; coverUrl: string }[];
-}
 
 interface Friend {
     id: number;
@@ -49,8 +33,8 @@ function BadgeCard({ value, max, label, active, color, glow, bg, Icon, motivatio
     const circumference = 2 * Math.PI * radius;
     const progress = Math.min(value / max, 1);
     const dashOffset = circumference - progress * circumference;
-    const iconSize = 78;   // SVG canvas
-    const iconPad = 8;     // padding inside SVG for progress ring
+    const iconSize = 78;
+    const iconPad = 8;
 
     return (
         <div
@@ -61,15 +45,11 @@ function BadgeCard({ value, max, label, active, color, glow, bg, Icon, motivatio
                 '--badge-bg': bg,
             } as React.CSSProperties}
         >
-            {/* label */}
             <p className="gaming-achiever-label">{label}</p>
 
-            {/* icon + progress ring */}
             <div className="gaming-badge-icon-wrap" style={{ width: 78, height: 78 }}>
-                {/* sparkle dot */}
                 {active && <span className="gaming-badge-sparkle" />}
 
-                {/* progress ring drawn as SVG around the icon */}
                 <svg
                     className="gaming-badge-progress-svg"
                     width={iconSize + iconPad * 2}
@@ -96,18 +76,15 @@ function BadgeCard({ value, max, label, active, color, glow, bg, Icon, motivatio
 
                 <Icon size={32} color={active ? color : '#475569'} />
 
-                {/* check / lock indicator */}
                 {active
                     ? <span className="gaming-badge-check">✓</span>
                     : <span className="gaming-badge-lock"><Lock size={10} /></span>
                 }
             </div>
 
-            {/* value progress */}
             <div className="gaming-badge-progress-text">{value}</div>
             <div className="gaming-badge-max-text">of {max}</div>
 
-            {/* motivational tagline shown on hover */}
             <div className="gaming-badge-motivation">{motivation}</div>
         </div>
     );
@@ -115,9 +92,7 @@ function BadgeCard({ value, max, label, active, color, glow, bg, Icon, motivatio
 
 export function ReadingDNA() {
     const { isAuthenticated, user, loading: authLoading } = useAuth();
-    const [dna, setDna] = useState<DNAStats | null>(null);
     const [friends, setFriends] = useState<Friend[]>([]);
-    const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('Overview');
 
     // Bio Edit State
@@ -128,24 +103,14 @@ export function ReadingDNA() {
     const [friendUsername, setFriendUsername] = useState('');
     const [friendMsg, setFriendMsg] = useState('');
 
+    const { data: dna, isLoading: dnaLoading, error: dnaError } = useDnaSnapshot();
+    const refreshMutation = useDnaRefresh();
+
+    // Fetch friends list (kept as-is since not part of DNA)
     useEffect(() => {
-        if (!isAuthenticated || authLoading) return;
-
-        const fetchData = async () => {
-            try {
-                const res = await api.get<DNAStats>('/api/dna');
-                setDna(res);
-
-                const fRes = await api.get<{ friends: Friend[] }>('/api/friends');
-                setFriends(fRes.friends);
-            } catch (err) {
-                console.error("Failed to fetch DNA stats:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [isAuthenticated, authLoading]);
+        if (!isAuthenticated) return;
+        api.get<{ friends: Friend[] }>('/api/friends').then(r => setFriends(r.friends)).catch(() => {});
+    }, [isAuthenticated]);
 
     const handleSaveBio = async () => {
         try {
@@ -171,7 +136,7 @@ export function ReadingDNA() {
         }
     };
 
-    if (authLoading || loading) {
+    if (authLoading || dnaLoading) {
         return (
             <div className="lb-page-container flex-center" style={{ minHeight: '80vh' }}>
                 <div className="loading-spinner"></div>
@@ -190,9 +155,23 @@ export function ReadingDNA() {
         );
     }
 
-    if (!dna) return null;
+    if (dnaError || !dna?.exists) {
+        return (
+            <div className="lb-page-container flex-center" style={{ minHeight: '80vh' }}>
+                <div className="auth-prompt-box glass-panel text-center">
+                    <h2 className="lb-section-title">Your DNA is Forming</h2>
+                    <p className="lb-body-text">Start logging books to build your reading identity!</p>
+                </div>
+            </div>
+        );
+    }
 
-    const { stats, badges, genres, recentBooks = [] } = dna;
+    const stats = dna.stats || { totalLogs: 0, booksThisYear: 0, currentStreak: 0, avgRating: 0, heatmap: [] as number[] };
+    const rawGenres = (dna.genres || []).map(g => ({ name: g.genre, value: Math.round(g.affinity * 100) }));
+    const genres = rawGenres.length ? rawGenres : dna.genreAffinities?.map(g => ({ name: g.genre, value: Math.round(g.affinity * 100) })) || dna.topGenres || [];
+    const badges = dna.badges || [];
+    const recentBooks: { id: string; title: string; author: string; coverUrl: string }[] = [];
+
     const activeBook = recentBooks[0];
     const topBooks = recentBooks.slice(1, 5);
 
@@ -206,16 +185,20 @@ export function ReadingDNA() {
         { name: 'Sun', hours: 4.8 },
     ];
 
+    const hasNightOwl = badges.some(b => b.badgeId === 'nightOwl');
+    const hasWeekendWarrior = badges.some(b => b.badgeId === 'weekendWarrior');
+    const hasSevenDayStreak = badges.some(b => b.badgeId === 'streak_7day');
+    const hasThirtyDayStreak = badges.some(b => b.badgeId === 'streak_30day');
+
     const allBadges = [
-        { id: 'b10', name: '10 Books', desc: 'Read 10 books this year', earned: stats.booksReadThisYear >= 10, icon: BookHeart, color: '#f43f5e' },
+        { id: 'b10', name: '10 Books', desc: 'Read 10 books this year', earned: stats.booksThisYear >= 10, icon: BookHeart, color: '#f43f5e' },
         { id: 'b50', name: '50 Reviews', desc: 'Log 50 total books', earned: stats.totalLogs >= 50, icon: Shield, color: '#0ea5e9' },
-        { id: 's7', name: '1 Week Streak', desc: 'Read 7 days in a row', earned: badges.sevenDayStreak, icon: Flame, color: '#f97316' },
-        { id: 's30', name: '1 Month Streak', desc: 'Read 30 days in a row', earned: badges.thirtyDayStreak, icon: Zap, color: '#eab308' },
-        { id: 'n1', name: 'Night Owl', desc: 'Read mostly late at night', earned: badges.nightOwl, icon: Moon, color: '#8b5cf6' },
-        { id: 'w1', name: 'Weekender', desc: 'Read mostly on weekends', earned: badges.weekendWarrior, icon: Sun, color: '#f59e0b' },
+        { id: 's7', name: '1 Week Streak', desc: 'Read 7 days in a row', earned: hasSevenDayStreak, icon: Flame, color: '#f97316' },
+        { id: 's30', name: '1 Month Streak', desc: 'Read 30 days in a row', earned: hasThirtyDayStreak, icon: Zap, color: '#eab308' },
+        { id: 'n1', name: 'Night Owl', desc: 'Read mostly late at night', earned: hasNightOwl, icon: Moon, color: '#8b5cf6' },
+        { id: 'w1', name: 'Weekender', desc: 'Read mostly on weekends', earned: hasWeekendWarrior, icon: Sun, color: '#f59e0b' },
     ];
 
-    // Rank item definitions with glow colours
     const rankItems = [
         {
             icon: <Flame size={32} color={stats.currentStreak > 0 ? "#f97316" : "#475569"} />,
@@ -227,35 +210,34 @@ export function ReadingDNA() {
         {
             icon: <Star size={32} color="#0ea5e9" />,
             title: 'Avg Rating',
-            sub: `${stats.avgRating} ★`,
+            sub: `${typeof stats.avgRating === 'number' ? stats.avgRating.toFixed(1) : stats.avgRating} ★`,
             glowColor: 'rgba(14,165,233,0.45)',
             tooltip: `⭐ Your average rating across all logs`,
         },
         {
-            icon: <Moon size={32} color={badges.nightOwl ? "#8b5cf6" : "#475569"} />,
+            icon: <Moon size={32} color={hasNightOwl ? "#8b5cf6" : "#475569"} />,
             title: 'Night Owl',
-            sub: badges.nightOwl ? "Unlocked" : "Locked",
+            sub: hasNightOwl ? "Unlocked" : "Locked",
             glowColor: 'rgba(139,92,246,0.45)',
-            tooltip: badges.nightOwl ? '🦉 You read late into the night!' : 'Read often after 10 PM to unlock',
+            tooltip: hasNightOwl ? '🦉 You read late into the night!' : 'Read often after 10 PM to unlock',
         },
         {
-            icon: <Sun size={32} color={badges.weekendWarrior ? "#f59e0b" : "#475569"} />,
+            icon: <Sun size={32} color={hasWeekendWarrior ? "#f59e0b" : "#475569"} />,
             title: 'Weekender',
-            sub: badges.weekendWarrior ? "Unlocked" : "Locked",
+            sub: hasWeekendWarrior ? "Unlocked" : "Locked",
             glowColor: 'rgba(245,158,11,0.45)',
-            tooltip: badges.weekendWarrior ? '☀️ Weekend reading champion!' : 'Read mostly on weekends to unlock',
+            tooltip: hasWeekendWarrior ? '☀️ Weekend reading champion!' : 'Read mostly on weekends to unlock',
         },
     ];
 
-    // Badge card definitions
     const badgeCards = [
         {
-            value: stats.booksReadThisYear, max: 10,
+            value: stats.booksThisYear, max: 10,
             label: '10 Books Read',
-            active: stats.booksReadThisYear >= 10,
+            active: stats.booksThisYear >= 10,
             color: '#f43f5e', glow: 'rgba(244,63,94,0.4)', bg: 'rgba(244,63,94,0.12)',
             Icon: BookHeart,
-            motivation: stats.booksReadThisYear >= 10 ? '🎉 Bookworm unlocked!' : `${10 - stats.booksReadThisYear} more to unlock!`,
+            motivation: stats.booksThisYear >= 10 ? '🎉 Bookworm unlocked!' : `${10 - stats.booksThisYear} more to unlock!`,
         },
         {
             value: stats.totalLogs, max: 50,
@@ -268,20 +250,23 @@ export function ReadingDNA() {
         {
             value: stats.currentStreak, max: 7,
             label: '7 Day Streak',
-            active: badges.sevenDayStreak,
+            active: hasSevenDayStreak,
             color: '#f97316', glow: 'rgba(249,115,22,0.4)', bg: 'rgba(249,115,22,0.12)',
             Icon: Flame,
-            motivation: badges.sevenDayStreak ? '🔥 One week strong!' : 'Read every day this week!',
+            motivation: hasSevenDayStreak ? '🔥 One week strong!' : 'Read every day this week!',
         },
         {
             value: stats.currentStreak, max: 30,
             label: '30 Day Streak',
-            active: badges.thirtyDayStreak,
+            active: hasThirtyDayStreak,
             color: '#eab308', glow: 'rgba(234,179,8,0.4)', bg: 'rgba(234,179,8,0.12)',
             Icon: Zap,
-            motivation: badges.thirtyDayStreak ? '⚡ Month-long legend!' : 'Stay consistent for 30 days!',
+            motivation: hasThirtyDayStreak ? '⚡ Month-long legend!' : 'Stay consistent for 30 days!',
         },
     ];
+
+    const personalityBadge = badges.find(b => b.family === 'archetype' && b.unlocked);
+    const unlockedBadges = badges.filter(b => b.unlocked);
 
     return (
         <div className="gaming-dna-wrapper animate-fade-in">
@@ -322,10 +307,10 @@ export function ReadingDNA() {
                             </h1>
                         </div>
                         <div className="gaming-status">
-                            Explorer Level <strong>{Math.max(1, Math.floor(stats.totalLogs / 5))}</strong>
+                            {dna.archetypeLabel || `Explorer Level ${Math.max(1, Math.floor(stats.totalLogs / 5))}`}
                         </div>
                         <div className="gaming-level">
-                            {stats.booksReadThisYear} Books Read This Year
+                            {stats.booksThisYear} Books Read This Year
                         </div>
                     </div>
                 </div>
@@ -342,10 +327,39 @@ export function ReadingDNA() {
                             </button>
                         </div>
 
+                        {dna.archetypeLabel && (
+                            <div className="gaming-archetype-banner" style={{ marginBottom: '1rem' }}>
+                                <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)' }}>
+                                    <div className="text-2xl">🧬</div>
+                                    <div>
+                                        <div className="text-sm font-bold text-indigo-400">{dna.archetypeLabel}</div>
+                                        {dna.confidence !== undefined && (
+                                            <div className="text-xs text-slate-500">{Math.round(dna.confidence * 100)}% confidence</div>
+                                        )}
+                                    </div>
+                                    <button
+                                        onClick={() => refreshMutation.mutate()}
+                                        disabled={refreshMutation.isPending}
+                                        className="ml-auto gaming-btn"
+                                        style={{ width: 'auto', padding: '4px 12px', fontSize: '0.75rem' }}
+                                        title="Refresh your DNA"
+                                    >
+                                        <RefreshCw size={14} className={refreshMutation.isPending ? 'animate-spin' : ''} />
+                                        {' Refresh'}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {dna.narrative && (
+                            <div className="gaming-narrative-box p-4 rounded-xl mb-4" style={{ background: 'rgba(30,41,59,0.6)', border: '1px solid rgba(71,85,105,0.3)' }}>
+                                <p className="text-sm text-slate-300 italic leading-relaxed">{dna.narrative}</p>
+                            </div>
+                        )}
+
                         <h3 className="gaming-section-title mt-8">Activity</h3>
                         {activeBook ? (
                             <div className="gaming-activity-card">
-                                {/* ── Book cover: always try to show img, fall back to emoji ── */}
                                 {activeBook.coverUrl && !activeBook.coverUrl.includes('placeholder') ? (
                                     <img
                                         src={activeBook.coverUrl}
@@ -406,7 +420,6 @@ export function ReadingDNA() {
                                             className="gaming-rank-item"
                                             style={{ '--rank-glow': r.glowColor } as React.CSSProperties}
                                         >
-                                            {/* Tooltip bubble */}
                                             <div className="gaming-rank-tooltip">{r.tooltip}</div>
                                             <div className="gaming-rank-icon">{r.icon}</div>
                                             <h4 className="gaming-rank-title">{r.title}</h4>
@@ -414,6 +427,22 @@ export function ReadingDNA() {
                                         </div>
                                     ))}
                                 </div>
+
+                                {/* ── Personality Badge ── */}
+                                {personalityBadge && (
+                                    <>
+                                        <h3 className="gaming-section-title">Reading Personality</h3>
+                                        <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-4 mb-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="text-2xl">🧬</div>
+                                                <div>
+                                                    <div className="text-white font-bold">{personalityBadge.badgeId.replace('archetype.', '')}</div>
+                                                    <div className="text-xs text-slate-400">{personalityBadge.tier} • {personalityBadge.progressLabel}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
 
                                 {/* ── Latest Achievements — motivational badge cards ── */}
                                 <h3 className="gaming-section-title">Latest Achievements</h3>
@@ -431,12 +460,12 @@ export function ReadingDNA() {
                                 <div className="dna-stats-cards">
                                     <div className="dna-stat-card">
                                         <div className="dna-stat-icon" style={{ color: '#4ade80', background: 'rgba(74,222,128,0.1)' }}>📖</div>
-                                        <div className="dna-stat-value">{stats.booksReadThisYear}</div>
+                                        <div className="dna-stat-value">{stats.booksThisYear}</div>
                                         <div className="dna-stat-label">Books This Year</div>
                                     </div>
                                     <div className="dna-stat-card">
                                         <div className="dna-stat-icon" style={{ color: '#f59e0b', background: 'rgba(245,158,11,0.1)' }}>⭐</div>
-                                        <div className="dna-stat-value">{stats.avgRating || '—'}</div>
+                                        <div className="dna-stat-value">{typeof stats.avgRating === 'number' ? stats.avgRating.toFixed(1) : stats.avgRating || '—'}</div>
                                         <div className="dna-stat-label">Avg Rating</div>
                                     </div>
                                     <div className="dna-stat-card">
@@ -459,7 +488,7 @@ export function ReadingDNA() {
                                         ))}
                                     </div>
                                     <div className="heatmap-container">
-                                        {(stats.heatmap || Array(12).fill(0)).map((count, i) => {
+                                        {(stats.heatmap || Array(12).fill(0)).map((count: number, i: number) => {
                                             const lev = count === 0 ? 0 : count < 3 ? 1 : count < 6 ? 2 : 3;
                                             return (
                                                 <div key={i} className={`heatmap-cell level-${lev}`} title={`${count} books`}>
@@ -564,21 +593,51 @@ export function ReadingDNA() {
                                 <div className="flex items-center justify-between mb-6">
                                     <h3 className="gaming-section-title mb-0">Total Badges</h3>
                                     <span className="text-sm text-green-400 font-bold bg-green-400/10 px-3 py-1 rounded-full">
-                                        {allBadges.filter(b => b.earned).length} / {allBadges.length} Earned
+                                        {unlockedBadges.length} / {badges.length} Earned
                                     </span>
                                 </div>
-                                <div className="badge-gallery">
-                                    {allBadges.map(badge => (
-                                        <div key={badge.id} className={`badge-item ${badge.earned ? 'earned' : ''}`}>
-                                            <div className="badge-icon-wrap" style={{ background: `${badge.color}20`, color: badge.color }}>
-                                                <badge.icon size={28} />
-                                            </div>
-                                            <div>
-                                                <h4 className="text-white font-bold text-sm mb-1">{badge.name}</h4>
-                                                <p className="text-xs text-slate-400">{badge.desc}</p>
-                                            </div>
+
+                                {/* Personality badge highlight */}
+                                {personalityBadge && (
+                                    <div className="mb-4 p-3 rounded-xl" style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)' }}>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-lg">🧬</span>
+                                            <span className="text-sm font-semibold text-indigo-300">
+                                                {personalityBadge.badgeId.replace('archetype.', '')}
+                                            </span>
+                                            <span className="text-xs text-slate-400 ml-auto">{personalityBadge.tier}</span>
                                         </div>
-                                    ))}
+                                    </div>
+                                )}
+
+                                <div className="badge-gallery">
+                                    {badges.map(badge => {
+                                        const isEarned = badge.unlocked;
+                                        const colorMap: Record<string, string> = {
+                                            exploration: '#f43f5e',
+                                            reviewer: '#0ea5e9',
+                                            discovery: '#8b5cf6',
+                                            dedication: '#4ade80',
+                                            archetype: '#6366f1',
+                                            nightOwl: '#f59e0b',
+                                            easterEgg: '#f97316',
+                                            rainbowReader: '#eab308',
+                                            completionist100: '#06b6d4',
+                                            criticsPet: '#ec4899',
+                                        };
+                                        const color = colorMap[badge.family] || '#64748b';
+                                        return (
+                                            <div key={badge.badgeId} className={`badge-item ${isEarned ? 'earned' : ''}`}>
+                                                <div className="badge-icon-wrap" style={{ background: `${color}20`, color }}>
+                                                    <Zap size={28} />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-white font-bold text-sm mb-1">{badge.badgeId}</h4>
+                                                    <p className="text-xs text-slate-400">{badge.progressLabel || badge.tier}</p>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </>
                         )}
