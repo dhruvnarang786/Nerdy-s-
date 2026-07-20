@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, BookOpen, Heart, Star, Eye, TrendingUp, Users, Zap } from 'lucide-react';
 import CountUp from 'react-countup';
-import { searchBooks, getBookDetails, type Book } from '@/lib/api';
+import { searchBooks, getBookDetails, type Book } from '@/lib/apiClient';
 import { GENRE_CONFIG } from '@/lib/genreConfig';
 import { GenreScrollRow } from '@/components/ui/GenreScrollRow';
 import { getFavorites, getAllLogs, getUserLogs } from '@/lib/storage';

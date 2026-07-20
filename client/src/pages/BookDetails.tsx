@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Star, Calendar, BookOpen, Loader2, Plus, Quote, LogIn, X } from 'lucide-react';
-import { getBookDetails, type Book } from '@/lib/api';
+import { getBookDetails, type Book } from '@/lib/apiClient';
 import { getBookLogs, getBookCommunityLogs, type BookLog, isFavorite, toggleFavorite } from '@/lib/storage';
 import { LogBook } from '@/components/features/LogBook';
 import { useAuth } from '@/lib/AuthContext';

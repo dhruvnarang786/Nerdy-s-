@@ -1,0 +1,1 @@
+{"version":3,"file":"RateLimitError.js","sourceRoot":"","sources":["../../../src/shared/errors/RateLimitError.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,QAAQ,EAAE,MAAM,eAAe,CAAA;AAExC,MAAM,OAAO,cAAe,SAAQ,QAAQ;IAC1C,YAAY,OAAO,GAAG,2CAA2C;QAC/D,KAAK,CAAC,OAAO,EAAE,GAAG,EAAE,cAAc,CAAC,CAAA;IACrC,CAAC;CACF"}

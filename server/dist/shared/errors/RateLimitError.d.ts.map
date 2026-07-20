@@ -1,0 +1,1 @@
+{"version":3,"file":"RateLimitError.d.ts","sourceRoot":"","sources":["../../../src/shared/errors/RateLimitError.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,QAAQ,EAAE,MAAM,eAAe,CAAA;AAExC,qBAAa,cAAe,SAAQ,QAAQ;gBAC9B,OAAO,SAA8C;CAGlE"}

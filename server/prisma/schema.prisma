@@ -7,15 +7,23 @@ datasource db {
 }
 
 model User {
-  id           Int        @id @default(autoincrement())
-  username     String     @unique
-  email        String     @unique
-  passwordHash String?
-  googleId     String?    @unique
-  createdAt    DateTime   @default(now())
-  logs         BookLog[]
-  favorites    Favorite[]
-  messages     Message[]
+  id               Int                @id @default(autoincrement())
+  username         String             @unique
+  email            String             @unique
+  passwordHash     String?
+  googleId         String?            @unique
+  createdAt        DateTime           @default(now())
+  bio              String             @default("")
+  Badge            Badge[]
+  logs             BookLog[]
+  DNASnapshot      DNASnapshot?
+  DnaActivityEvent DnaActivityEvent[]
+  favorites        Favorite[]
+  GenreAffinity    GenreAffinity[]
+  messages         Message[]
+  RefreshToken     RefreshToken[]
+  User_A           User[]             @relation("UserFriends")
+  User_B           User[]             @relation("UserFriends")
 }
 
 model BookLog {
@@ -64,4 +72,111 @@ model Message {
   roomId    Int
   room      ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuthorCountry {
+  id         Int      @id @default(autoincrement())
+  author     String   @unique
+  country    String
+  provider   String
+  resolvedAt DateTime
+  attempts   Int      @default(0)
+
+  @@index([country])
+}
+
+model Badge {
+  id            Int       @id @default(autoincrement())
+  badgeId       String
+  family        String
+  tier          String
+  unlocked      Boolean   @default(false)
+  progress      Float     @default(0)
+  progressLabel String?
+  unlockedAt    DateTime?
+  reason        String?
+  userId        Int
+  User          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([badgeId, unlocked])
+  @@index([userId, family])
+  @@index([userId, unlocked])
+}
+
+model DNASnapshot {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @unique
+  version         Int      @default(1)
+  computedAt      DateTime @default(now())
+  staleAfter      DateTime
+  totalLogs       Int      @default(0)
+  booksThisYear   Int      @default(0)
+  avgRating       Float    @default(0)
+  currentStreak   Int      @default(0)
+  bestStreak      Int      @default(0)
+  level           Int      @default(1)
+  xp              Int      @default(0)
+  totalFavorites  Int      @default(0)
+  spoilerRatio    Float    @default(0)
+  metrics         Json     @default("{}")
+  heatmap         Json     @default("{}")
+  trends          Json     @default("{}")
+  personality     Json     @default("{}")
+  narration       Json     @default("{}")
+  badgeSummary    Json     @default("{}")
+  genreSummary    Json     @default("{}")
+  dataVersion     String   @default("v1")
+  badgeDefVersion String   @default("v1")
+  User            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([booksThisYear])
+  @@index([computedAt])
+  @@index([currentStreak])
+  @@index([level])
+  @@index([userId])
+}
+
+model DnaActivityEvent {
+  id                       Int      @id @default(autoincrement())
+  userId                   Int
+  eventType                String
+  payload                  Json
+  timestamp                DateTime @default(now())
+  processedSnapshotVersion Int?
+  User                     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([eventType, timestamp])
+  @@index([timestamp])
+  @@index([userId, processedSnapshotVersion])
+  @@index([userId, timestamp])
+}
+
+model GenreAffinity {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  genre     String
+  affinity  Float    @default(0)
+  count     Int      @default(0)
+  trend     String   @default("stable")
+  updatedAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, genre])
+  @@index([affinity])
+  @@index([userId, affinity])
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  jti       String   @unique
+  userId    Int
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@index([jti])
+  @@index([userId])
 }

@@ -1,3 +1,16 @@
+// Book type definition (moved from api.ts)
+export interface Book {
+    id: string;
+    title: string;
+    author: string;
+    description: string;
+    coverUrl: string;
+    rating: number;
+    publishedDate: string;
+    pages: number;
+    genre: string[];
+}
+
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const REQUEST_TIMEOUT_MS = 30000; // 30 seconds — generous for Render cold start
 const MAX_RETRIES = 3;
@@ -83,6 +96,70 @@ async function request<T>(
     }
 
     throw lastError;
+}
+
+// Book API functions (moved from api.ts)
+const FETCH_TIMEOUT_MS = 60000;
+const MAX_BOOK_RETRIES = 2;
+const BASE_BOOK_BACKOFF_MS = 1500;
+
+async function fetchWithRetry(url: string): Promise<Response> {
+    for (let attempt = 0; attempt <= MAX_BOOK_RETRIES; attempt++) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+        try {
+            const res = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            if (res.ok) return res;
+            if (res.status >= 500 && attempt < MAX_BOOK_RETRIES) {
+                await new Promise(r => setTimeout(r, BASE_BOOK_BACKOFF_MS * (attempt + 1)));
+                continue;
+            }
+            return res;
+        } catch (err) {
+            clearTimeout(timeoutId);
+            if (attempt < MAX_BOOK_RETRIES) {
+                await new Promise(r => setTimeout(r, BASE_BOOK_BACKOFF_MS * (attempt + 1)));
+                continue;
+            }
+            throw err;
+        }
+    }
+    return fetch(url);
+}
+
+export async function searchBooks(query: string, startIndex = 0, maxResults = 20): Promise<{ books: Book[]; totalItems: number }> {
+    if (!query) return { books: [], totalItems: 0 };
+    const url = `${BASE_URL}/api/books/search?q=${encodeURIComponent(query)}&maxResults=${maxResults}&startIndex=${startIndex}`;
+    try {
+        const res = await fetchWithRetry(url);
+        if (!res.ok) {
+            console.warn(`[api] searchBooks 404/error for "${query}"`, res.status);
+            return { books: [], totalItems: 0 };
+        }
+        const data = await res.json();
+        console.log(`[api] searchBooks "${query}" → ${data.books?.length ?? 0} results`);
+        return data;
+    } catch (error) {
+        const isAbort = error instanceof Error && error.name === 'AbortError';
+        console.warn(`[api] searchBooks "${query}" ${isAbort ? 'timed out' : 'failed'} — server unreachable or slow.`, error);
+        return { books: [], totalItems: 0 };
+    }
+}
+
+export async function getBookDetails(id: string): Promise<Book | null> {
+    try {
+        const res = await fetchWithRetry(`${BASE_URL}/api/books/${id}`);
+        if (!res.ok) {
+            console.warn(`[api] getBookDetails 404 for "${id}"`, res.status);
+            return null;
+        }
+        return await res.json();
+    } catch (error) {
+        const isAbort = error instanceof Error && error.name === 'AbortError';
+        console.warn(`[api] getBookDetails "${id}" ${isAbort ? 'timed out' : 'failed'} — server unreachable or slow.`, error);
+        return null;
+    }
 }
 
 export const api = {

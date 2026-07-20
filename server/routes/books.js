@@ -38,6 +38,23 @@ router.get('/trending', async (req, res) => {
     }
 });
 
+// Legacy fallback for old client calls to /api/books?q=...
+router.get('/', async (req, res) => {
+    try {
+        const { q, limit = 20, offset = 0 } = req.query;
+        if (!q) return res.status(400).json({ error: 'Query parameter q is required' });
+
+        const result = await bookService.search(q, Number(limit), Number(offset));
+        res.json({
+            books: result.books.map(toApiFormat),
+            totalItems: result.totalItems,
+        });
+    } catch (err) {
+        console.error('Legacy books search error:', err);
+        res.json({ books: [], totalItems: 0 });
+    }
+});
+
 // GET /api/books/:id — fetch a single book's details
 router.get('/:id', async (req, res) => {
     try {
@@ -45,7 +62,7 @@ router.get('/:id', async (req, res) => {
         const book = await bookService.getById(id);
 
         if (!book) {
-            return res.status(500).json({ error: 'Failed to fetch book' });
+            return res.status(404).json({ error: 'Book not found' });
         }
 
         res.json(toApiFormat(book));

@@ -1,5 +1,5 @@
 import { api } from '@/lib/apiClient';
-import type { Book } from './api';
+import type { Book } from '@/lib/apiClient';
 
 export interface BookLog {
     id?: number;
@@ -28,10 +28,10 @@ export async function saveBookLog(log: Omit<BookLog, 'id' | 'createdAt'>): Promi
     }
 }
 
-export async function getUserLogs(_username: string): Promise<BookLog[]> {
+export async function getUserLogs(username: string): Promise<BookLog[]> {
     // For the current user — auth token is auto-sent
     try {
-        const data = await api.get<{ logs: BookLog[] }>('/api/logs');
+        const data = await api.get<{ logs: BookLog[] }>(`/api/logs/user/${username}`);
         return data.logs;
     } catch { return []; }
 }

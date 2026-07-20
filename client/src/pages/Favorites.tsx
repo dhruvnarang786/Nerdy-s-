@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BookCard } from '@/components/ui/BookCard';
 import { getFavorites } from '@/lib/storage';
-import { type Book } from '@/lib/api';
+import { type Book } from '@/lib/apiClient';
 import { Heart, BookOpen, Sparkles, TrendingUp, Star, Search } from 'lucide-react';
 import '@/styles/pages.css';
 import '@/styles/favorites.css';

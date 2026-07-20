@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { searchBooks, type Book } from '@/lib/api';
+import { searchBooks, type Book } from '@/lib/apiClient';
 import { BookCard } from '@/components/ui/BookCard';
 import { Loader2, Search, ArrowRight } from 'lucide-react';
 import '@/styles/pages.css';

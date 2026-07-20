@@ -10,7 +10,7 @@ router.get('/', requireAuth, async (req, res) => {
         const userWithFriends = await prisma.user.findUnique({
             where: { id: req.user.id },
             include: {
-                friends: {
+                User_A: {
                     select: {
                         id: true,
                         username: true,
@@ -23,7 +23,7 @@ router.get('/', requireAuth, async (req, res) => {
             }
         });
 
-        res.json({ friends: userWithFriends?.friends || [] });
+        res.json({ friends: userWithFriends?.User_A || [] });
     } catch (err) {
         console.error('Error fetching friends:', err);
         res.status(500).json({ error: 'Server error fetching friends' });
@@ -56,7 +56,7 @@ router.post('/add', requireAuth, async (req, res) => {
         await prisma.user.update({
             where: { id: req.user.id },
             data: {
-                friends: {
+                User_A: {
                     connect: { id: friend.id }
                 }
             }
@@ -64,7 +64,7 @@ router.post('/add', requireAuth, async (req, res) => {
         await prisma.user.update({
             where: { id: friend.id },
             data: {
-                friends: {
+                User_B: {
                     connect: { id: req.user.id }
                 }
             }

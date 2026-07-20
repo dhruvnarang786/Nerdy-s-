@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Sparkles, Clock, Smile, Search, BookOpen, Send, Mic, MicOff, Volume2 } from 'lucide-react';
-import { searchBooks, type Book } from '@/lib/api';
+import { searchBooks, type Book } from '@/lib/apiClient';
 import '@/styles/pages.css';
 import '@/styles/ai-chat.css';
 

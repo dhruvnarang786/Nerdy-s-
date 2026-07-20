@@ -2,7 +2,7 @@
 import { memo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
-import { type Book } from '@/lib/api';
+import { type Book } from '@/lib/apiClient';
 import '@/styles/components.css';
 
 const FALLBACK_COVER = 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=200&auto=format&fit=crop';
