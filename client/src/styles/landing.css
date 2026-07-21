@@ -1,0 +1,438 @@
+/* ==========================================
+   Landing Page Redesign — Hero + Marquee
+   ========================================== */
+
+/* Full-viewport hero */
+.landing-hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 10;
+    gap: 0;
+    padding-bottom: 2rem;
+}
+
+/* ── Book Marquee ────────────────────────── */
+.landing-marquee-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 5rem 0 2.5rem;
+    flex-shrink: 0;
+}
+
+.landing-marquee-track {
+    display: flex;
+    gap: 1.5rem;
+    width: max-content;
+    animation: marquee-scroll 40s linear infinite;
+    will-change: transform;
+}
+
+.landing-marquee-track:hover {
+    animation-play-state: paused;
+}
+
+@keyframes marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.landing-marquee-item {
+    flex-shrink: 0;
+    display: block;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.landing-marquee-item:hover {
+    transform: scale(1.08) translateY(-6px);
+    z-index: 5;
+}
+
+.landing-marquee-item img {
+    width: 110px;
+    height: 165px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    display: block;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    transition: box-shadow 0.3s ease;
+}
+
+.landing-marquee-item:hover img {
+    box-shadow: 0 15px 40px rgba(212, 175, 55, 0.25), 0 8px 25px rgba(0, 0, 0, 0.6);
+}
+
+/* Edge fade overlays */
+.landing-marquee-fade-left,
+.landing-marquee-fade-right {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 120px;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.landing-marquee-fade-left {
+    left: 0;
+    background: linear-gradient(to right, #1a1614 0%, transparent 100%);
+}
+
+.landing-marquee-fade-right {
+    right: 0;
+    background: linear-gradient(to left, #1a1614 0%, transparent 100%);
+}
+
+/* ── Hero Content (centered below marquee) ── */
+.landing-hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem 2rem 0;
+    max-width: 800px;
+    flex: 1;
+    justify-content: center;
+}
+
+.landing-hero-content .landing-badge {
+    margin-bottom: 2rem;
+}
+
+.landing-hero-content .landing-headline {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.landing-hero-content .landing-subhead {
+    text-align: center;
+    margin-bottom: 0;
+}
+
+.landing-hero-content .landing-action-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+}
+
+.landing-hero-content .landing-readers {
+    margin-top: 0;
+    justify-content: center;
+}
+
+/* ── Responsive ─────────────────────────── */
+@media (max-width: 768px) {
+    .landing-marquee-item img {
+        width: 90px;
+        height: 135px;
+    }
+
+    .landing-marquee-track {
+        gap: 1rem;
+    }
+
+    .landing-marquee-fade-left,
+    .landing-marquee-fade-right {
+        width: 60px;
+    }
+
+    .landing-hero-content {
+        padding: 1.5rem 1.5rem 0;
+    }
+
+    .landing-hero-content .landing-headline {
+        font-size: 2.5rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .landing-marquee-item img {
+        width: 75px;
+        height: 112px;
+    }
+
+    .landing-hero-content .landing-headline {
+        font-size: 2rem !important;
+    }
+}
+
+/* ── Letterboxd-style Features Grid ──────── */
+.nerdys-features-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 5rem 2rem 6rem;
+    position: relative;
+    z-index: 10;
+    scroll-margin-top: 6rem;
+}
+
+.nerdys-features-heading {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: #d4af37;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+}
+
+.nerdys-features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+@media (max-width: 900px) {
+    .nerdys-features-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 520px) {
+    .nerdys-features-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.nerdys-feature-card {
+    background: rgba(90, 70, 50, 0.35);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: transform 0.2s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+.nerdys-feature-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(212, 175, 55, 0.5);
+    background: rgba(100, 78, 55, 0.45);
+}
+
+.nerdys-feature-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    color: #d4af37;
+    flex-shrink: 0;
+}
+
+.nerdys-feature-card p {
+    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.55;
+    margin: 0;
+}
+
+/* ── Final CTA Section ───────────────────── */
+.landing-final-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 6rem 2rem 8rem;
+    position: relative;
+    z-index: 10;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.landing-final-heading {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+}
+
+.landing-final-sub {
+    font-size: 1.15rem;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+    max-width: 480px;
+}
+
+@media (max-width: 768px) {
+    .landing-final-heading {
+        font-size: 2rem;
+    }
+
+    .landing-final-sub {
+        font-size: 1rem;
+    }
+}
+
+/* ── Stats Box ───────────────────────────── */
+.landing-stats-container {
+    max-width: 1100px;
+    width: 100%;
+    margin: 3rem auto 0;
+    padding: 0 2rem;
+    position: relative;
+    z-index: 10;
+}
+
+.landing-stats-box {
+    background: rgba(90, 70, 50, 0.35);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 1rem;
+    padding: 2.5rem 0;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+}
+
+.landing-stat {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    flex: 1;
+    position: relative;
+}
+
+/* Full separator lines between stats */
+.landing-stat:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -10px;
+    bottom: -10px;
+    width: 1px;
+    background: linear-gradient(to bottom, rgba(212, 175, 55, 0), rgba(212, 175, 55, 0.4), rgba(212, 175, 55, 0));
+}
+
+.landing-stat-icon-gold {
+    color: #d4af37;
+    width: 40px;
+    height: 40px;
+}
+
+.landing-stat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.landing-stat-value-bold {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #d4af37;
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.landing-stat-label-white {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+@media (max-width: 900px) {
+    .landing-stats-box {
+        flex-direction: column;
+        gap: 3rem;
+        padding: 3rem 0;
+    }
+    
+    .landing-stat:not(:last-child)::after {
+        right: auto;
+        bottom: -1.5rem;
+        top: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 1px;
+        background: linear-gradient(to right, rgba(212, 175, 55, 0), rgba(212, 175, 55, 0.4), rgba(212, 175, 55, 0));
+    }
+}
+
+/* ── Scroll Indicator ────────────────────── */
+.landing-scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    transition: opacity 0.3s ease;
+}
+
+.landing-scroll-indicator:hover a {
+    opacity: 1 !important;
+    color: #d4af37 !important;
+}
+
+/* ── Showcase Mockup Section ─────────────── */
+.landing-showcase-section {
+    max-width: 1100px;
+    margin: 6rem auto 0;
+    padding: 0 2rem;
+    position: relative;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+}
+
+.landing-showcase-container {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    border-radius: 1.5rem;
+    padding: 1rem;
+    background: rgba(90, 70, 50, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+    transform: perspective(1000px) rotateX(2deg);
+    transition: transform 0.5s ease;
+}
+
+.landing-showcase-container:hover {
+    transform: perspective(1000px) rotateX(0deg) translateY(-5px);
+}
+
+.landing-showcase-img {
+    width: 100%;
+    height: auto;
+    border-radius: 1rem;
+    display: block;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.landing-showcase-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80%;
+    height: 80%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+    filter: blur(40px);
+}
+
+/* ── Features Background Glow ────────────── */
+.features-bg-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle at center, rgba(100, 78, 55, 0.2) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: -1;
+}
