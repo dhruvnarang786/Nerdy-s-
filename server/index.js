@@ -38,7 +38,7 @@ const httpServer = createServer(app);
 
 // Configure CORS with specific origins for security
 const corsOptions = {
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map(o => o.trim()) : 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
