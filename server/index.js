@@ -91,7 +91,7 @@ app.use((err, req, res, next) => {
 });
 
 // 404 handler for unknown routes
-app.use('*', (_req, res) => {
+app.use((_req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
