@@ -144,15 +144,11 @@ export async function searchBooks(query: string, startIndex = 0, maxResults = 20
     try {
         const res = await fetchWithRetry(url, {}, BOOK_FETCH_TIMEOUT_MS, MAX_BOOK_RETRIES);
         if (!res.ok) {
-            console.warn(`[api] searchBooks 404/error for "${query}"`, res.status);
             return { books: [], totalItems: 0 };
         }
         const data = await res.json();
-        console.log(`[api] searchBooks "${query}" → ${data.books?.length ?? 0} results`);
         return data;
     } catch (error) {
-        const isAbort = error instanceof Error && error.name === 'AbortError';
-        console.warn(`[api] searchBooks "${query}" ${isAbort ? 'timed out' : 'failed'} — server unreachable or slow.`, error);
         return { books: [], totalItems: 0 };
     }
 }
@@ -161,13 +157,10 @@ export async function getBookDetails(id: string): Promise<Book | null> {
     try {
         const res = await fetchWithRetry(`${BASE_URL}/api/books/${id}`, {}, BOOK_FETCH_TIMEOUT_MS, MAX_BOOK_RETRIES);
         if (!res.ok) {
-            console.warn(`[api] getBookDetails 404 for "${id}"`, res.status);
             return null;
         }
         return await res.json();
     } catch (error) {
-        const isAbort = error instanceof Error && error.name === 'AbortError';
-        console.warn(`[api] getBookDetails "${id}" ${isAbort ? 'timed out' : 'failed'} — server unreachable or slow.`, error);
         return null;
     }
 }

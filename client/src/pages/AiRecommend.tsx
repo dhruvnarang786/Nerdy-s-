@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Sparkles, Clock, Smile, Search, BookOpen, Send, Mic, MicOff, Volume2 } from 'lucide-react';
 import { searchBooks, type Book } from '@/lib/apiClient';
+import { FALLBACK_COVER } from '@/lib/constants';
 import '@/styles/pages.css';
 import '@/styles/ai-chat.css';
 
@@ -310,8 +311,8 @@ export function AiRecommend() {
                                     {recommendations.map((book) => (
                                         <a key={book.id} href={`/book/${book.id}`} className="ai-result-card">
                                             <div className="ai-result-cover-wrap">
-                                                <img src={book.coverUrl} alt={book.title} className="ai-result-cover"
-                                                    onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/200x300?text=No+Cover'; }} />
+                                                <img src={book.coverUrl || FALLBACK_COVER} alt={book.title} className="ai-result-cover"
+                                                    onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_COVER; }} />
                                             </div>
                                             <div className="ai-result-info">
                                                 <p className="ai-result-title">{book.title}</p>

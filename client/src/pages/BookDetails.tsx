@@ -6,6 +6,7 @@ import { getBookDetails, type Book } from '@/lib/apiClient';
 import { getBookLogs, getBookCommunityLogs, type BookLog, isFavorite, toggleFavorite } from '@/lib/storage';
 import { LogBook } from '@/components/features/LogBook';
 import { useAuth } from '@/lib/AuthContext';
+import { FALLBACK_COVER } from '@/lib/constants';
 import '@/styles/pages.css';
 
 export function BookDetails() {
@@ -138,7 +139,7 @@ export function BookDetails() {
             <div className="book-details-header">
                 <div className="flex-shrink-0 mx-auto md:mx-0">
                     <img
-                        src={book.coverUrl}
+                        src={book.coverUrl || FALLBACK_COVER}
                         alt={book.title}
                         className="book-cover-large"
                     />

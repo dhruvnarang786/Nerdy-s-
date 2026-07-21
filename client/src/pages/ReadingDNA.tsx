@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ResponsiveContainer, AreaChart, Area, RadarChart, PolarGrid, PolarAngleAxis, Radar, XAxis } from 'recharts';
 import { api } from '@/lib/apiClient';
 import { useAuth } from '@/lib/AuthContext';
+import { FALLBACK_COVER } from '@/lib/constants';
 import { Check, Flame, Star, Moon, Sun, BookHeart, Library, Edit3, UserPlus, Shield, Zap, Lock } from 'lucide-react';
 import '@/styles/dna-gaming.css';
 
@@ -383,7 +384,7 @@ export function ReadingDNA() {
                                 <h3 className="gaming-section-title">Top Books</h3>
                                 <div className="gaming-top-games">
                                     {topBooks.map((b, i) => (
-                                        <div key={i} className="gaming-top-game" style={{ backgroundImage: `url(${b.coverUrl})` }}></div>
+                                        <div key={i} className="gaming-top-game" style={{ backgroundImage: `url(${b.coverUrl || FALLBACK_COVER})` }}></div>
                                     ))}
                                     {[...Array(Math.max(0, 4 - topBooks.length))].map((_, i) => (
                                         <div key={`empty-${i}`} className="gaming-top-game" style={{ background: '#232833', border: '1px dashed #334155' }}></div>

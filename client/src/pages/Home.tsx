@@ -6,8 +6,9 @@ import CountUp from 'react-countup';
 import { searchBooks, getBookDetails, type Book } from '@/lib/apiClient';
 import { GENRE_CONFIG } from '@/lib/genreConfig';
 import { GenreScrollRow } from '@/components/ui/GenreScrollRow';
-import { getFavorites, getAllLogs, getUserLogs } from '@/lib/storage';
+import { getFavorites, getAllLogs, getCurrentUserLogs } from '@/lib/storage';
 import { useAuth } from '@/lib/AuthContext';
+import { FALLBACK_COVER } from '@/lib/constants';
 import '@/styles/pages.css';
 import { Landing } from './Landing';
 
@@ -62,7 +63,7 @@ export function Home() {
         if (!isAuthenticated) return;
         // Load stats
         getFavorites().then(favs => setFavsCount(favs.length)).catch(() => { });
-        getUserLogs('').then(logs => setBooksRead(logs.length)).catch(() => { });
+        getCurrentUserLogs().then(logs => setBooksRead(logs.length)).catch(() => { });
         // Load community reviews
         getAllLogs().then(realLogs => {
             const withNotes = realLogs.filter(l => l.notes && l.notes.trim() && (l.username || l.user?.username));
@@ -204,7 +205,7 @@ export function Home() {
                         ? Array.from({ length: 10 }).map((_, i) => <div key={i} className="lb-showcase-skeleton" />)
                         : showcaseBooks.map((book, i) => (
                             <Link key={book.id} to={`/book/${book.id}`} className="lb-showcase-cover" style={{ animationDelay: `${i * 50}ms` }}>
-                                <img src={book.coverUrl} alt={book.title} />
+                                <img src={book.coverUrl || FALLBACK_COVER} alt={book.title} />
                             </Link>
                         ))
                     }
@@ -325,7 +326,7 @@ export function Home() {
                     <div className="lb-botd-label">📖 BOOK OF THE DAY</div>
                     <div className="lb-botd-card">
                         <Link to={`/book/${heroBook.id}`} className="lb-botd-cover-link">
-                            <img src={heroBook.coverUrl} alt={heroBook.title} className="lb-botd-cover" />
+                            <img src={heroBook.coverUrl || FALLBACK_COVER} alt={heroBook.title} className="lb-botd-cover" />
                         </Link>
                         <div className="lb-botd-info">
                             <h3 className="lb-botd-title">{heroBook.title}</h3>
