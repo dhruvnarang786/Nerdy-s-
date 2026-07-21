@@ -22,8 +22,8 @@ model User {
   GenreAffinity    GenreAffinity[]
   messages         Message[]
   RefreshToken     RefreshToken[]
-  User_A           User[]             @relation("UserFriends")
-  User_B           User[]             @relation("UserFriends")
+  friendsFrom       User[]             @relation("UserFriends")
+  friendsTo         User[]             @relation("UserFriends")
 }
 
 model BookLog {

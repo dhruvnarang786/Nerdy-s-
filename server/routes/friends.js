@@ -10,7 +10,7 @@ router.get('/', requireAuth, async (req, res) => {
         const userWithFriends = await prisma.user.findUnique({
             where: { id: req.user.id },
             include: {
-                User_A: {
+                friendsFrom: {
                     select: {
                         id: true,
                         username: true,
@@ -23,7 +23,7 @@ router.get('/', requireAuth, async (req, res) => {
             }
         });
 
-        res.json({ friends: userWithFriends?.User_A || [] });
+        res.json({ friends: userWithFriends?.friendsFrom || [] });
     } catch (err) {
         console.error('Error fetching friends:', err);
         res.status(500).json({ error: 'Server error fetching friends' });
@@ -51,12 +51,11 @@ router.post('/add', requireAuth, async (req, res) => {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        // Connect them (uni-directional for simplicity, or bi-directional)
-        // Let's make it a mutual connection for UX simplicity in this prototype
+        // Connect them bidirectionally for mutual friendship
         await prisma.user.update({
             where: { id: req.user.id },
             data: {
-                User_A: {
+                friendsFrom: {
                     connect: { id: friend.id }
                 }
             }
@@ -64,7 +63,7 @@ router.post('/add', requireAuth, async (req, res) => {
         await prisma.user.update({
             where: { id: friend.id },
             data: {
-                User_B: {
+                friendsTo: {
                     connect: { id: req.user.id }
                 }
             }

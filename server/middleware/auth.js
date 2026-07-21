@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { prisma } from '../index.js';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
+import { JWT_SECRET } from '../config.js';
 
 export async function requireAuth(req, res, next) {
     try {
