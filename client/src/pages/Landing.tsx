@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, MessageSquare, Users, Star, Heart, Edit3, LayoutGrid, ChevronDown, Twitter, Instagram, Github } from 'lucide-react';
+import { BookOpen, MessageSquare, Users, Star, Heart, Edit3, LayoutGrid, ChevronDown } from 'lucide-react';
 import '@/styles/pages.css';
 import '@/styles/bento.css';
 import '@/styles/landing.css';

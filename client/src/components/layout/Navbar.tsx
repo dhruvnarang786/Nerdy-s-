@@ -25,13 +25,19 @@ export function Navbar() {
         navigate('/');
     };
 
-    const publicNavLinks = [
+    interface NavLink {
+        name: string;
+        href: string;
+        isScroll?: boolean;
+    }
+
+    const publicNavLinks: NavLink[] = [
         { name: 'Home', href: '/' },
         { name: 'About Us', href: '#features', isScroll: true },
         { name: 'Profile / Dashboard', href: '/login' },
     ];
 
-    const authNavLinks = [
+    const authNavLinks: NavLink[] = [
         { name: 'Home', href: '/' },
         { name: 'Trending', href: '/trending' },
         { name: 'Favorites', href: '/favorites' },
