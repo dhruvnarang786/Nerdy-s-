@@ -18,8 +18,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 4rem;
-    /* h-16 */
+    height: 5.5rem;
 }
 
 .navbar-brand {
@@ -30,14 +29,14 @@
 }
 
 .navbar-logo {
-    height: 2rem;
-    width: 2rem;
+    height: 2.5rem;
+    width: 2.5rem;
     color: var(--primary);
 }
 
 .navbar-title {
-    font-weight: 700;
-    font-size: var(--font-xl);
+    font-weight: 800;
+    font-size: 1.75rem;
     letter-spacing: -0.025em;
     color: var(--foreground);
 }
@@ -58,13 +57,25 @@
     color: var(--foreground);
     padding: var(--spacing-2) var(--spacing-3);
     border-radius: var(--radius);
-    font-size: var(--font-sm);
-    font-weight: 500;
+    font-size: 1.1rem;
+    font-weight: 600;
     transition: color 0.2s, background-color 0.2s;
+    position: relative;
 }
 
-.nav-link:hover {
+.nav-link:hover, .nav-link-active {
     color: var(--primary);
+}
+
+.nav-link-active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: var(--spacing-3);
+    right: var(--spacing-3);
+    height: 2px;
+    background-color: var(--primary);
+    border-radius: 2px;
 }
 
 .navbar-search {
