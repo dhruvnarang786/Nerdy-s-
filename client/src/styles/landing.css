@@ -53,17 +53,17 @@
 }
 
 .landing-marquee-item img {
-    width: 110px;
-    height: 165px;
+    width: 126px;
+    height: 189px;
     object-fit: cover;
     border-radius: 0.5rem;
     display: block;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 0 0 20px rgba(212, 175, 55, 0.2);
     transition: box-shadow 0.3s ease;
 }
 
 .landing-marquee-item:hover img {
-    box-shadow: 0 15px 40px rgba(212, 175, 55, 0.25), 0 8px 25px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 20px 50px rgba(212, 175, 55, 0.4), 0 12px 30px rgba(0, 0, 0, 0.8);
 }
 
 /* Edge fade overlays */
