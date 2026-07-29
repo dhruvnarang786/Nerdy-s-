@@ -40,9 +40,7 @@ export function Navbar() {
     const authNavLinks: NavLink[] = [
         { name: 'Home', href: '/' },
         { name: 'Trending', href: '/trending' },
-        { name: 'Favorites', href: '/favorites' },
         { name: 'Community', href: '/community' },
-        { name: 'My Journal', href: '/journal' },
         { name: 'My DNA', href: '/dna' },
     ];
 
