@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
-import { ArrowRight, BookOpen, Star, Users, Zap, TrendingUp, Clock, Activity, Flame, Crown, Heart, MessageCircle } from 'lucide-react';
-import CountUp from 'react-countup';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Star, TrendingUp, Clock, Activity, Flame, Crown, Heart, MessageCircle } from 'lucide-react';
 import { searchBooks, getBookDetails, type Book } from '@/lib/apiClient';
-import { getFavorites, getAllLogs, getCurrentUserLogs } from '@/lib/storage';
+import { getAllLogs } from '@/lib/storage';
 import { useAuth } from '@/lib/AuthContext';
 import { FALLBACK_COVER } from '@/lib/constants';
 import '@/styles/pages.css';
@@ -61,14 +60,11 @@ export function Home() {
     const [showcaseBooks, setShowcaseBooks] = useState<Book[]>(FALLBACK_SHOWCASE);
     const [recentBooks, setRecentBooks] = useState<Book[]>([]);
     const [communityReviews, setCommunityReviews] = useState<ReviewItem[]>(SAMPLE_REVIEWS);
-    const [booksRead, setBooksRead] = useState(0);
-    const [favsCount, setFavsCount] = useState(0);
 
-    // Load real user stats and reviews from API
+
+    // Load real user reviews from API
     useEffect(() => {
         if (!isAuthenticated) return;
-        getFavorites().then(favs => setFavsCount(favs.length)).catch(() => { });
-        getCurrentUserLogs().then(logs => setBooksRead(logs.length)).catch(() => { });
         
         getAllLogs().then(realLogs => {
             const withNotes = realLogs.filter(l => l.notes && l.notes.trim() && (l.username || l.user?.username));
