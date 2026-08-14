@@ -13,6 +13,7 @@ model User {
   passwordHash String?
   googleId     String?    @unique
   createdAt    DateTime   @default(now())
+  bio          String     @default("")
   logs         BookLog[]
   favorites    Favorite[]
   messages     Message[]
@@ -21,6 +22,7 @@ model User {
   badges          Badge[]
   genreAffinities GenreAffinity[]
   dnaEvents       DnaActivityEvent[]
+  refreshTokens   RefreshToken[]
 
   friends  User[] @relation("UserFriends")
   friendOf User[] @relation("UserFriends")
@@ -74,10 +76,6 @@ model Message {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// ── My DNA Models ──
-
-/// One row per user. The single source of truth for all derived DNA state.
-/// Written during snapshot recomputation; read by every DNA API call.
 model DNASnapshot {
   id        Int      @id @default(autoincrement())
   userId    Int      @unique
@@ -86,7 +84,6 @@ model DNASnapshot {
   computedAt DateTime @default(now())
   staleAfter DateTime
 
-  // Scalar stats (indexed for leaderboard queries)
   totalLogs         Int    @default(0)
   booksThisYear     Int    @default(0)
   avgRating         Float  @default(0)
@@ -115,8 +112,6 @@ model DNASnapshot {
   @@index([booksThisYear])
 }
 
-/// One row per user per badge tier. Updated on every snapshot recomputation.
-/// Badge definitions live in badges_v1.json, not in the database.
 model Badge {
   id         Int      @id @default(autoincrement())
   badgeId    String
@@ -137,7 +132,6 @@ model Badge {
   @@index([badgeId, unlocked])
 }
 
-/// One row per user per genre. Updated on snapshot recomputation.
 model GenreAffinity {
   id        Int      @id @default(autoincrement())
   userId    Int
@@ -153,7 +147,6 @@ model GenreAffinity {
   @@index([affinity])
 }
 
-/// Append-only event log. Every user action that affects DNA is recorded here.
 model DnaActivityEvent {
   id        Int      @id @default(autoincrement())
   userId    Int
@@ -169,14 +162,27 @@ model DnaActivityEvent {
   @@index([userId, processedSnapshotVersion])
 }
 
-/// Lookup table mapping author names to countries of origin.
 model AuthorCountry {
-  id      Int      @id @default(autoincrement())
-  author  String   @unique
-  country String
-  provider String
+  id         Int      @id @default(autoincrement())
+  author     String   @unique
+  country    String
+  provider   String
   resolvedAt DateTime
-  attempts Int    @default(0)
+  attempts   Int      @default(0)
 
   @@index([country])
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  jti       String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
+  @@index([jti])
+  @@index([userId])
 }

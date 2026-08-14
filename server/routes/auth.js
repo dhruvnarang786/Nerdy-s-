@@ -2,10 +2,9 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../index.js';
+import { JWT_SECRET } from '../config.js';
 
 const router = express.Router();
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 
 function generateToken(userId) {
     return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '30d' });

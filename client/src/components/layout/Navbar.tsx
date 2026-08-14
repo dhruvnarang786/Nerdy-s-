@@ -1,5 +1,5 @@
 
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { BookOpen, Search, Menu, X, LogIn, UserPlus, LogOut, User } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
@@ -9,6 +9,7 @@ export function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
     const { isAuthenticated, user, logout } = useAuth();
 
     const handleSearch = (e: React.FormEvent) => {
@@ -24,18 +25,22 @@ export function Navbar() {
         navigate('/');
     };
 
-    const publicNavLinks = [
+    interface NavLink {
+        name: string;
+        href: string;
+        isScroll?: boolean;
+    }
+
+    const publicNavLinks: NavLink[] = [
         { name: 'Home', href: '/' },
-        { name: 'About Us', href: '/about' },
+        { name: 'About Us', href: '#features', isScroll: true },
         { name: 'Profile / Dashboard', href: '/login' },
     ];
 
-    const authNavLinks = [
+    const authNavLinks: NavLink[] = [
         { name: 'Home', href: '/' },
         { name: 'Trending', href: '/trending' },
-        { name: 'Favorites', href: '/favorites' },
         { name: 'Community', href: '/community' },
-        { name: 'My Journal', href: '/journal' },
         { name: 'My DNA', href: '/dna' },
     ];
 
@@ -53,15 +58,55 @@ export function Navbar() {
                     </div>
 
                     <div className="navbar-links">
-                        {activeNavLinks.map((link, index) => (
-                            <Link
-                                key={link.name}
-                                to={link.href}
-                                className={`nav-link hover-underline-animation delay-${(index + 1) * 100}`}
-                            >
-                                {link.name}
-                            </Link>
-                        ))}
+                        {activeNavLinks.map((link, index) => {
+                            let isActive = false;
+                            
+                            // Determine active state
+                            if (link.isScroll) {
+                                isActive = location.hash === link.href;
+                            } else {
+                                // Home is active only if there's no hash and path is /
+                                isActive = location.pathname === link.href && !location.hash;
+                            }
+                            
+                            const activeClass = isActive ? 'nav-link-active' : '';
+
+                            if (link.isScroll) {
+                                return (
+                                    <a
+                                        key={link.name}
+                                        href={link.href}
+                                        className={`nav-link hover-underline-animation delay-${(index + 1) * 100} ${activeClass}`}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            if (location.pathname !== '/') {
+                                                navigate('/');
+                                                setTimeout(() => {
+                                                    const el = document.getElementById(link.href.replace('#', ''));
+                                                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                                                }, 100);
+                                            } else {
+                                                const el = document.getElementById(link.href.replace('#', ''));
+                                                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                                                window.history.pushState(null, '', link.href);
+                                            }
+                                        }}
+                                    >
+                                        {link.name}
+                                    </a>
+                                );
+                            }
+
+                            return (
+                                <Link
+                                    key={link.name}
+                                    to={link.href}
+                                    className={`nav-link hover-underline-animation delay-${(index + 1) * 100} ${activeClass}`}
+                                >
+                                    {link.name}
+                                </Link>
+                            );
+                        })}
                     </div>
 
                     <div className="navbar-search">

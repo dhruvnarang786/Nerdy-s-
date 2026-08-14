@@ -38,6 +38,8 @@ router.get('/trending', async (req, res) => {
     }
 });
 
+
+
 // GET /api/books/:id — fetch a single book's details
 router.get('/:id', async (req, res) => {
     try {
@@ -45,7 +47,7 @@ router.get('/:id', async (req, res) => {
         const book = await bookService.getById(id);
 
         if (!book) {
-            return res.status(500).json({ error: 'Failed to fetch book' });
+            return res.status(404).json({ error: 'Book not found' });
         }
 
         res.json(toApiFormat(book));

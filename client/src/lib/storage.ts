@@ -1,5 +1,5 @@
 import { api } from '@/lib/apiClient';
-import type { Book } from './api';
+import type { Book } from '@/lib/apiClient';
 
 export interface BookLog {
     id?: number;
@@ -28,10 +28,19 @@ export async function saveBookLog(log: Omit<BookLog, 'id' | 'createdAt'>): Promi
     }
 }
 
-export async function getUserLogs(_username: string): Promise<BookLog[]> {
-    // For the current user — auth token is auto-sent
+export async function getCurrentUserLogs(): Promise<BookLog[]> {
+    // For the current authenticated user
     try {
         const data = await api.get<{ logs: BookLog[] }>('/api/logs');
+        return data.logs;
+    } catch { return []; }
+}
+
+export async function getUserLogs(username: string): Promise<BookLog[]> {
+    // For a specific user's public profile
+    if (!username) return [];
+    try {
+        const data = await api.get<{ logs: BookLog[] }>(`/api/logs/user/${username}`);
         return data.logs;
     } catch { return []; }
 }
@@ -65,7 +74,7 @@ export async function getFavorites(): Promise<Book[]> {
             id: f.bookId,
             title: f.bookTitle || '',
             author: f.author || '',
-            coverUrl: f.coverUrl || '',
+            coverUrl: f.coverUrl || 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=200&auto=format&fit=crop',
             description: '',
             publishedDate: '',
             rating: 0,

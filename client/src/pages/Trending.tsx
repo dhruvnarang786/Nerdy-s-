@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { searchBooks, type Book } from '@/lib/api';
+import { searchBooks, type Book } from '@/lib/apiClient';
 import { GENRE_CONFIG } from '@/lib/genreConfig';
 import { GenreScrollRow } from '@/components/ui/GenreScrollRow';
 import { Filter, TrendingUp } from 'lucide-react';

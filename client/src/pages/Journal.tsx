@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Star, BookOpen, Calendar, Loader2 } from 'lucide-react';
 import { getUserLogs, type BookLog } from '@/lib/storage';
 import { useAuth } from '@/lib/AuthContext';
-import { getBookDetails, type Book } from '@/lib/api';
+import { getBookDetails, type Book } from '@/lib/apiClient';
 import '@/styles/pages.css';
 
 export function Journal() {

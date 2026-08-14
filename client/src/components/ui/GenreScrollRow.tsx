@@ -1,6 +1,6 @@
 import { memo, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { type Book } from '@/lib/api';
+import { type Book } from '@/lib/apiClient';
 import { BookCard } from '@/components/ui/BookCard';
 import '@/styles/components.css';
 

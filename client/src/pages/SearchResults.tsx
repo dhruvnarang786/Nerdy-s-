@@ -1,8 +1,9 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { searchBooks, type Book } from '@/lib/api';
+import { searchBooks, type Book } from '@/lib/apiClient';
 import { BookCard } from '@/components/ui/BookCard';
+import { FALLBACK_COVER } from '@/lib/constants';
 import { Loader2, Search, ArrowRight } from 'lucide-react';
 import '@/styles/pages.css';
 
@@ -75,7 +76,7 @@ export function SearchResults() {
                                 <Link to={`/book/${books[0].id}`} className="search-hero-link">
                                     <div className="search-hero-cover-wrap">
                                         <img
-                                            src={books[0].coverUrl}
+                                            src={books[0].coverUrl || FALLBACK_COVER}
                                             alt={books[0].title}
                                             className="search-hero-cover"
                                         />

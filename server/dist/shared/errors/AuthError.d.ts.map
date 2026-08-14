@@ -1,0 +1,1 @@
+{"version":3,"file":"AuthError.d.ts","sourceRoot":"","sources":["../../../src/shared/errors/AuthError.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,QAAQ,EAAE,MAAM,eAAe,CAAA;AAExC,qBAAa,SAAU,SAAQ,QAAQ;gBACzB,OAAO,SAA4B;CAGhD"}

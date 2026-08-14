@@ -1,0 +1,1 @@
+{"version":3,"file":"ExternalServiceError.js","sourceRoot":"","sources":["../../../src/shared/errors/ExternalServiceError.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,QAAQ,EAAE,MAAM,eAAe,CAAA;AAExC,MAAM,OAAO,oBAAqB,SAAQ,QAAQ;IAChD,YAAY,OAAO,GAAG,8BAA8B,EAAE,OAAiB;QACrE,KAAK,CAAC,OAAO,EAAE,GAAG,EAAE,wBAAwB,EAAE,OAAO,CAAC,CAAA;IACxD,CAAC;CACF"}
