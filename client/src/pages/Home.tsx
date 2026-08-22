@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Star, TrendingUp, Clock, Activity, Flame, Crown, Heart, MessageCircle } from 'lucide-react';
+import { Star, TrendingUp, Clock, Activity, Flame, Crown, Heart, MessageCircle } from 'lucide-react';
 import { searchBooks, getBookDetails, type Book } from '@/lib/apiClient';
 import { getAllLogs } from '@/lib/storage';
 import { useAuth } from '@/lib/AuthContext';
