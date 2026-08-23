@@ -171,7 +171,7 @@ export class DnaComputeService {
     incMetrics._accum = updatedAccum;
 
     // Full recompute genre diversity (fast enough)
-    const logs = await prisma.bookLog.findMany({ where: { userId }, select: { genre: true, author: true, dateRead: true, rating: true, notes: true, createdAt: true, bookId: true } });
+    const logs = await prisma.bookLog.findMany({ where: { userId }, select: { id: true, author: true, dateRead: true, rating: true, notes: true, createdAt: true, bookId: true, bookTitle: true, hasSpoilers: true } });
     incMetrics.genreDiversity = logs.length > 0 ? (await this.metricsEngine.fullRecomputeFromLogs(logs, {}, 0)).genreDiversity : 0;
     incMetrics.totalLogs = logs.length;
 

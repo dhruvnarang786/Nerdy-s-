@@ -86,14 +86,24 @@ interface Message {
 }
 
 // ─── Speech Recognition Type ─────────────────────────────────────────────────
-interface SpeechRecognitionType extends EventTarget {
+interface SpeechRecognitionEvent {
+    results: {
+        [index: number]: {
+            [index: number]: {
+                transcript: string;
+            };
+        };
+    };
+}
+
+interface SpeechRecognitionType {
     lang: string;
     continuous: boolean;
     interimResults: boolean;
     start(): void;
     stop(): void;
-    onresult: ((event: any) => void) | null;
-    onerror: ((event: any) => void) | null;
+    onresult: ((event: SpeechRecognitionEvent) => void) | null;
+    onerror: ((event: Event) => void) | null;
     onend: (() => void) | null;
 }
 
@@ -179,7 +189,7 @@ export function AiRecommend() {
                 utterance.pitch = 1;
                 window.speechSynthesis.speak(utterance);
             }
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error('[AI Chat] Network error:', e);
             setMessages(prev => [...prev, {
                 role: 'model',
@@ -211,7 +221,7 @@ export function AiRecommend() {
         recognition.lang = 'en-US';
         recognition.continuous = false;
         recognition.interimResults = false;
-        recognition.onresult = (event: any) => {
+        recognition.onresult = (event: SpeechRecognitionEvent) => {
             const transcript = event.results[0][0].transcript;
             setChatInput(transcript);
         };

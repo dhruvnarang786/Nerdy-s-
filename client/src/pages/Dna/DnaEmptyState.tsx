@@ -1,10 +1,7 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useNavigate } from 'react-router-dom';
 
-interface BrandNewUserProps {
-  onDismiss?: () => void;
-}
-
-function BrandNewUser({ onDismiss }: BrandNewUserProps) {
+function BrandNewUser() {
   const navigate = useNavigate();
 
   return (

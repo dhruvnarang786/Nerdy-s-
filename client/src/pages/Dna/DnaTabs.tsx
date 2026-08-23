@@ -1,19 +1,19 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
-import { LayoutDashboard, BarChart3, Award, Users, TrendingUp } from 'lucide-react';
-import { useDnaStats, useDnaBadges, useDnaTrends } from './hooks';
+import { useState, useRef, useCallback } from 'react';
+import { User, Activity, BookOpen, MessageSquare, Heart } from 'lucide-react';
+import { useDnaStats } from './hooks';
 
 export interface TabDef {
   id: string;
   label: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: React.ComponentType<{ size?: number; className?: string; style?: React.CSSProperties }>;
 }
 
-export const TABS: TabDef[] = [
-  { id: 'Overview', label: 'Overview', icon: LayoutDashboard },
-  { id: 'Stats', label: 'Stats', icon: BarChart3 },
-  { id: 'Badges', label: 'Badges', icon: Award },
-  { id: 'Friends', label: 'Friends', icon: Users },
-  { id: 'Trends', label: 'Trends', icon: TrendingUp },
+const TABS: TabDef[] = [
+  { id: 'Profile', label: 'Profile', icon: User },
+  { id: 'Activity', label: 'Activity', icon: Activity },
+  { id: 'Books', label: 'Books', icon: BookOpen },
+  { id: 'Reviews', label: 'Reviews', icon: MessageSquare },
+  { id: 'Favorites', label: 'Favorites', icon: Heart },
 ];
 
 interface DnaTabBarProps {
@@ -25,9 +25,7 @@ function useTabPrefetcher() {
   const [prefetchTab, setPrefetchTab] = useState<string | null>(null);
   const hoverTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
-  useDnaStats(prefetchTab === 'Stats');
-  useDnaBadges(prefetchTab === 'Badges');
-  useDnaTrends(prefetchTab === 'Trends');
+  useDnaStats(prefetchTab === 'Profile');
 
   const onHover = useCallback((tabId: string) => {
     if (hoverTimers.current[tabId]) return;
@@ -77,33 +75,35 @@ export function DnaTabBar({ activeTab, onTabChange }: DnaTabBarProps) {
   return (
     <nav
       ref={tabBarRef}
-      className="dna-tab-bar"
+      className="lb-subnav-bar"
       role="tablist"
-      aria-label="DNA sections"
+      aria-label="Profile navigation"
       aria-orientation="horizontal"
     >
-      {TABS.map((tab, i) => {
-        const isActive = activeTab === tab.id;
-        const Icon = tab.icon;
-        return (
-          <button
-            key={tab.id}
-            id={`tab-${tab.id}`}
-            className={`dna-tab ${isActive ? 'active' : ''}`}
-            role="tab"
-            aria-selected={isActive}
-            aria-controls={`tabpanel-${tab.id}`}
-            tabIndex={isActive ? 0 : -1}
-            onClick={() => onTabChange(tab.id)}
-            onKeyDown={(e) => handleKeyDown(e, i)}
-            onMouseEnter={() => onHover(tab.id)}
-            onMouseLeave={() => onLeave(tab.id)}
-          >
-            <Icon size={16} />
-            <span className="dna-tab-label">{tab.label}</span>
-          </button>
-        );
-      })}
+      <div className="lb-subnav-links">
+        {TABS.map((tab, i) => {
+          const isActive = activeTab === tab.id;
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              id={`tab-${tab.id}`}
+              className={`lb-subnav-tab ${isActive ? 'active' : ''}`}
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`tabpanel-${tab.id}`}
+              tabIndex={isActive ? 0 : -1}
+              onClick={() => onTabChange(tab.id)}
+              onKeyDown={(e) => handleKeyDown(e, i)}
+              onMouseEnter={() => onHover(tab.id)}
+              onMouseLeave={() => onLeave(tab.id)}
+            >
+              <Icon size={14} />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
     </nav>
   );
 }
@@ -115,26 +115,22 @@ interface DnaTabPanelProps {
 }
 
 export function DnaTabPanel({ tabId, activeTab, children }: DnaTabPanelProps) {
-  const panelRef = useRef<HTMLElement>(null);
+  const isSelected = activeTab === tabId;
+  const [hasRendered, setHasRendered] = useState(isSelected);
 
-  useEffect(() => {
-    if (tabId === activeTab && panelRef.current) {
-      panelRef.current.focus();
-    }
-  }, [tabId, activeTab]);
-
-  if (tabId !== activeTab) return null;
+  if (isSelected && !hasRendered) {
+    setHasRendered(true);
+  }
 
   return (
-    <section
+    <div
       id={`tabpanel-${tabId}`}
-      ref={panelRef}
-      className="dna-tab-panel"
       role="tabpanel"
       aria-labelledby={`tab-${tabId}`}
-      tabIndex={-1}
+      hidden={!isSelected}
+      className="lb-tab-panel"
     >
-      {children}
-    </section>
+      {hasRendered ? children : null}
+    </div>
   );
 }

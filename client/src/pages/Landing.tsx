@@ -1,22 +1,24 @@
 import { Link } from 'react-router-dom';
 import { BookOpen, MessageSquare, Users, Star, Heart, Edit3, LayoutGrid, ChevronDown } from 'lucide-react';
+import { getBookCoverUrl } from '@/lib/bookCover';
+import { FALLBACK_COVER } from '@/lib/constants';
 import '@/styles/pages.css';
 import '@/styles/bento.css';
 import '@/styles/landing.css';
 
 const MARQUEE_BOOKS = [
-    { id: '1', title: 'The Seven Husbands of Evelyn Hugo', cover: 'https://covers.openlibrary.org/b/id/10515129-L.jpg' },
-    { id: '2', title: 'The Midnight Library', cover: 'https://covers.openlibrary.org/b/id/10543666-L.jpg' },
-    { id: '3', title: 'The Fault in Our Stars', cover: 'https://covers.openlibrary.org/b/id/8259441-L.jpg' },
-    { id: '4', title: 'Atomic Habits', cover: 'https://covers.openlibrary.org/b/id/12879555-L.jpg' },
-    { id: '5', title: '1984', cover: 'https://covers.openlibrary.org/b/id/15325651-L.jpg' },
-    { id: '6', title: 'To Kill a Mockingbird', cover: 'https://covers.openlibrary.org/b/id/14407559-L.jpg' },
-    { id: '7', title: 'The Alchemist', cover: 'https://covers.openlibrary.org/b/id/12662058-L.jpg' },
-    { id: '8', title: 'Harry Potter and the Sorcerer\'s Stone', cover: 'https://covers.openlibrary.org/b/id/10521270-L.jpg' },
-    { id: '9', title: 'Sapiens', cover: 'https://covers.openlibrary.org/b/id/12586074-L.jpg' },
-    { id: '10', title: 'Where the Crawdads Sing', cover: 'https://covers.openlibrary.org/b/id/12693892-L.jpg' },
-    { id: '11', title: 'The Great Gatsby', cover: 'https://covers.openlibrary.org/b/id/12563339-L.jpg' },
-    { id: '12', title: 'The Book Thief', cover: 'https://covers.openlibrary.org/b/id/10476483-L.jpg' },
+    { id: 'OL27479W', title: '1984', cover: 'https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg' },
+    { id: 'OL82536W', title: 'The Great Gatsby', cover: 'https://covers.openlibrary.org/b/isbn/9780743273565-L.jpg' },
+    { id: 'OL27516W', title: 'The Hobbit', cover: 'https://covers.openlibrary.org/b/isbn/9780547928227-L.jpg' },
+    { id: 'OL45804W', title: 'Pride and Prejudice', cover: 'https://covers.openlibrary.org/b/isbn/9780141439518-L.jpg' },
+    { id: 'OL15125W', title: 'To Kill a Mockingbird', cover: 'https://covers.openlibrary.org/b/isbn/9780061120084-L.jpg' },
+    { id: 'OL81613W', title: 'The Alchemist', cover: 'https://covers.openlibrary.org/b/isbn/9780062315007-L.jpg' },
+    { id: 'OL12345W', title: 'Atomic Habits', cover: 'https://covers.openlibrary.org/b/isbn/9780735211292-L.jpg' },
+    { id: 'OL27258W', title: 'Dune', cover: 'https://covers.openlibrary.org/b/isbn/9780441172719-L.jpg' },
+    { id: 'OL17075704W', title: 'Sapiens', cover: 'https://covers.openlibrary.org/b/isbn/9780062316097-L.jpg' },
+    { id: 'OL17930368W', title: 'Project Hail Mary', cover: 'https://covers.openlibrary.org/b/isbn/9780593135204-L.jpg' },
+    { id: 'OL20644253W', title: 'The Midnight Library', cover: 'https://covers.openlibrary.org/b/isbn/9780525559474-L.jpg' },
+    { id: 'OL82563W', title: 'The Night Circus', cover: 'https://covers.openlibrary.org/b/isbn/9780307744432-L.jpg' },
 ];
 
 export function Landing() {
@@ -25,15 +27,6 @@ export function Landing() {
 
     return (
         <div className="home-wrapper" style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
-            {/* ── GLOBAL BOOKSHELF BACKGROUND ──────────────────── */}
-            <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1, pointerEvents: 'none' }}>
-                <div className="lb-hero-bg hero-gradient-bg" style={{ position: 'absolute', inset: 0, opacity: 0.95, mixBlendMode: 'normal', backgroundImage: 'url("https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2000&auto=format&fit=crop")', backgroundSize: 'cover', backgroundPosition: 'center', filter: 'sepia(0.3) opacity(0.3) brightness(1.2) contrast(0.9)' }}>
-                    <div className="lb-hero-overlay" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.8) 100%)' }} />
-                </div>
-                <div className="hero-noise-overlay" style={{ position: 'absolute', inset: 0 }}></div>
-                <div className="hero-radial-glow" style={{ position: 'absolute', inset: 0 }}></div>
-            </div>
-
             {/* ── HERO SECTION ─────────────────────────────────── */}
             <section className="landing-hero">
                 {/* Infinite Book Marquee */}
@@ -41,7 +34,14 @@ export function Landing() {
                     <div className="landing-marquee-track">
                         {marqueeItems.map((book, i) => (
                             <Link key={`${book.id}-${i}`} to={`/book/${book.id}`} className="landing-marquee-item">
-                                <img src={book.cover} alt={book.title} loading="lazy" />
+                                <img
+                                    src={getBookCoverUrl(book.id, book.cover)}
+                                    alt={book.title}
+                                    loading="lazy"
+                                    onError={(e) => {
+                                        e.currentTarget.src = FALLBACK_COVER;
+                                    }}
+                                />
                             </Link>
                         ))}
                     </div>
@@ -103,27 +103,39 @@ export function Landing() {
                 <h2 className="nerdys-features-heading animate-fade-in-up">NERDY'S LETS YOU…</h2>
                 <div className="nerdys-features-grid">
                     <div className="nerdys-feature-card animate-fade-in-up delay-100">
-                        <BookOpen className="nerdys-feature-icon" />
+                        <div className="nerdys-feature-icon-wrapper">
+                            <BookOpen className="nerdys-feature-icon" />
+                        </div>
                         <p>Keep track of every book you've ever read (or just start from the day you join)</p>
                     </div>
                     <div className="nerdys-feature-card animate-fade-in-up delay-200">
-                        <Heart className="nerdys-feature-icon" />
+                        <div className="nerdys-feature-icon-wrapper">
+                            <Heart className="nerdys-feature-icon" />
+                        </div>
                         <p>Show some love for your favorite books, lists and reviews with a "like"</p>
                     </div>
                     <div className="nerdys-feature-card animate-fade-in-up delay-300">
-                        <Edit3 className="nerdys-feature-icon" />
+                        <div className="nerdys-feature-icon-wrapper">
+                            <Edit3 className="nerdys-feature-icon" />
+                        </div>
                         <p>Write and share reviews, and follow friends and other members to read theirs</p>
                     </div>
                     <div className="nerdys-feature-card animate-fade-in-up delay-100">
-                        <Star className="nerdys-feature-icon" />
+                        <div className="nerdys-feature-icon-wrapper">
+                            <Star className="nerdys-feature-icon" />
+                        </div>
                         <p>Rate each book on a five-star scale to record and share your reaction</p>
                     </div>
                     <div className="nerdys-feature-card animate-fade-in-up delay-200">
-                        <Users className="nerdys-feature-icon" />
+                        <div className="nerdys-feature-icon-wrapper">
+                            <Users className="nerdys-feature-icon" />
+                        </div>
                         <p>Join book clubs and communities to discuss your reads with fellow book lovers</p>
                     </div>
                     <div className="nerdys-feature-card animate-fade-in-up delay-300">
-                        <LayoutGrid className="nerdys-feature-icon" />
+                        <div className="nerdys-feature-icon-wrapper">
+                            <LayoutGrid className="nerdys-feature-icon" />
+                        </div>
                         <p>Compile and share lists of books on any topic and keep a personal reading list</p>
                     </div>
                 </div>

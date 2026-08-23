@@ -3,17 +3,17 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Star, BookOpen, Calendar, ArrowLeft, Loader2 } from 'lucide-react';
 import { getUserLogs, type BookLog } from '@/lib/storage';
+import { displayName, userInitial } from '@/lib/displayName';
+import { getBookCoverUrl } from '@/lib/bookCover';
 import '@/styles/pages.css';
 
 export function UserProfile() {
     const { username } = useParams<{ username: string }>();
     const [logs, setLogs] = useState<BookLog[]>([]);
-
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (!username) return;
-        setLoading(true);
         getUserLogs(username)
             .then(userLogs => {
                 userLogs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -28,6 +28,7 @@ export function UserProfile() {
         : '—';
 
     const avatarColor = stringToColor(username || '');
+    const cleanName = displayName(username);
 
     if (loading) {
         return (
@@ -47,10 +48,10 @@ export function UserProfile() {
             {/* Profile Header */}
             <div className="profile-header">
                 <div className="profile-avatar-lg" style={{ background: avatarColor }}>
-                    {(username || '?')[0].toUpperCase()}
+                    {userInitial(username)}
                 </div>
                 <div className="profile-info">
-                    <h1 className="profile-username">@{username}</h1>
+                    <h1 className="profile-username">@{cleanName}</h1>
                     <p className="profile-sub">Member of Nerdy's</p>
                     <div className="profile-stats">
                         <div className="profile-stat">
@@ -88,30 +89,40 @@ export function UserProfile() {
                 ) : (
                     <div className="profile-logs">
                         {logs.map((log, i) => (
-                            <div key={i} className="profile-log-card">
-                                <div className="profile-log-header">
-                                    <div>
-                                        <Link
-                                            to={`/book/${log.bookId}`}
-                                            className="profile-log-book-title"
-                                        >
-                                            {log.bookTitle || `Book #${log.bookId.slice(0, 8)}`}
-                                        </Link>
-                                        <div className="profile-log-meta">
-                                            <Calendar className="w-3 h-3" />
-                                            <span>Read on {log.dateRead}</span>
+                            <div key={i} className="profile-log-card" style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                                <Link to={`/book/${log.bookId}`} style={{ flexShrink: 0 }}>
+                                    <img
+                                        src={getBookCoverUrl(log.bookId, log.coverUrl)}
+                                        alt={log.bookTitle || 'Book'}
+                                        style={{ width: '48px', height: '72px', objectFit: 'cover', borderRadius: '4px' }}
+                                        onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }}
+                                    />
+                                </Link>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div className="profile-log-header">
+                                        <div>
+                                            <Link
+                                                to={`/book/${log.bookId}`}
+                                                className="profile-log-book-title"
+                                            >
+                                                {log.bookTitle || `Book #${log.bookId.slice(0, 8)}`}
+                                            </Link>
+                                            <div className="profile-log-meta">
+                                                <Calendar className="w-3 h-3" />
+                                                <span>Read on {log.dateRead}</span>
+                                            </div>
+                                        </div>
+                                        <div className="profile-log-rating">
+                                            {Array.from({ length: log.rating }).map((_, si) => (
+                                                <Star key={si} className="profile-star" />
+                                            ))}
+                                            <span className="profile-log-rating-num">{log.rating}/5</span>
                                         </div>
                                     </div>
-                                    <div className="profile-log-rating">
-                                        {Array.from({ length: log.rating }).map((_, si) => (
-                                            <Star key={si} className="profile-star" />
-                                        ))}
-                                        <span className="profile-log-rating-num">{log.rating}/5</span>
-                                    </div>
+                                    {log.notes && (
+                                        <p className="profile-log-notes">"{log.notes}"</p>
+                                    )}
                                 </div>
-                                {log.notes && (
-                                    <p className="profile-log-notes">"{log.notes}"</p>
-                                )}
                             </div>
                         ))}
                     </div>

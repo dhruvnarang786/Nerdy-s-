@@ -1,5 +1,5 @@
 interface DnaNarrationProps {
-  identity: string | null;
+  identity?: string | null;
   archetypeLabel?: string | null;
   version?: string;
 }

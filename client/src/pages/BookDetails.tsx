@@ -1,11 +1,13 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Star, Calendar, BookOpen, Loader2, Plus, Quote, LogIn, X } from 'lucide-react';
 import { getBookDetails, type Book } from '@/lib/apiClient';
 import { getBookLogs, getBookCommunityLogs, type BookLog, isFavorite, toggleFavorite } from '@/lib/storage';
 import { LogBook } from '@/components/features/LogBook';
 import { useAuth } from '@/lib/AuthContext';
+import { displayName } from '@/lib/displayName';
+import { getBookCoverUrl } from '@/lib/bookCover';
 import { FALLBACK_COVER } from '@/lib/constants';
 import '@/styles/pages.css';
 
@@ -30,16 +32,19 @@ export function BookDetails() {
         setRevealedLogs(prev => ({ ...prev, [logId]: true }));
     };
 
-    const refreshLogs = async () => {
+    const refreshLogs = useCallback(async () => {
         if (id) {
-            const [personal, community] = await Promise.all([
-                getBookLogs(id),
-                getBookCommunityLogs(id)
-            ]);
-            setLogs(personal);
+            const community = await getBookCommunityLogs(id);
             setCommunityLogs(community);
+
+            if (isAuthenticated) {
+                const personal = await getBookLogs(id);
+                setLogs(personal);
+            } else {
+                setLogs([]);
+            }
         }
-    };
+    }, [id, isAuthenticated]);
 
     useEffect(() => {
         const fetchBook = async () => {
@@ -49,8 +54,12 @@ export function BookDetails() {
                 const data = await getBookDetails(id);
                 setBook(data);
                 await refreshLogs();
-                const favResult = await isFavorite(id);
-                setIsFav(favResult);
+                if (isAuthenticated) {
+                    const favResult = await isFavorite(id);
+                    setIsFav(favResult);
+                } else {
+                    setIsFav(false);
+                }
 
                 // Track recent views in localStorage
                 const recentKey = 'nerdys_recent_views';
@@ -67,7 +76,7 @@ export function BookDetails() {
 
         fetchBook();
 
-    }, [id]);
+    }, [id, isAuthenticated, refreshLogs]);
 
     const handleToggleFav = () => {
         if (book) {
@@ -95,6 +104,8 @@ export function BookDetails() {
                 <LogBook
                     bookId={book.id}
                     bookTitle={book.title}
+                    coverUrl={book.coverUrl}
+                    author={book.author}
                     onClose={() => setShowLogModal(false)}
                     onSave={refreshLogs}
                 />
@@ -139,9 +150,12 @@ export function BookDetails() {
             <div className="book-details-header">
                 <div className="flex-shrink-0 mx-auto md:mx-0">
                     <img
-                        src={book.coverUrl || FALLBACK_COVER}
+                        src={getBookCoverUrl(book.id, book.coverUrl)}
                         alt={book.title}
                         className="book-cover-large"
+                        onError={(e) => {
+                            e.currentTarget.src = FALLBACK_COVER;
+                        }}
                     />
                 </div>
                 <div className="book-info">
@@ -276,7 +290,7 @@ export function BookDetails() {
                                             <div className="bg-primary/20 p-2 rounded-full">
                                                 <Quote className="w-4 h-4 text-primary" />
                                             </div>
-                                            {log.user && <span className="text-sm font-bold ml-1 text-white">{log.user.username}</span>}
+                                            {log.user && <span className="text-sm font-bold ml-1 text-white">{displayName(log.user.username)}</span>}
                                             <span className="text-sm text-muted-foreground">{log.dateRead}</span>
                                         </div>
                                         <div className="review-rating">

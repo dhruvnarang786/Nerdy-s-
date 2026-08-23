@@ -13,31 +13,35 @@ export function DnaStatCards({ booksThisYear, avgRating, currentStreak, totalBad
     {
       icon: BookOpen,
       value: booksThisYear,
-      label: 'Books This Year',
-      color: '#4ade80',
-      glow: 'rgba(74,222,128,0.35)',
+      label: 'Books Logged This Year',
+      color: 'var(--primary)',
+      glow: 'rgba(212, 175, 55, 0.25)',
+      decimals: 0,
     },
     {
       icon: Star,
       value: typeof avgRating === 'number' ? parseFloat(avgRating.toFixed(1)) : 0,
-      label: 'Avg Rating',
-      color: '#f59e0b',
-      glow: 'rgba(245,158,11,0.35)',
+      label: 'Average Rating',
+      color: '#eab308',
+      glow: 'rgba(234, 179, 8, 0.25)',
+      decimals: 1,
     },
     {
       icon: Flame,
       value: currentStreak,
-      label: 'Day Streak',
+      label: 'Current Reading Streak',
       color: '#f97316',
-      glow: 'rgba(249,115,22,0.35)',
+      glow: 'rgba(249, 115, 34, 0.25)',
       pulsing: currentStreak > 0,
+      decimals: 0,
     },
     {
       icon: Award,
       value: totalBadges,
-      label: 'Badges',
-      color: '#8b5cf6',
-      glow: 'rgba(139,92,246,0.35)',
+      label: 'Trophies Unlocked',
+      color: '#a855f7',
+      glow: 'rgba(168, 85, 247, 0.25)',
+      decimals: 0,
     },
   ];
 
@@ -49,11 +53,15 @@ export function DnaStatCards({ booksThisYear, avgRating, currentStreak, totalBad
           className={`dna-stat-card-compact ${card.pulsing ? 'dna-pulse-glow' : ''}`}
           style={{ '--stat-glow': card.glow } as React.CSSProperties}
         >
-          <card.icon size={20} color={card.color} />
-          <span className="dna-stat-number">
-            <CountUp end={card.value} duration={2} separator="," />
-          </span>
-          <span className="dna-stat-label-compact">{card.label}</span>
+          <div className="dna-stat-icon-wrapper">
+            <card.icon size={20} color={card.color} />
+          </div>
+          <div className="dna-stat-details">
+            <span className="dna-stat-number">
+              <CountUp end={card.value} decimals={card.decimals} duration={1.5} separator="," />
+            </span>
+            <span className="dna-stat-label-compact">{card.label}</span>
+          </div>
         </div>
       ))}
     </div>

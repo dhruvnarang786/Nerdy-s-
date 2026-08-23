@@ -4,6 +4,17 @@ import { requireAuth } from '../middleware/auth.js';
 import { dnaComputeService, dnaEventService, dnaQueryService } from '../services/dna/index.js';
 
 const router = express.Router();
+const inFlightRecomputes = new Map();
+
+async function deduplicatedRecompute(userId) {
+  if (inFlightRecomputes.has(userId)) {
+    return inFlightRecomputes.get(userId);
+  }
+  const promise = dnaComputeService.fullRecompute(userId)
+    .finally(() => inFlightRecomputes.delete(userId));
+  inFlightRecomputes.set(userId, promise);
+  return promise;
+}
 
 // GET /api/dna — composable endpoint for all DNA data
 router.get('/', requireAuth, async (req, res) => {
@@ -17,7 +28,7 @@ router.get('/', requireAuth, async (req, res) => {
     if (!result.exists) {
       // No snapshot yet — compute one on demand (first visit)
       try {
-        await dnaComputeService.fullRecompute(req.user.id);
+        await deduplicatedRecompute(req.user.id);
         result = await dnaQueryService.getSnapshot(req.user.id, fields);
       } catch (computeErr) {
         console.error('[DNA] First-time compute failed:', computeErr.message);

@@ -4,6 +4,8 @@ import { ArrowRight, Star, TrendingUp, Clock, Activity, Flame, Crown, Heart, Mes
 import { searchBooks, getBookDetails, type Book } from '@/lib/apiClient';
 import { getAllLogs } from '@/lib/storage';
 import { useAuth } from '@/lib/AuthContext';
+import { displayName } from '@/lib/displayName';
+import { getBookCoverUrl } from '@/lib/bookCover';
 import { FALLBACK_COVER } from '@/lib/constants';
 import '@/styles/pages.css';
 import '@/styles/lb-home.css';
@@ -11,11 +13,11 @@ import '@/styles/lb-home.css';
 import { Landing } from './Landing';
 
 const SAMPLE_REVIEWS = [
-    { user: 'alice_reads', book: 'The Night Circus', bookId: '', rating: 5, comment: 'Absolutely magical. One of the most atmospheric books I\'ve ever read. The world-building is top notch.' },
-    { user: 'bookworm91', book: 'Project Hail Mary', bookId: '', rating: 5, comment: 'Andy Weir at the peak of his craft. Couldn\'t put it down. Science meets heart.' },
-    { user: 'literary_leo', book: 'Tomorrow, and Tomorrow, and Tomorrow', bookId: '', rating: 4, comment: 'A gorgeous meditation on friendship, creativity and loss.' },
-    { user: 'sarah_pages', book: 'Piranesi', bookId: '', rating: 5, comment: 'Strange, beautiful, and unlike anything else. A modern classic.' },
-    { user: 'readsalot', book: 'The Midnight Library', bookId: '', rating: 4, comment: 'A philosophical page-turner. Made me rethink my choices.' },
+    { user: 'alice_reads', book: 'The Night Circus', bookId: 'OL82563W', rating: 5, comment: 'Absolutely magical. One of the most atmospheric books I\'ve ever read. The world-building is top notch.' },
+    { user: 'bookworm91', book: 'Project Hail Mary', bookId: 'OL17930368W', rating: 5, comment: 'Andy Weir at the peak of his craft. Couldn\'t put it down. Science meets heart.' },
+    { user: 'literary_leo', book: 'Tomorrow, and Tomorrow, and Tomorrow', bookId: 'OL20897277W', rating: 4, comment: 'A gorgeous meditation on friendship, creativity and loss.' },
+    { user: 'sarah_pages', book: 'Piranesi', bookId: 'OL19631252W', rating: 5, comment: 'Strange, beautiful, and unlike anything else. A modern classic.' },
+    { user: 'readsalot', book: 'The Midnight Library', bookId: 'OL20644253W', rating: 4, comment: 'A philosophical page-turner. Made me rethink my choices.' },
 ];
 
 const POPULAR_LISTS = [
@@ -61,24 +63,30 @@ export function Home() {
     const [recentBooks, setRecentBooks] = useState<Book[]>([]);
     const [communityReviews, setCommunityReviews] = useState<ReviewItem[]>(SAMPLE_REVIEWS);
 
-
     // Load real user reviews from API
     useEffect(() => {
         if (!isAuthenticated) return;
         
         getAllLogs().then(realLogs => {
             const withNotes = realLogs.filter(l => l.notes && l.notes.trim() && (l.username || l.user?.username));
-            if (withNotes.length >= 3) {
+            if (withNotes.length > 0) {
                 const sorted = [...withNotes].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-                setCommunityReviews(sorted.slice(0, 10).map(l => ({
-                    user: l.username || l.user?.username || 'Anonymous',
+                const realItems: ReviewItem[] = sorted.slice(0, 10).map(l => ({
+                    user: displayName(l.username || l.user?.username || 'Anonymous'),
                     book: l.bookTitle || 'a book',
                     bookId: l.bookId,
                     rating: l.rating,
                     comment: l.notes,
                     isReal: true,
                     date: 'Today'
-                })));
+                }));
+                
+                // If fewer than 4 real reviews, append sample reviews for rich appearance
+                if (realItems.length < 4) {
+                    setCommunityReviews([...realItems, ...SAMPLE_REVIEWS.slice(0, 5 - realItems.length)]);
+                } else {
+                    setCommunityReviews(realItems);
+                }
             }
         }).catch(() => { });
     }, [isAuthenticated]);
@@ -120,7 +128,7 @@ export function Home() {
             {/* ── COMPACT WELCOME BAR (just below navbar) ───────── */}
             <section className="lb-welcome-bar animate-fade-in-up">
                 <h1 className="lb-welcome-greeting">
-                    Welcome back, <span className="lb-welcome-username">{user?.username}</span>.
+                    Welcome back, <span className="lb-welcome-username">{displayName(user?.username)}</span>.
                 </h1>
                 <p className="lb-welcome-sub">Here's what your friends have been reading.</p>
             </section>
@@ -134,7 +142,14 @@ export function Home() {
                     </div>
                     <div className="lb-botd-content">
                         <Link to={`/book/${heroBook.id}`} className="lb-botd-cover-wrap">
-                            <img src={heroBook.coverUrl || FALLBACK_COVER} alt={heroBook.title} className="lb-botd-cover" />
+                            <img
+                                src={getBookCoverUrl(heroBook.id, heroBook.coverUrl)}
+                                alt={heroBook.title}
+                                className="lb-botd-cover"
+                                onError={(e) => {
+                                    e.currentTarget.src = FALLBACK_COVER;
+                                }}
+                            />
                         </Link>
                         <div className="lb-botd-info">
                             <Link to={`/book/${heroBook.id}`} className="lb-botd-title">{heroBook.title}</Link>
@@ -209,7 +224,14 @@ export function Home() {
                         <div className="lb-popular-grid">
                             {showcaseBooks.map(book => (
                                 <Link key={book.id} to={`/book/${book.id}`} className="lb-popular-cover-link">
-                                    <img src={book.coverUrl || FALLBACK_COVER} alt={book.title} className="lb-popular-cover" />
+                                    <img
+                                        src={getBookCoverUrl(book.id, book.coverUrl)}
+                                        alt={book.title}
+                                        className="lb-popular-cover"
+                                        onError={(e) => {
+                                            e.currentTarget.src = FALLBACK_COVER;
+                                        }}
+                                    />
                                     <div className="lb-popular-cover-overlay">
                                         <span className="lb-popular-cover-title">{book.title}</span>
                                     </div>
@@ -231,7 +253,14 @@ export function Home() {
                             <div className="lb-sidebar-grid">
                                 {recentBooks.map(book => (
                                     <Link key={book.id} to={`/book/${book.id}`} className="lb-sidebar-cover-link">
-                                        <img src={book.coverUrl || FALLBACK_COVER} alt={book.title} className="lb-sidebar-cover" />
+                                        <img
+                                            src={getBookCoverUrl(book.id, book.coverUrl)}
+                                            alt={book.title}
+                                            className="lb-sidebar-cover"
+                                            onError={(e) => {
+                                                e.currentTarget.src = FALLBACK_COVER;
+                                            }}
+                                        />
                                     </Link>
                                 ))}
                             </div>
@@ -257,7 +286,14 @@ export function Home() {
                                 <div className="lb-plist-covers">
                                     {covers.map((book, ci) => (
                                         <div key={ci} className="lb-plist-cover-slot">
-                                            <img src={book.coverUrl || FALLBACK_COVER} alt={book.title} className="lb-plist-cover-img" />
+                                            <img
+                                                src={getBookCoverUrl(book.id, book.coverUrl)}
+                                                alt={book.title}
+                                                className="lb-plist-cover-img"
+                                                onError={(e) => {
+                                                    e.currentTarget.src = FALLBACK_COVER;
+                                                }}
+                                            />
                                         </div>
                                     ))}
                                 </div>

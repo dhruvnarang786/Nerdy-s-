@@ -120,11 +120,13 @@ router.post('/google', async (req, res) => {
                 .replace(/[^a-z0-9]/g, '')
                 .slice(0, 20) || 'user';
 
-            // Ensure username is unique by appending part of googleId if needed
+            // Ensure username is unique by checking DB and appending random suffix if needed
             let username = baseUsername;
-            const existingUsername = await prisma.user.findUnique({ where: { username } });
-            if (existingUsername) {
-                username = `${baseUsername}${googleId.slice(-4)}`;
+            let counter = 0;
+            while (await prisma.user.findUnique({ where: { username } })) {
+                counter++;
+                const suffix = counter === 1 ? googleId.slice(-4) : Math.random().toString(36).substring(2, 6);
+                username = `${baseUsername.slice(0, 15)}${suffix}`;
             }
 
             user = await prisma.user.create({

@@ -8,7 +8,7 @@ interface DnaErrorStateProps {
   context?: 'page' | 'tab' | 'background' | 'comparison';
 }
 
-const ERROR_MAP: Record<string, { title: string; description: string; Icon: React.ComponentType<{ size?: number }>; action?: string }> = {
+const ERROR_MAP: Record<string, { title: string; description: string; Icon: React.ComponentType<{ size?: number; className?: string }>; action?: string }> = {
   DNA_NOT_FOUND: {
     title: "Your DNA hasn't formed yet",
     description: 'Log your first book to start building your reading identity.',

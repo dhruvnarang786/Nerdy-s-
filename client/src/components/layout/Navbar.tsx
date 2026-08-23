@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { BookOpen, Search, Menu, X, LogIn, UserPlus, LogOut, User } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
+import { displayName } from '@/lib/displayName';
 import '@/styles/layout.css';
 
 export function Navbar() {
@@ -129,7 +130,7 @@ export function Navbar() {
                                 <div className="auth-avatar">
                                     <User className="auth-avatar-icon" />
                                 </div>
-                                <span className="auth-username">{user?.username}</span>
+                                <span className="auth-username">{displayName(user?.username)}</span>
                                 <button onClick={handleLogout} className="auth-btn auth-btn-logout" title="Logout">
                                     <LogOut className="auth-btn-icon" />
                                 </button>
@@ -190,7 +191,7 @@ export function Navbar() {
                         ))}
                         {isAuthenticated ? (
                             <button onClick={handleLogout} className="mobile-nav-link" style={{ textAlign: 'left', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', width: '100%', padding: 0 }}>
-                                Logout ({user?.username})
+                                Logout ({displayName(user?.username)})
                             </button>
                         ) : (
                             <>

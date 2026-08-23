@@ -1,17 +1,19 @@
 /* ═══════════════════════════════════════════════════════════════
-   DNA IDENTITY — Complete Stylesheet
+   MY DNA — Sitewide-Harmonious Letterboxd Reader Identity Stylesheet
+   Pure Glassmorphism with Canonical Gold Accents & Complementary Greens/Roses
+   (Clear-as-Glass Containers · True 5-Star Gold Ratings · Prestigious Trophies)
    ═══════════════════════════════════════════════════════════════ */
 
-/* ─── CSS Variables ─────────────────────────────────────────── */
 .dna-page-wrapper {
-  --dna-accent: #6366f1;
-  background: var(--background);
-  color: var(--foreground);
+  max-width: 1280px;
+  margin: 0 auto;
   min-height: 100vh;
+  padding: 1rem 1.5rem 2.5rem;
+  background: transparent !important;
   position: relative;
+  width: 100%;
 }
 
-/* ─── Screen Reader Only ────────────────────────────────────── */
 .dna-sr-only {
   position: absolute;
   width: 1px;
@@ -24,1692 +26,1928 @@
   border: 0;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   HERO SECTION
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ═══════════════════════════════════════════════════════════════
-   TWO-ZONE LAYOUT
-   ═══════════════════════════════════════════════════════════════ */
-
+/* ─── 1. LETTERBOXD PROFILE HERO HEADER ─────────────────────── */
 .dna-hero-zone {
-  position: relative;
-  z-index: 30;
+  margin-top: 0;
+  margin-bottom: 1rem;
 }
 
-/* ─── HERO ──────────────────────────────────────────────────── */
-.dna-hero {
-  position: relative;
-  padding: 2.5rem 3rem 1.5rem;
-  max-width: 1250px;
-  margin: 0 auto;
+.lb-profile-hero {
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-
-.dna-hero-gradient {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--dna-accent) 15%, transparent) 0%, transparent 70%);
-  pointer-events: none;
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
-}
-
-.dna-hero-gradient::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 256px 256px;
-  pointer-events: none;
-}
-
-.dna-hero-content {
-  position: relative;
-  z-index: 2;
-}
-
-.dna-identity-section {
-  display: flex;
-  align-items: flex-end;
+  justify-content: space-between;
+  align-items: center;
   gap: 1.5rem;
-  margin-bottom: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: background 0.25s ease, border-color 0.25s ease;
 }
 
-.dna-avatar-block {
-  flex-shrink: 0;
+.lb-profile-hero:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(212, 175, 55, 0.25) !important;
 }
 
-.dna-avatar-ring-container {
-  position: relative;
-  width: 128px;
-  height: 128px;
+/* Left Group: Avatar & Details */
+.lb-profile-identity-group {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex: 1;
+  min-width: 320px;
 }
 
-.dna-avatar-ring-svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 128px;
-  height: 128px;
-}
-
-.dna-level-ring {
-  transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
-  filter: drop-shadow(0 0 8px var(--dna-accent));
-}
-
-.dna-avatar-letter {
-  width: 116px;
-  height: 116px;
+.lb-profile-avatar {
+  width: 84px;
+  height: 84px;
   border-radius: 50%;
-  background: var(--card);
+  background: #d4af37;
+  color: #1a1614;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
-  font-weight: 700;
-  position: absolute;
-  top: 6px;
-  left: 6px;
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.35);
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-.dna-identity-info {
-  flex: 1;
-  padding-bottom: 8px;
+.lb-profile-avatar-letter {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #1a1614;
+  line-height: 1;
+  font-family: inherit;
 }
 
-.dna-username {
-  font-size: 2.2rem;
-  font-weight: 700;
-  margin: 0 0 4px;
-  line-height: 1.2;
+.lb-profile-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.dna-personality-tag {
+.lb-profile-name-row {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 8px;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.dna-personality-badge {
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 4px 14px;
+.lb-profile-username {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.lb-profile-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.lb-level-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.18rem 0.6rem;
   border-radius: 9999px;
-  border: 1px solid var(--dna-accent);
-  color: var(--dna-accent);
-  background: color-mix(in srgb, var(--dna-accent) 12%, var(--card));
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: #d4af37;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.dna-level-tag {
-  font-size: 0.78rem;
-  color: var(--muted-foreground);
+.lb-archetype-badge {
+  font-size: 0.82rem;
   font-weight: 600;
+  color: #d4af37;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.18rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* XP BAR */
-.dna-xp-bar-track {
-  width: 100%;
-  max-width: 320px;
-  height: 8px;
-  background: color-mix(in srgb, var(--border) 60%, transparent);
+.lb-xp-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.18rem 0.6rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.lb-xp-track {
+  width: 60px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 9999px;
   overflow: hidden;
 }
 
-.dna-xp-bar-fill {
+.lb-xp-fill {
   height: 100%;
+  background: #d4af37;
   border-radius: 9999px;
-  background: var(--dna-accent);
-  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 8px var(--dna-accent);
+  transition: width 0.6s ease;
 }
 
-.dna-xp-text {
+.lb-xp-text {
   font-size: 0.72rem;
-  color: var(--muted-foreground);
-  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.45);
 }
 
-/* NARRATION */
-.dna-narration-box {
-  margin: 1rem 0 0;
-  animation: dna-fade-in 0.4s ease-out;
-  background: color-mix(in srgb, var(--dna-accent) 6%, var(--card));
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
-  border: 1px solid color-mix(in srgb, var(--dna-accent) 15%, transparent);
-}
-
-.dna-narration-text {
-  font-size: 1rem;
-  color: var(--foreground);
-  font-style: italic;
-  line-height: 1.7;
-  margin: 0;
-  font-weight: 500;
-}
-
-.dna-narration-attribution {
-  font-size: 0.72rem;
-  color: var(--muted-foreground);
-  display: block;
-  margin-top: 6px;
-}
-
-/* NARRATION — strengths, explanation, suggestion */
-.dna-narration-strengths {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border);
-}
-
-.dna-narration-strength-item {
-  font-size: 0.85rem;
-  color: var(--muted-foreground);
-  line-height: 1.5;
-  padding-left: 1rem;
-  border-left: 2px solid var(--dna-accent);
-  margin-bottom: 0.5rem;
-}
-
-.dna-strength-badge {
-  display: inline-flex;
+/* Right Group: Letterboxd Prominent Stat Counters */
+.lb-profile-stats-counters {
+  display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--dna-accent);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.5rem;
+  gap: 1.5rem;
+  flex-shrink: 0;
 }
 
-/* HERO STATS SECTION */
-.dna-hero-stats-section {
-  position: relative;
-  z-index: 2;
-  margin-top: 1.5rem;
-}
-
-/* STAT CARDS ROW */
-.dna-stat-cards-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-}
-
-.dna-stat-card-compact {
-  background: color-mix(in srgb, var(--card) 80%, transparent);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem;
+.lb-stat-counter-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
   text-align: center;
-  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.dna-stat-card-compact:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px var(--stat-glow, rgba(255,255,255,0.06));
-}
-
-.dna-stat-number {
-  font-size: 1.6rem;
+.lb-stat-number {
+  font-size: 1.75rem;
   font-weight: 800;
+  color: #ffffff;
   line-height: 1;
-  color: var(--foreground);
+  letter-spacing: -0.02em;
 }
 
-.dna-stat-label-compact {
+.lb-stat-label {
   font-size: 0.68rem;
-  color: var(--muted-foreground);
-  font-weight: 600;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.08em;
+  margin-top: 0.35rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
-.dna-pulse-glow {
-  animation: dna-pulse-glow 2.5s ease-in-out infinite;
+.lb-stat-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.08);
 }
 
-@keyframes dna-pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 var(--stat-glow, rgba(249,115,22,0.2)); }
-  50% { box-shadow: 0 0 12px 4px var(--stat-glow, rgba(249,115,22,0.4)); }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   TAB BAR
-   ═══════════════════════════════════════════════════════════════ */
-
-.dna-tab-bar {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  display: flex;
-  gap: 0;
-  background: color-mix(in srgb, var(--background) 92%, transparent);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--border);
-  padding: 0 2rem;
-  max-width: 1250px;
-  margin: 0 auto;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-
-.dna-tab-bar::-webkit-scrollbar { display: none; }
-
-.dna-tab {
+/* ─── 2. SUB-NAVIGATION TABS (Letterboxd Style) ─────────────── */
+.lb-subnav-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 14px 20px;
-  background: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1.75rem;
+  overflow-x: auto;
+}
+
+.lb-subnav-links {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.lb-subnav-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.75rem 1.25rem;
+  background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
-  color: var(--muted-foreground);
-  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: all 0.2s ease;
   white-space: nowrap;
-  min-height: 44px;
 }
 
-.dna-tab:hover {
-  color: var(--foreground);
+.lb-subnav-tab:hover {
+  color: #ffffff;
 }
 
-.dna-tab.active {
-  color: var(--dna-accent);
-  border-bottom-color: var(--dna-accent);
+.lb-subnav-tab.active {
+  color: #d4af37;
+  border-bottom-color: #d4af37;
 }
 
-.dna-tab:focus-visible {
-  outline: 2px solid var(--dna-accent);
-  outline-offset: -2px;
-  border-radius: 4px;
+.lb-tab-panel {
+  animation: fadeIn 0.25s ease-out;
 }
 
-.dna-tab-label {
-  @media (max-width: 640px) { display: none; }
-}
-
-
-
-/* TAB CONTENT */
-.dna-tab-content {
-  max-width: 1250px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-.dna-tab-panel {
-  animation: dna-slide-up 0.3s ease-out;
-  outline: none;
-}
-
-.dna-tab-panel:focus-visible {
-  outline: 2px solid var(--dna-accent);
-  outline-offset: 4px;
-  border-radius: 8px;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .dna-tab-loading {
-  padding: 3rem;
+  padding: 4rem;
   text-align: center;
-  color: var(--muted-foreground);
-  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.95rem;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   CARD COMPONENT
-   ═══════════════════════════════════════════════════════════════ */
-
-.dna-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.5rem;
-  transition: border-color 0.2s;
-}
-
-.dna-card:hover {
-  border-color: var(--muted);
-}
-
-.dna-card-title {
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0 0 1rem;
-  color: var(--foreground);
-}
-
-.dna-empty-text {
-  color: var(--muted-foreground);
-  font-size: 0.85rem;
-  text-align: center;
-  padding: 1rem 0;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   OVERVIEW TAB
-   ═══════════════════════════════════════════════════════════════ */
-
-.dna-overview-grid {
+/* ─── 3. LETTERBOXD 2-COLUMN MAIN PROFILE LAYOUT ────────────── */
+.lb-profile-overview-layout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) 300px;
   gap: 1.5rem;
+  align-items: start;
+  width: 100%;
+  max-width: 100%;
 }
 
-@media (max-width: 768px) {
-  .dna-overview-grid { grid-template-columns: 1fr; }
-}
-
-/* Personality Breakdown */
-.dna-personality-breakdown {
-  grid-column: 1 / -1;
-}
-
-.dna-breakdown-header {
+.lb-profile-main-column {
   display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.lb-profile-sidebar-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+  width: 100%;
+}
+
+/* Common Section Headers */
+.lb-profile-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.lb-profile-section-header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.45rem;
   margin-bottom: 1rem;
 }
 
-.dna-breakdown-archetype {
-  font-size: 1.1rem;
+.lb-profile-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  color: var(--dna-accent);
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
 }
 
-.dna-breakdown-confidence {
-  font-size: 0.78rem;
-  color: var(--muted-foreground);
-  padding: 2px 10px;
+.lb-profile-section-sub {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.lb-gold-icon {
+  color: #d4af37;
+}
+
+.lb-green-icon {
+  color: #22c55e;
+}
+
+.lb-rose-icon {
+  color: #f43f5e;
+}
+
+.lb-indigo-icon {
+  color: #818cf8;
+}
+
+.lb-link-more {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #d4af37;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.lb-link-more:hover {
+  color: #ffffff;
+}
+
+/* ─── 4. FAVORITE BOOKS (Horizontal Scrollable Ribbon) ──────── */
+.lb-scroll-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.lb-scroll-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lb-scroll-btn:hover {
+  background: #d4af37;
+  color: #1a1614;
+  border-color: #d4af37;
+}
+
+.lb-fav-scroll-container {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.3) transparent;
+  padding-bottom: 0.5rem;
+}
+
+.lb-fav-scroll-container::-webkit-scrollbar {
+  height: 5px;
+}
+
+.lb-fav-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.3);
   border-radius: 9999px;
-  background: color-mix(in srgb, var(--muted) 40%, transparent);
 }
 
+.lb-fav-scroll-track {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.lb-fav-scroll-card {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 120px;
+  max-width: 180px;
+  aspect-ratio: 2 / 3;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.lb-fav-scroll-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(212, 175, 55, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Empty Spotlight Slot (+ Add Favorite) */
+.lb-fav-slot-empty {
+  border: 1px dashed rgba(212, 175, 55, 0.3) !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.lb-fav-slot-empty:hover {
+  border-color: #d4af37 !important;
+  background: rgba(212, 175, 55, 0.07) !important;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.18);
+}
+
+.lb-fav-slot-empty-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem 0.5rem;
+  gap: 0.35rem;
+  width: 100%;
+  height: 100%;
+}
+
+.lb-fav-slot-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.lb-fav-slot-empty:hover .lb-fav-slot-icon-box {
+  background: #d4af37;
+  border-color: #d4af37;
+}
+
+.lb-fav-slot-plus {
+  color: #d4af37;
+  transition: color 0.2s ease;
+}
+
+.lb-fav-slot-empty:hover .lb-fav-slot-plus {
+  color: #1a1614;
+}
+
+.lb-fav-slot-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.lb-fav-slot-sub {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.lb-fav-poster-img-wrap {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.lb-fav-poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.lb-poster-cover-fallback {
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  gap: 0.35rem;
+}
+
+.lb-fallback-icon {
+  color: #d4af37;
+}
+
+.lb-fallback-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+  max-height: 2.4em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lb-fallback-author {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.lb-fav-poster-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.2) 60%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.lb-fav-scroll-card:hover .lb-fav-poster-overlay {
+  opacity: 1;
+}
+
+.lb-fav-poster-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.lb-fav-poster-author {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 0.2rem;
+}
+
+.lb-fav-empty-banner {
+  padding: 2.5rem 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+}
+
+.lb-fav-empty-banner-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* ─── 5. RECENT ACTIVITY POSTER ROW ─────────────────────────── */
+.lb-recent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.85rem;
+}
+
+.lb-recent-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.lb-recent-cover-link {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  display: block;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.lb-recent-cover-link:hover {
+  transform: translateY(-2px);
+  border-color: rgba(212, 175, 55, 0.35);
+}
+
+.lb-recent-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.lb-recent-rating-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 4px;
+  padding: 0.12rem 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #d4af37;
+}
+
+.lb-recent-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.lb-recent-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lb-recent-title:hover {
+  color: #d4af37;
+}
+
+.lb-recent-date {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ─── 6. LITERARY CODEX & AI READING DNA MODULE ─────────────── */
+.lb-codex-archetype-pill {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #d4af37;
+  background: rgba(212, 175, 55, 0.1);
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+.lb-codex-card {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px;
+  padding: 1.4rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.lb-codex-quote-box {
+  border-left: 2.5px solid #d4af37;
+  padding: 0.35rem 0 0.35rem 1rem;
+}
+
+.lb-codex-quote {
+  font-size: 1.05rem;
+  font-style: italic;
+  color: #e6dfd4;
+  line-height: 1.6;
+  font-weight: 400;
+  margin: 0;
+}
+
+.lb-codex-attribution {
+  display: block;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 0.35rem;
+  letter-spacing: 0.03em;
+}
+
+.lb-codex-strengths-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.lb-codex-strengths-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #d4af37;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.lb-codex-pills-wrap {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.lb-codex-strength-pill {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.2rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.lb-codex-suggestion-box {
+  border-left: 2px solid rgba(212, 175, 55, 0.5);
+  padding: 0.3rem 0 0.3rem 0.85rem;
+}
+
+.lb-codex-suggestion-text {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #ddd;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.lb-gold-text {
+  color: #d4af37;
+  font-weight: 600;
+}
+
+.lb-codex-rationale-box {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.lb-codex-rationale-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #d4af37;
+  margin-bottom: 0.35rem;
+}
+
+.lb-codex-rationale-text {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ─── 7. TOP AUTHORS & READING ATMOSPHERE CARDS ─────────────── */
+.lb-authors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.85rem;
+}
+
+.lb-author-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.lb-author-card:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(212, 175, 55, 0.3);
+  transform: translateY(-2px);
+}
+
+.lb-author-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: #d4af37;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.lb-author-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.lb-author-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lb-author-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.lb-author-rating {
+  color: #d4af37;
+  font-weight: 600;
+}
+
+/* Atmosphere Vibes */
+.lb-atmosphere-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.85rem;
+}
+
+.lb-atmosphere-card {
+  padding: 1rem 1.15rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.lb-atmosphere-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(212, 175, 55, 0.25);
+}
+
+.lb-atmosphere-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lb-atmosphere-emoji {
+  font-size: 1.2rem;
+}
+
+.lb-atmosphere-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.lb-atmosphere-desc {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.lb-card-glass {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  border-radius: 10px;
+  padding: 1.25rem 1.4rem;
+}
+
+/* Trait breakdown bars */
 .dna-breakdown-bars {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0.75rem;
 }
 
 .dna-breakdown-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 1rem;
 }
 
 .dna-breakdown-label {
-  font-size: 0.78rem;
-  color: var(--muted-foreground);
-  width: 120px;
+  width: 140px;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
   flex-shrink: 0;
 }
 
 .dna-breakdown-track {
   flex: 1;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.05);
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
   border-radius: 9999px;
   overflow: hidden;
 }
 
 .dna-breakdown-fill {
   height: 100%;
-  background: var(--dna-accent);
+  background: #d4af37;
   border-radius: 9999px;
-  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.6s ease;
 }
 
 .dna-breakdown-value {
-  font-size: 0.78rem;
-  color: var(--muted-foreground);
-  width: 30px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  width: 32px;
   text-align: right;
 }
 
-/* Genre Summary */
+/* Genre List */
 .dna-genre-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.75rem;
 }
 
 .dna-genre-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 1rem;
 }
 
 .dna-genre-name {
-  font-size: 0.8rem;
-  color: var(--muted-foreground);
-  width: 100px;
+  width: 130px;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
   flex-shrink: 0;
 }
 
 .dna-genre-track {
   flex: 1;
   height: 6px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
   border-radius: 9999px;
   overflow: hidden;
 }
 
 .dna-genre-fill {
   height: 100%;
-  background: #0ea5e9;
+  background: #d4af37;
   border-radius: 9999px;
   transition: width 0.6s ease;
 }
 
 .dna-genre-count {
   font-size: 0.75rem;
-  color: var(--muted-foreground);
-  width: 24px;
+  color: rgba(255, 255, 255, 0.5);
+  width: 38px;
   text-align: right;
 }
 
-/* Activity List */
-.dna-activity-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+/* ─── 8. SIDEBAR: RATING HISTOGRAM, VELOCITY & MOMENTUM ──────── */
+.lb-sidebar-card {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  border-radius: 10px;
+  padding: 1.15rem 1.25rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 
-.dna-activity-item {
+.lb-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 0.45rem;
+  margin-bottom: 1rem;
+}
+
+.lb-sidebar-title {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.85rem;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
 }
 
-.dna-activity-dot {
-  width: 6px;
+.lb-sidebar-sub {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Rating Histogram */
+.lb-histogram-bars {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+  align-items: flex-end;
+  height: 90px;
+  padding: 0.5rem 0.25rem 0;
+}
+
+.lb-histogram-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.lb-histogram-bar-track {
+  width: 100%;
+  max-width: 24px;
+  height: 58px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 4px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.lb-histogram-bar-fill {
+  width: 100%;
+  background: #d4af37;
+  border-radius: 4px 4px 0 0;
+  transition: height 0.6s ease;
+}
+
+.lb-histogram-star-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.lb-histogram-count {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* Reading Velocity */
+.lb-pace-metrics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.lb-pace-metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.lb-pace-metric-label {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.lb-pace-metric-val {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.lb-pace-track {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.lb-pace-fill {
+  height: 100%;
+  background: #d4af37;
+  border-radius: 9999px;
+}
+
+/* Streak Box */
+.lb-streak-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lb-streak-number-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.lb-streak-val {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #f97316;
+  line-height: 1;
+}
+
+.lb-streak-unit {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.lb-streak-sub {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.lb-goal-progress-section {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.lb-goal-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.lb-goal-val {
+  font-weight: 700;
+  color: #d4af37;
+}
+
+.lb-goal-track {
   height: 6px;
-  border-radius: 50%;
-  background: var(--dna-accent);
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.lb-goal-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #d4af37, #f97316);
+  border-radius: 9999px;
+}
+
+/* Badges Mini Showcase */
+.lb-badges-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.lb-badge-mini-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.65rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+}
+
+.lb-badge-mini-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lb-empty-text-sm {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── 9. 52-WEEK GITHUB / LEETCODE 7-DAY EMERALD GREEN HEATMAP ─ */
+.lb-heatmap-card {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px;
+  padding: 1.25rem 1.4rem;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.lb-heatmap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.lb-heatmap-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lb-heatmap-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.lb-heatmap-meta-stats {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.lb-heatmap-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.lb-heatmap-meta-item strong {
+  color: #ffffff;
+}
+
+.lb-heatmap-scroll-wrap {
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34, 197, 94, 0.25) transparent;
+}
+
+.lb-heatmap-inner-grid {
+  display: flex;
+  flex-direction: column;
+  min-width: 780px;
+}
+
+.lb-heatmap-months-row {
+  display: flex;
+  height: 18px;
+  margin-bottom: 4px;
+}
+
+.lb-heatmap-day-label-space {
+  width: 34px;
   flex-shrink: 0;
 }
 
-.dna-activity-type {
-  color: var(--foreground);
+.lb-heatmap-months-track {
+  position: relative;
+  flex: 1;
 }
 
-.dna-activity-time {
-  color: var(--muted-foreground);
-  font-size: 0.75rem;
-  margin-left: auto;
-}
-
-/* Metrics Mini Grid */
-.dna-metrics-grid-mini {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.dna-metric-mini {
-  text-align: center;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 10px;
-}
-
-.dna-metric-mini-value {
-  font-size: 1.3rem;
-  font-weight: 800;
-  display: block;
-  color: var(--dna-accent);
-}
-
-.dna-metric-mini-label {
+.lb-heatmap-month-label {
+  position: absolute;
+  top: 0;
   font-size: 0.68rem;
-  color: var(--muted-foreground);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 600;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   STATS TAB
-   ═══════════════════════════════════════════════════════════════ */
+.lb-heatmap-body-row {
+  display: flex;
+  gap: 8px;
+}
 
-.dna-stats-grid {
+.lb-heatmap-days-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 26px;
+  height: 102px; /* 7 cells * 12px + 6 gaps (3px) = 102px */
+}
+
+.lb-heatmap-day-label {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 12px;
+  height: 12px;
+  font-weight: 500;
+}
+
+.lb-heatmap-columns-wrap {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+}
+
+.lb-heatmap-week-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.lb-heatmap-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2.5px;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.lb-heatmap-cell:hover {
+  transform: scale(1.35);
+  z-index: 10;
+  filter: brightness(1.3);
+}
+
+/* GitHub Emerald Green Intensity Levels */
+.lb-cell-green-lvl-0 {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.lb-cell-green-lvl-1 {
+  background: #0e4429;
+  border: 1px solid rgba(14, 68, 41, 0.5);
+}
+
+.lb-cell-green-lvl-2 {
+  background: #006d32;
+}
+
+.lb-cell-green-lvl-3 {
+  background: #26a641;
+  box-shadow: 0 0 6px rgba(38, 166, 65, 0.4);
+}
+
+.lb-cell-green-lvl-4 {
+  background: #39d353;
+  box-shadow: 0 0 10px rgba(57, 211, 83, 0.7);
+}
+
+.lb-heatmap-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.lb-tooltip-green {
+  color: #22c55e;
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
+.lb-heatmap-tooltip-muted {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.lb-heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lb-legend-text {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 4px;
+}
+
+/* ─── 10. CLEAN ACTIVITY TIMELINE MILESTONES ─────────────────── */
+.lb-tab-activity-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.lb-activity-timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.lb-activity-milestone-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.lb-activity-milestone-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(212, 175, 55, 0.25);
+  transform: translateX(3px);
+}
+
+.lb-activity-type-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.lb-activity-thumb-link {
+  width: 38px;
+  aspect-ratio: 2 / 3;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  display: block;
+}
+
+.lb-activity-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lb-activity-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.lb-activity-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.lb-activity-title-text {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.lb-activity-stars {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.lb-activity-tier-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+  background: rgba(212, 175, 55, 0.15);
+  color: #d4af37;
+  text-transform: uppercase;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.lb-activity-subtitle {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.lb-activity-quote {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+  border-left: 2px solid rgba(212, 175, 55, 0.4);
+  padding-left: 0.6rem;
+}
+
+.lb-activity-quote-text {
+  font-size: 0.82rem;
+  font-style: italic;
+  color: #d8d0c5;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.lb-activity-timestamp-badge {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+
+/* ─── 11. GRIMOIRE & METRICS LAYOUT ─────────────────────────── */
+.lb-tab-stats-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.lb-stats-two-col {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
 }
 
-@media (max-width: 768px) {
-  .dna-stats-grid { grid-template-columns: 1fr; }
-}
-
-.dna-stats-grid .dna-card:last-child {
-  grid-column: 1 / -1;
-}
-
-/* Heatmap */
-.dna-heatmap-month-labels {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 4px;
-  margin-bottom: 4px;
-}
-
-.dna-heatmap-label {
-  font-size: 0.65rem;
-  color: var(--muted-foreground);
-  text-align: center;
-}
-
-.dna-heatmap-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 4px;
-}
-
-.dna-heatmap-cell {
-  height: 32px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.04);
-  position: relative;
-  transition: background 0.15s;
-}
-
-.dna-heatmap-cell:hover {
-  filter: brightness(1.3);
-}
-
-.dna-heatmap-lvl-1 { background: rgba(74, 222, 128, 0.25); }
-.dna-heatmap-lvl-2 { background: rgba(74, 222, 128, 0.55); }
-.dna-heatmap-lvl-3 { background: rgba(74, 222, 128, 0.85); }
-
-.dna-heatmap-count {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.55rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.dna-heatmap-legend {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  justify-content: flex-end;
-  margin-top: 12px;
-  font-size: 0.7rem;
-  color: var(--muted-foreground);
-}
-
-/* Metrics Detail */
-.dna-metrics-detail-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
-}
-
-.dna-metric-detail {
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.025);
-  border-radius: 10px;
-}
-
-.dna-metric-detail-header {
+/* ─── 12. DEDICATED TAB VIEWS (BOOKS, REVIEWS, FAVORITES) ───── */
+.lb-books-toolbar {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 6px;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.dna-metric-detail-label {
-  font-size: 0.75rem;
-  color: var(--muted-foreground);
-}
-
-.dna-metric-detail-score {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--dna-accent);
-}
-
-.dna-metric-detail-track {
-  height: 4px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 9999px;
-  overflow: hidden;
-}
-
-.dna-metric-detail-fill {
-  height: 100%;
-  background: var(--dna-accent);
-  border-radius: 9999px;
-  transition: width 0.6s ease;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   BADGES TAB
-   ═══════════════════════════════════════════════════════════════ */
-
-.dna-badges-tab {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.dna-badges-header {
+.lb-books-count-label {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-}
-
-.dna-badges-count {
-  font-size: 0.85rem;
-  color: var(--dna-accent);
+  gap: 0.5rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  padding: 4px 14px;
-  border-radius: 9999px;
-  background: color-mix(in srgb, var(--dna-accent) 12%, transparent);
+  color: #ffffff;
 }
 
-.dna-badge-filters {
+.lb-rating-filter-pills {
   display: flex;
-  gap: 6px;
+  gap: 0.35rem;
   flex-wrap: wrap;
 }
 
-.dna-badge-filter {
-  padding: 5px 14px;
+.lb-filter-pill {
+  padding: 0.25rem 0.65rem;
   font-size: 0.75rem;
   font-weight: 600;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
   border-radius: 9999px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--muted-foreground);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s ease;
 }
 
-.dna-badge-filter.active {
-  background: var(--dna-accent);
-  color: #0f172a;
-  border-color: var(--dna-accent);
+.lb-filter-pill:hover {
+  color: #ffffff;
+  border-color: rgba(212, 175, 55, 0.3);
 }
 
-.dna-badge-filter:hover:not(.active) {
-  border-color: rgba(255, 255, 255, 0.15);
-  color: var(--foreground);
+.lb-filter-pill.active {
+  background: #d4af37;
+  color: #1a1614;
+  border-color: #d4af37;
 }
 
-.dna-badge-gallery {
+.lb-books-posters-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1.25rem;
+}
+
+.lb-book-poster-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.lb-book-poster-img-wrap {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  display: block;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.lb-book-poster-img-wrap:hover {
+  transform: translateY(-4px);
+  border-color: rgba(212, 175, 55, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.lb-book-poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.lb-book-poster-stars-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 4px;
+  padding: 0.15rem 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #d4af37;
+}
+
+.lb-book-poster-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.lb-book-poster-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lb-book-poster-title:hover {
+  color: #d4af37;
+}
+
+.lb-book-poster-author {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lb-book-poster-date {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* Reviews List */
+.lb-reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lb-review-item-card {
+  display: flex;
+  gap: 1.25rem;
+  padding: 1.25rem 1.4rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.lb-review-item-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(212, 175, 55, 0.2);
+}
+
+.lb-review-cover-link {
+  width: 64px;
+  aspect-ratio: 2 / 3;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lb-review-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lb-review-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  flex: 1;
+}
+
+.lb-review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.lb-review-book-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.lb-review-book-title:hover {
+  color: #d4af37;
+}
+
+.lb-review-book-author {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.1rem;
+}
+
+.lb-review-stars-date {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+}
+
+.lb-review-stars {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.lb-review-date {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.lb-review-quote-body {
+  display: flex;
+  gap: 0.5rem;
+  border-left: 2px solid rgba(212, 175, 55, 0.5);
+  padding-left: 0.75rem;
+}
+
+.lb-review-quote-icon {
+  color: #d4af37;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+
+.lb-review-text {
+  font-size: 0.9rem;
+  color: #ddd;
+  line-height: 1.6;
+  font-style: italic;
+  margin: 0;
+}
+
+.lb-empty-tab-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.lb-empty-icon {
+  color: rgba(212, 175, 55, 0.5);
+  margin-bottom: 0.75rem;
+}
+
+/* ─── 13. TROPHIES & BADGES TAB ──────────────────────────────── */
+.dna-badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1rem;
 }
 
 .dna-badge-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 1.25rem 1rem;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  opacity: 0.5;
-  filter: grayscale(0.8);
-  transition: all 0.3s;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  transition: all 0.2s ease;
 }
 
 .dna-badge-card.unlocked {
-  opacity: 1;
-  filter: grayscale(0);
-  border-color: color-mix(in srgb, var(--badge-color, var(--dna-accent)) 30%, transparent);
+  border-color: rgba(212, 175, 55, 0.35);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .dna-badge-card.unlocked:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .dna-badge-icon-wrap {
-  position: relative;
-  width: 56px;
-  height: 56px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  position: relative;
 }
 
 .dna-badge-check {
   position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 18px;
-  height: 18px;
+  bottom: -2px;
+  right: -2px;
+  width: 16px;
+  height: 16px;
+  background: #22c55e;
+  color: #ffffff;
   border-radius: 50%;
-  background: var(--badge-color, #4ade80);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #0f172a;
 }
 
 .dna-badge-lock-icon {
   position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 18px;
-  height: 18px;
+  bottom: -2px;
+  right: -2px;
+  width: 16px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.6);
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--muted-foreground);
 }
 
 .dna-badge-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.15rem;
+  min-width: 0;
 }
 
 .dna-badge-name {
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  color: var(--foreground);
+  color: #ffffff;
   text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dna-badge-tier {
-  font-size: 0.68rem;
-  color: var(--muted-foreground);
-  text-transform: capitalize;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #d4af37;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .dna-badge-progress-text {
-  font-size: 0.65rem;
-  color: var(--muted-foreground);
-}
-
-.dna-badge-glow {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.dna-badge-card.unlocked:hover .dna-badge-glow {
-  opacity: 1;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   FRIENDS TAB
-   ═══════════════════════════════════════════════════════════════ */
-
-.dna-friends-tab {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.dna-friend-add-form {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.dna-input {
-  flex: 1;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--border);
-  color: var(--foreground);
-  padding: 0.6rem 0.75rem;
-  border-radius: 8px;
-  font-size: 0.85rem;
-}
-
-.dna-input:focus {
-  outline: none;
-  border-color: var(--dna-accent);
-}
-
-.dna-input-inline {
-  background: transparent;
-  border: none;
-  color: var(--foreground);
-  font-size: 0.85rem;
-  padding: 4px;
-  flex: 1;
-}
-
-.dna-input-inline:focus { outline: none; }
-
-.dna-msg-success {
-  font-size: 0.8rem;
-  color: #4ade80;
-  margin-top: 8px;
-}
-
-.dna-friends-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.dna-search-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(0, 0, 0, 0.15);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 4px 10px;
-  color: var(--muted-foreground);
-}
-
-.dna-friend-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.dna-friend-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  transition: background 0.15s;
-}
-
-.dna-friend-card:hover {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.dna-friend-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #0ea5e9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: white;
-  flex-shrink: 0;
-}
-
-.dna-friend-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.dna-friend-name {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--foreground);
-}
-
-.dna-friend-meta {
-  font-size: 0.72rem;
-  color: var(--muted-foreground);
-}
-
-.dna-btn-icon {
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px;
-  color: var(--muted-foreground);
-  cursor: pointer;
-  transition: all 0.15s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.dna-btn-icon:hover { color: var(--foreground); border-color: rgba(255,255,255,0.2); }
-.dna-btn-icon.active { color: var(--dna-accent); border-color: var(--dna-accent); }
-
-/* Comparison Card */
-.dna-comparison-card {
-  border-color: var(--dna-accent);
-}
-
-.dna-comparison-clash {
-  color: #f43f5e;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
-.dna-comparison-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px;
-}
-
-.dna-comparison-stat {
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 10px;
-}
-
-.dna-comp-stat-label {
-  font-size: 0.72rem;
-  color: var(--muted-foreground);
-  display: block;
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.dna-comp-values {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: 0.8rem;
-  margin-bottom: 4px;
-}
-
-.dna-comp-you { color: var(--foreground); }
-.dna-comp-them { color: var(--muted-foreground); }
-
-.dna-comp-diff {
-  font-size: 1rem;
-  font-weight: 800;
-}
-
-.dna-comp-common {
-  font-size: 0.85rem;
-  color: var(--dna-accent);
-  margin-top: 0.75rem;
-  font-weight: 600;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   TRENDS TAB
-   ═══════════════════════════════════════════════════════════════ */
-
-.dna-trends-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-@media (max-width: 768px) {
-  .dna-trends-grid { grid-template-columns: 1fr; }
-}
-
-.dna-momentum-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 1.25rem;
-}
-
-.dna-momentum-icon { display: flex; }
-
-.dna-momentum-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.dna-momentum-label {
-  font-size: 0.72rem;
-  color: var(--muted-foreground);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.dna-momentum-value {
-  font-size: 1.1rem;
-  font-weight: 700;
-}
-
-.dna-velocity-value {
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--dna-accent);
-  margin-bottom: 0.75rem;
-}
-
-.dna-velocity-unit {
-  font-size: 0.8rem;
-  font-weight: 400;
-  color: var(--muted-foreground);
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   BUTTONS
-   ═══════════════════════════════════════════════════════════════ */
-
-.dna-btn-primary {
-  background: var(--dna-accent);
-  color: #0f172a;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: opacity 0.15s, transform 0.15s;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.dna-btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-.dna-btn-secondary {
-  background: transparent;
-  color: var(--dna-accent);
-  border: 1px solid var(--dna-accent);
-  padding: 10px 24px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.15s;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.dna-btn-secondary:hover {
-  background: color-mix(in srgb, var(--dna-accent) 10%, transparent);
-}
-
-.dna-btn-ghost {
-  background: transparent;
-  color: var(--dna-accent);
-  border: 1px solid transparent;
-  padding: 6px 14px;
-  border-radius: var(--radius);
-  font-weight: 600;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.15s;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.dna-btn-ghost:hover {
-  background: color-mix(in srgb, var(--dna-accent) 8%, transparent);
-  border-color: color-mix(in srgb, var(--dna-accent) 20%, transparent);
-}
-
-
-
-/* ═══════════════════════════════════════════════════════════════
-   AUTH PROMPT
-   ═══════════════════════════════════════════════════════════════ */
-
-.dna-auth-prompt {
-  max-width: 400px;
-  margin: 6rem auto;
-  text-align: center;
-  padding: 3rem 2rem;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-}
-
-.dna-auth-prompt h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0 0 0.75rem;
-}
-
-.dna-auth-prompt p {
-  font-size: 0.9rem;
-  color: var(--muted-foreground);
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   EMPTY STATES
-   ═══════════════════════════════════════════════════════════════ */
-
-.dna-empty-state {
-  max-width: 500px;
-  margin: 4rem auto;
-  text-align: center;
-  padding: 3rem 2rem;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-}
-
-.dna-empty-decorative {
-  margin-bottom: 1.5rem;
-}
-
-.dna-helix-animation {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  font-size: 2.5rem;
-}
-
-.dna-helix-emoji {
-  display: inline-block;
-  animation: dna-float 3s ease-in-out infinite;
-}
-
-.dna-helix-emoji:nth-child(2) { animation-delay: 0.5s; }
-.dna-helix-emoji:nth-child(3) { animation-delay: 1s; }
-
-@keyframes dna-float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-8px) rotate(8deg); }
-}
-
-.dna-empty-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin: 0 0 0.75rem;
-}
-
-.dna-empty-description {
-  font-size: 0.9rem;
-  color: var(--muted-foreground);
-  line-height: 1.6;
-  margin: 0 0 1.5rem;
-}
-
-.dna-empty-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-}
-
-.dna-empty-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-}
-
-.dna-feature-pill {
-  font-size: 0.72rem;
-  color: var(--muted-foreground);
-  padding: 4px 12px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border);
-}
-
-/* Insufficient Data State */
-.dna-insufficient-state {
-  max-width: 500px;
-  margin: 2rem auto;
-  text-align: center;
-  padding: 2.5rem 2rem;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-}
-
-.dna-insufficient-icon {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-
-.dna-insufficient-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin: 0 0 0.75rem;
-}
-
-.dna-insufficient-description {
-  font-size: 0.85rem;
-  color: var(--muted-foreground);
-  line-height: 1.5;
-  margin: 0 0 1rem;
-}
-
-.dna-progress-track {
-  width: 100%;
-  max-width: 300px;
-  height: 10px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 9999px;
-  overflow: hidden;
-  margin: 0 auto;
-}
-
-.dna-progress-fill {
-  height: 100%;
-  background: var(--dna-accent);
-  border-radius: 9999px;
-  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.dna-progress-label {
-  font-size: 0.8rem;
-  color: var(--muted-foreground);
-  display: block;
-  margin-top: 8px;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   ERROR STATES
-   ═══════════════════════════════════════════════════════════════ */
-
-.dna-error-page {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-  padding: 2rem;
-}
-
-.dna-error-tab {
-  padding: 2rem 1rem;
-}
-
-.dna-error-inline {
-  padding: 1rem 0;
-}
-
-.dna-error-card {
-  text-align: center;
-  max-width: 420px;
-  padding: 3rem 2rem;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-}
-
-.dna-error-icon {
-  color: var(--dna-accent);
-  margin-bottom: 1rem;
-}
-
-.dna-error-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem;
-}
-
-.dna-error-description {
-  font-size: 0.85rem;
-  color: var(--muted-foreground);
-  line-height: 1.5;
-  margin: 0 0 1.5rem;
-}
-
-.dna-error-subtle {
-  font-size: 0.75rem;
-  color: var(--muted-foreground);
-  margin-top: 0.75rem;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   TOAST NOTIFICATIONS
-   ═══════════════════════════════════════════════════════════════ */
-
-.dna-toast-container {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-width: 360px;
-}
-
-.dna-toast {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  border-radius: 12px;
-  background: #1e293b;
-  border: 1px solid var(--border);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  animation: dna-slide-up 0.3s ease-out;
-  font-size: 0.85rem;
-  min-height: 44px;
-}
-
-.dna-toast-success { border-left: 3px solid #4ade80; }
-.dna-toast-error { border-left: 3px solid #f43f5e; }
-.dna-toast-info { border-left: 3px solid #0ea5e9; }
-
-.dna-toast-icon {
-  display: flex;
-  flex-shrink: 0;
-}
-
-.dna-toast-success .dna-toast-icon { color: #4ade80; }
-.dna-toast-error .dna-toast-icon { color: #f43f5e; }
-.dna-toast-info .dna-toast-icon { color: #0ea5e9; }
-
-.dna-toast-message {
-  flex: 1;
-  color: var(--foreground);
-}
-
-.dna-toast-close {
-  background: none;
-  border: none;
-  color: var(--muted-foreground);
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  display: flex;
-}
-
-.dna-toast-close:hover {
-  color: var(--foreground);
-  background: rgba(255, 255, 255, 0.05);
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   SKELETON LOADING
-   ═══════════════════════════════════════════════════════════════ */
-
-.dna-skeleton-shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.02) 0%,
-    rgba(255, 255, 255, 0.06) 50%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-  background-size: 200% 100%;
-  animation: dna-shimmer 1.5s ease-in-out infinite;
-}
-
-@keyframes dna-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-.dna-skeleton-phase1 {
-  pointer-events: none;
-}
-
-.dna-skeleton-phase2 {
-  pointer-events: none;
-  animation: dna-fade-in 0.3s ease-out;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   ANIMATION CLASSES
-   ═══════════════════════════════════════════════════════════════ */
-
-.dna-fade-in {
-  animation: dna-fade-in 0.4s ease-out;
-}
-
-.dna-slide-up {
-  animation: dna-slide-up 0.3s ease-out;
-}
-
-.dna-scale-in {
-  animation: dna-scale-in 0.3s ease-out;
-}
-
-.dna-progress-fill {
-  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.dna-ring-fill {
-  transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes dna-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes dna-slide-up {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes dna-scale-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-/* Stagger animation classes */
-.dna-stagger-1 { animation-delay: 0.1s; }
-.dna-stagger-2 { animation-delay: 0.2s; }
-.dna-stagger-3 { animation-delay: 0.3s; }
-.dna-stagger-4 { animation-delay: 0.4s; }
-.dna-stagger-5 { animation-delay: 0.5s; }
-.dna-stagger-6 { animation-delay: 0.6s; }
-.dna-stagger-7 { animation-delay: 0.7s; }
-.dna-stagger-8 { animation-delay: 0.8s; }
-
-/* ═══════════════════════════════════════════════════════════════
-   PAGE ENTRANCE ANIMATION SEQUENCE
-   ═══════════════════════════════════════════════════════════════ */
-
-.dna-hero {
-  animation: dna-entrance-hero 0.5s ease-out both;
-}
-
-.dna-hero .dna-level-ring {
-  animation: dna-ring-appear 0.8s ease-out 0.1s both;
-}
-
-.dna-hero .dna-stat-card-compact {
-  opacity: 0;
-  animation: dna-entrance-card 0.3s ease-out forwards;
-}
-
-.dna-hero .dna-stat-card-compact:nth-child(1) { animation-delay: 0.2s; }
-.dna-hero .dna-stat-card-compact:nth-child(2) { animation-delay: 0.3s; }
-.dna-hero .dna-stat-card-compact:nth-child(3) { animation-delay: 0.4s; }
-.dna-hero .dna-stat-card-compact:nth-child(4) { animation-delay: 0.5s; }
-
-.dna-hero .dna-narration-box {
-  animation: dna-fade-in 0.4s ease-out 0.3s both;
-}
-
-.dna-tab-bar {
-  animation: dna-fade-in 0.4s ease-out 0.5s both;
-}
-
-.dna-tab-panel {
-  animation: dna-slide-up 0.3s ease-out 0.7s both;
-}
-
-@keyframes dna-entrance-hero {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes dna-ring-appear {
-  from { stroke-dashoffset: 339.292; }
-  to { stroke-dashoffset: var(--ring-offset, 0); }
-}
-
-@keyframes dna-entrance-card {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* When entrance is complete, remove initial hidden states */
-.dna-entrance-complete .dna-hero .dna-stat-card-compact {
-  opacity: 1;
-}
-
-
-
-@media (prefers-reduced-motion: reduce) {
-  .dna-hero,
-  .dna-hero .dna-level-ring,
-  .dna-hero .dna-stat-card-compact,
-  .dna-hero .dna-narration-box,
-  .dna-tab-bar,
-  .dna-tab-panel {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ─── 14. RESPONSIVE BREAKPOINTS ─────────────────────────────── */
+@media (max-width: 1100px) {
+  .lb-profile-overview-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .lb-profile-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .lb-profile-stats-counters {
+    width: 100%;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .lb-stats-two-col {
+    grid-template-columns: 1fr;
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   RESPONSIVE BREAKPOINTS
-   ═══════════════════════════════════════════════════════════════ */
-
-/* Phone (< 640px) */
-@media (max-width: 639px) {
-  .dna-hero { padding: 1rem; }
-  .dna-identity-section { gap: 0.75rem; }
-  .dna-avatar-ring-container { width: 72px; height: 72px; }
-  .dna-avatar-ring-svg { width: 72px; height: 72px; }
-  .dna-avatar-letter { width: 64px; height: 64px; font-size: 1.8rem; top: 4px; left: 4px; }
-  .dna-username { font-size: 1.4rem; }
-  .dna-stat-cards-row {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-  .dna-stat-card-compact { padding: 0.75rem; }
-  .dna-stat-number { font-size: 1.2rem; }
-  .dna-tab-bar { padding: 0 1rem; }
-  .dna-tab { padding: 12px 14px; }
-  .dna-tab-label { display: none; }
-  .dna-tab-content { padding: 1rem; }
-  .dna-trends-grid { grid-template-columns: 1fr; }
-  .dna-overview-grid { grid-template-columns: 1fr; }
-  .dna-stats-grid { grid-template-columns: 1fr; }
-  .dna-badge-gallery { grid-template-columns: repeat(2, 1fr); }
-  .dna-page-wrapper { padding-bottom: 80px; }
-  .dna-empty-actions { flex-direction: column; align-items: center; }
-}
-
-/* Tablet (640px - 1024px) */
-@media (min-width: 640px) and (max-width: 1024px) {
-  .dna-badge-gallery { grid-template-columns: repeat(3, 1fr); }
-  .dna-stat-cards-row { gap: 10px; }
-}
-
-/* Desktop (> 1024px) */
-@media (min-width: 1025px) {
-  .dna-hero { padding: 2.5rem 3rem 1.5rem; }
-  .dna-tab-bar { padding: 0 3rem; }
-  .dna-tab-content { padding: 2.5rem 3rem; }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   REDUCED MOTION
-   ═══════════════════════════════════════════════════════════════ */
-
-@media (prefers-reduced-motion: reduce) {
-  .dna-float,
-  .dna-pulse-glow,
-  .dna-sparkle,
-  .dna-helix-animation .dna-helix-emoji {
-    animation: none !important;
+@media (max-width: 640px) {
+  .lb-profile-identity-group {
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 100%;
   }
 
-  .dna-skeleton-shimmer {
-    animation: none !important;
-    background: rgba(255, 255, 255, 0.04) !important;
+  .lb-profile-avatar {
+    width: 64px;
+    height: 64px;
   }
 
-  .dna-fade-in,
-  .dna-slide-up,
-  .dna-scale-in,
-  .dna-tab-panel,
-  .dna-narration-box {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
+  .lb-profile-avatar-letter {
+    font-size: 1.8rem;
   }
 
-  [class*="dna-stagger-"] {
-    animation-delay: 0ms !important;
+  .lb-fav-scroll-card {
+    width: 120px;
   }
 
-  .dna-xp-bar-fill,
-  .dna-level-ring,
-  .dna-progress-fill,
-  .dna-metric-detail-fill,
-  .dna-breakdown-fill {
-    transition-duration: 0.01ms !important;
+  .lb-profile-stats-counters {
+    gap: 0.75rem;
   }
 
-  .dna-toast {
-    animation: none !important;
+  .lb-stat-number {
+    font-size: 1.3rem;
   }
 
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   FOCUS INDICATOR
-   ═══════════════════════════════════════════════════════════════ */
-
-*:focus-visible {
-  outline: 2px solid var(--dna-accent);
-  outline-offset: 2px;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   TOUCH TARGETS
-   ═══════════════════════════════════════════════════════════════ */
-
-@media (pointer: coarse) {
-  .dna-tab,
-  .dna-btn-primary,
-  .dna-btn-secondary,
-  .dna-badge-filter,
-  .dna-btn-icon {
-    min-height: 44px;
-    min-width: 44px;
-  }
-
-  .dna-badge-card {
-    min-height: 44px;
+  .lb-stat-label {
+    font-size: 0.6rem;
   }
 }

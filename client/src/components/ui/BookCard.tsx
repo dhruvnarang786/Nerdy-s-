@@ -3,6 +3,7 @@ import { memo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { type Book } from '@/lib/apiClient';
+import { getBookCoverUrl } from '@/lib/bookCover';
 import { FALLBACK_COVER } from '@/lib/constants';
 import '@/styles/components.css';
 
@@ -12,7 +13,7 @@ interface BookCardProps {
 
 export const BookCard = memo(function BookCard({ book }: BookCardProps) {
     const [imgError, setImgError] = useState(false);
-    const coverUrl = book.coverUrl && book.coverUrl.trim() ? book.coverUrl : FALLBACK_COVER;
+    const coverUrl = getBookCoverUrl(book.id, book.coverUrl);
 
     return (
         <Link to={`/book/${book.id}`} className="book-card group">
