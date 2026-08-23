@@ -1,24 +1,37 @@
-import { FALLBACK_COVER } from './constants';
-
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 /**
- * Universal Book Cover URL Resolver
- * Resolves Google Books, Open Library (proxied to bypass ISP/CORS blocks), and fallback covers
+ * Procedurally generated Dark Academia SVG cover URL
  */
-export function getBookCoverUrl(bookId?: string | null, coverUrl?: string | null): string {
+export function getGeneratedCoverUrl(title?: string | null, author?: string | null): string {
+  const safeTitle = encodeURIComponent(title || 'Untitled Work');
+  const safeAuthor = encodeURIComponent(author || 'Anonymous');
+  return `${BASE_URL}/api/books/cover/generated?title=${safeTitle}&author=${safeAuthor}`;
+}
+
+/**
+ * Universal Book Cover URL Resolver
+ * Resolves Google Books, Open Library (proxied to bypass ISP/CORS blocks and 1x1 blanks),
+ * and generates high-aesthetic Dark Academia SVG typographic covers when artwork is absent.
+ */
+export function getBookCoverUrl(
+  bookId?: string | null,
+  coverUrl?: string | null,
+  title?: string | null,
+  author?: string | null
+): string {
+  const metaParams = `title=${encodeURIComponent(title || '')}&author=${encodeURIComponent(author || '')}`;
+
   if (coverUrl && typeof coverUrl === 'string' && coverUrl.trim().length > 0) {
     let clean = coverUrl.trim();
 
     // If OpenLibrary or archive.org, route through backend proxy to bypass regional ISP blockades & CORS issues
     if (clean.includes('covers.openlibrary.org') || clean.includes('archive.org')) {
-      // Use base64-in-path form to avoid adblockers that match blocked hostnames in the query string
-      // Encode the URL as base64 and URL-encode it for safe path usage
       try {
         const b64 = btoa(unescape(encodeURIComponent(clean)));
-        return `${BASE_URL}/api/books/cover/b64/${encodeURIComponent(b64)}`;
+        return `${BASE_URL}/api/books/cover/b64/${encodeURIComponent(b64)}?${metaParams}`;
       } catch {
-        return `${BASE_URL}/api/books/cover?url=${encodeURIComponent(clean)}`;
+        return `${BASE_URL}/api/books/cover?url=${encodeURIComponent(clean)}&${metaParams}`;
       }
     }
 
@@ -32,11 +45,11 @@ export function getBookCoverUrl(bookId?: string | null, coverUrl?: string | null
   if (bookId && typeof bookId === 'string' && bookId.trim().length > 0) {
     const id = bookId.trim();
 
-    // Open Library OLID — route through backend proxy
+    // Open Library OLID — route through backend proxy with title/author fallback
     if (id.startsWith('OL') || id.includes('/works/OL')) {
       const cleanOlid = id.replace('/works/', '').replace('/books/', '');
       const directUrl = `https://covers.openlibrary.org/b/olid/${cleanOlid}-M.jpg`;
-      return `${BASE_URL}/api/books/cover?url=${encodeURIComponent(directUrl)}`;
+      return `${BASE_URL}/api/books/cover?url=${encodeURIComponent(directUrl)}&${metaParams}`;
     }
 
     // Google Books ID (alphanumeric string without spaces)
@@ -45,5 +58,6 @@ export function getBookCoverUrl(bookId?: string | null, coverUrl?: string | null
     }
   }
 
-  return FALLBACK_COVER;
+  // Fallback to generated Dark Academia SVG cover
+  return getGeneratedCoverUrl(title, author);
 }

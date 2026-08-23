@@ -74,8 +74,9 @@ export class DnaComputeService {
     // Narration — let the engine decide if regeneration is needed
     const narration = await this.narrationEngine.generate(existingSnapshot, personality, { totalLogs, avgRating, currentStreak });
 
-    // Compute heatmap
+    // Compute heatmap and trends
     const heatmap = this._computeHeatmap(logs, currentYear);
+    const trends = this._computeTrends(logs);
 
     // Persist
     const snapshot = await prisma.dNASnapshot.upsert({
@@ -91,7 +92,7 @@ export class DnaComputeService {
         totalFavorites, spoilerRatio,
         metrics: JSON.parse(JSON.stringify(metrics)),
         heatmap,
-        trends: {},
+        trends,
         personality,
         narration,
         badgeSummary: { totalEarned: 0, recentUnlocks: badgeResult.changes.slice(0, 3) },
@@ -108,6 +109,7 @@ export class DnaComputeService {
         totalFavorites, spoilerRatio,
         metrics: JSON.parse(JSON.stringify(metrics)),
         heatmap,
+        trends,
         personality,
         narration: narration || undefined,
         badgeSummary: { totalEarned: 0, recentUnlocks: badgeResult.changes.slice(0, 3) },
@@ -234,6 +236,7 @@ export class DnaComputeService {
         level: newLevel, xp,
         metrics: JSON.parse(JSON.stringify(incMetrics)),
         heatmap,
+        trends: this._computeTrends(logs),
         personality,
         narration: narration || undefined,
         badgeSummary: { totalEarned: badgeResult.changes.length, recentUnlocks: badgeResult.changes.slice(0, 3) },
@@ -338,6 +341,49 @@ export class DnaComputeService {
       }
     }
     return { year, months };
+  }
+
+  _computeTrends(logs) {
+    const now = Date.now();
+    const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
+    const weekCounts = [0, 0, 0, 0]; // [W-3, W-2, W-1, This Week]
+
+    for (const log of logs) {
+      const logTime = log.dateRead ? new Date(log.dateRead).getTime() : new Date(log.createdAt).getTime();
+      if (isNaN(logTime)) continue;
+
+      const diffMs = now - logTime;
+      if (diffMs < 0) continue;
+
+      const weekIndex = Math.floor(diffMs / oneWeekMs);
+      if (weekIndex === 0) weekCounts[3]++; // This week
+      else if (weekIndex === 1) weekCounts[2]++; // W-1
+      else if (weekIndex === 2) weekCounts[1]++; // W-2
+      else if (weekIndex === 3) weekCounts[0]++; // W-3
+    }
+
+    const weeklyVelocity = [
+      { week: 'W-3', count: weekCounts[0] },
+      { week: 'W-2', count: weekCounts[1] },
+      { week: 'W-1', count: weekCounts[2] },
+      { week: 'This', count: weekCounts[3] },
+    ];
+
+    const totalLast4Weeks = weekCounts.reduce((a, b) => a + b, 0);
+    const velocity = Number((totalLast4Weeks / 4).toFixed(1));
+
+    const recent2 = weekCounts[2] + weekCounts[3];
+    const prev2 = weekCounts[0] + weekCounts[1];
+    let momentum = 'stable';
+    if (recent2 > prev2 + 1) momentum = 'accelerating';
+    else if (recent2 < prev2 - 1) momentum = 'declining';
+
+    return {
+      velocity,
+      momentum,
+      weeklyCounts: weeklyVelocity,
+      weeklyVelocity,
+    };
   }
 
   _computeGenreSummary(genreCounts) {

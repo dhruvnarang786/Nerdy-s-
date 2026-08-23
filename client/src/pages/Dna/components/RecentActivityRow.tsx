@@ -41,7 +41,7 @@ export function RecentActivityRow({ logs, onViewAll }: RecentActivityRowProps) {
 
       <div className="lb-recent-grid">
         {recentLogs.map((log, i) => {
-          const cover = getBookCoverUrl(log.bookId, log.coverUrl);
+          const cover = getBookCoverUrl(log.bookId, log.coverUrl, log.bookTitle, log.author);
           return (
             <div key={log.id || i} className="lb-recent-card">
               <Link to={`/book/${log.bookId}`} className="lb-recent-cover-link">
@@ -52,9 +52,7 @@ export function RecentActivityRow({ logs, onViewAll }: RecentActivityRowProps) {
                   loading="lazy"
                   referrerPolicy="no-referrer"
                   onError={(e) => {
-                    (e.currentTarget as HTMLElement).style.display = 'none';
-                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (fallback) fallback.style.display = 'flex';
+                    e.currentTarget.src = getBookCoverUrl(log.bookId, null, log.bookTitle, log.author);
                   }}
                 />
                 {/* Dynamic Styled Cover Fallback */}

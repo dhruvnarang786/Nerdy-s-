@@ -1,9 +1,9 @@
 
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { BookOpen, Search, Menu, X, LogIn, UserPlus, LogOut, User } from 'lucide-react';
+import { BookOpen, Search, Menu, X, LogIn, UserPlus, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import { displayName } from '@/lib/displayName';
+import { displayName, userInitial, getAvatarColor } from '@/lib/displayName';
 import '@/styles/layout.css';
 
 export function Navbar() {
@@ -127,10 +127,41 @@ export function Navbar() {
                     <div className="navbar-auth">
                         {isAuthenticated ? (
                             <div className="auth-user-info">
-                                <div className="auth-avatar">
-                                    <User className="auth-avatar-icon" />
-                                </div>
-                                <span className="auth-username">{displayName(user?.username)}</span>
+                                <Link to={`/user/${user?.username}`} className="auth-avatar-link" title="My Profile">
+                                    <div
+                                        className="auth-avatar"
+                                        style={{
+                                            backgroundColor: user?.avatar ? 'transparent' : getAvatarColor(user?.email || user?.username)
+                                        }}
+                                    >
+                                        {user?.avatar ? (
+                                            <img
+                                                src={user.avatar}
+                                                alt={displayName(user?.username)}
+                                                className="auth-avatar-img"
+                                                referrerPolicy="no-referrer"
+                                                onError={(e) => {
+                                                    e.currentTarget.style.display = 'none';
+                                                    const parent = e.currentTarget.parentElement;
+                                                    if (parent) {
+                                                        parent.style.backgroundColor = getAvatarColor(user?.email || user?.username);
+                                                        const fallback = parent.querySelector('.auth-avatar-fallback') as HTMLElement;
+                                                        if (fallback) fallback.style.display = 'flex';
+                                                    }
+                                                }}
+                                            />
+                                        ) : null}
+                                        <span
+                                            className="auth-avatar-fallback"
+                                            style={{ display: user?.avatar ? 'none' : 'flex' }}
+                                        >
+                                            {userInitial(user?.username)}
+                                        </span>
+                                    </div>
+                                </Link>
+                                <Link to={`/user/${user?.username}`} className="auth-username-link">
+                                    <span className="auth-username">{displayName(user?.username)}</span>
+                                </Link>
                                 <button onClick={handleLogout} className="auth-btn auth-btn-logout" title="Logout">
                                     <LogOut className="auth-btn-icon" />
                                 </button>

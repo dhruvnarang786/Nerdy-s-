@@ -1,7 +1,7 @@
 import { OpenLibraryProvider } from '../providers/OpenLibraryProvider.js';
 import { GoogleBooksProvider } from '../providers/GoogleBooksProvider.js';
 import { deduplicateBooks } from '../utils/deduplicateBooks.js';
-import { prisma } from '../index.js';
+import { prisma } from '../db.js';
 
 const SUFFICIENT_RESULTS = 5;
 const CACHE = new Map();

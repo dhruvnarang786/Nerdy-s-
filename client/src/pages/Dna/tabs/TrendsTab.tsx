@@ -28,18 +28,20 @@ function MomentumIndicator({ momentum }: { momentum?: string }) {
   );
 }
 
-function VelocityChart({ velocity }: { velocity?: number }) {
-  const data = [
-    { week: 'W-3', count: Math.max(0, (velocity || 0) * 0.7) },
-    { week: 'W-2', count: Math.max(0, (velocity || 0) * 0.9) },
-    { week: 'W-1', count: Math.max(0, (velocity || 0) * 1.1) },
-    { week: 'This', count: Math.max(0, velocity || 0) },
-  ];
+function VelocityChart({ velocity, weeklyVelocity }: { velocity?: number; weeklyVelocity?: { week: string; count: number }[] }) {
+  const data = (weeklyVelocity && weeklyVelocity.length > 0)
+    ? weeklyVelocity
+    : [
+        { week: 'W-3', count: 0 },
+        { week: 'W-2', count: 0 },
+        { week: 'W-1', count: 0 },
+        { week: 'This', count: Math.max(0, velocity || 0) },
+      ];
 
   return (
     <div className="dna-card">
       <h3 className="dna-card-title">Reading Velocity</h3>
-      <div className="dna-velocity-value">{velocity?.toFixed(1) || '—'} <span className="dna-velocity-unit">books/week</span></div>
+      <div className="dna-velocity-value">{velocity?.toFixed(1) || '0.0'} <span className="dna-velocity-unit">books/week</span></div>
       <div style={{ height: 120 }}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
@@ -97,14 +99,15 @@ export function TrendsTab({ enabled }: TrendsTabProps) {
     return <div className="dna-tab-loading" role="status" aria-label="Loading trends">Loading trends...</div>;
   }
 
-  const trends = data?.trends;
+  const trends = data?.trends as { velocity?: number; momentum?: string; weeklyCounts?: { week: string; count: number }[]; weeklyVelocity?: { week: string; count: number }[] } | undefined;
   const velocity = trends?.velocity;
   const momentum = trends?.momentum;
   const weeklyCounts = trends?.weeklyCounts;
+  const weeklyVelocity = trends?.weeklyVelocity;
 
   return (
     <div className="dna-trends-grid">
-      <VelocityChart velocity={velocity} />
+      <VelocityChart velocity={velocity} weeklyVelocity={weeklyVelocity} />
       <MomentumIndicator momentum={momentum} />
       <WeeklyChart weeklyCounts={weeklyCounts} />
     </div>

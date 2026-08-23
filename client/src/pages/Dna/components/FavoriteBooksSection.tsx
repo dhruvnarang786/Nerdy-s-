@@ -66,7 +66,7 @@ export function FavoriteBooksSection({ favorites, onViewAll }: FavoriteBooksSect
       <div className="lb-fav-scroll-container" ref={scrollContainerRef}>
         <div className="lb-fav-scroll-track">
           {favorites.map((book, index) => {
-            const cover = getBookCoverUrl(book.id, book.coverUrl);
+            const cover = getBookCoverUrl(book.id, book.coverUrl, book.title, book.author);
             return (
               <Link
                 key={book.id || index}
@@ -82,9 +82,7 @@ export function FavoriteBooksSection({ favorites, onViewAll }: FavoriteBooksSect
                     loading="lazy"
                     referrerPolicy="no-referrer"
                     onError={(e) => {
-                      (e.currentTarget as HTMLElement).style.display = 'none';
-                      const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                      if (fallback) fallback.style.display = 'flex';
+                      e.currentTarget.src = getBookCoverUrl(book.id, null, book.title, book.author);
                     }}
                   />
                   {/* Dynamic Fallback if image fails */}

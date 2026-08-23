@@ -8,7 +8,6 @@ import { LogBook } from '@/components/features/LogBook';
 import { useAuth } from '@/lib/AuthContext';
 import { displayName } from '@/lib/displayName';
 import { getBookCoverUrl } from '@/lib/bookCover';
-import { FALLBACK_COVER } from '@/lib/constants';
 import '@/styles/pages.css';
 
 export function BookDetails() {
@@ -150,11 +149,11 @@ export function BookDetails() {
             <div className="book-details-header">
                 <div className="flex-shrink-0 mx-auto md:mx-0">
                     <img
-                        src={getBookCoverUrl(book.id, book.coverUrl)}
+                        src={getBookCoverUrl(book.id, book.coverUrl, book.title, book.author)}
                         alt={book.title}
                         className="book-cover-large"
                         onError={(e) => {
-                            e.currentTarget.src = FALLBACK_COVER;
+                            e.currentTarget.src = getBookCoverUrl(book.id, null, book.title, book.author);
                         }}
                     />
                 </div>

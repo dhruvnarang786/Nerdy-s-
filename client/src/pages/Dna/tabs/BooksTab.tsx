@@ -76,7 +76,7 @@ export function BooksTab({ enabled }: BooksTabProps) {
       ) : (
         <div className="lb-books-posters-grid">
           {filtered.map((log, i) => {
-            const cover = getBookCoverUrl(log.bookId, log.coverUrl);
+            const cover = getBookCoverUrl(log.bookId, log.coverUrl, log.bookTitle, log.author);
             return (
               <div key={log.id || i} className="lb-book-poster-card">
                 <Link to={`/book/${log.bookId}`} className="lb-book-poster-img-wrap">
@@ -86,9 +86,7 @@ export function BooksTab({ enabled }: BooksTabProps) {
                     className="lb-book-poster-img"
                     loading="lazy"
                     onError={(e) => {
-                      (e.currentTarget as HTMLElement).style.display = 'none';
-                      const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                      if (fallback) fallback.style.display = 'flex';
+                      e.currentTarget.src = getBookCoverUrl(log.bookId, null, log.bookTitle, log.author);
                     }}
                   />
                   <div className="lb-poster-cover-fallback" style={{ display: 'none' }}>

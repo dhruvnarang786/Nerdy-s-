@@ -4,7 +4,6 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { searchBooks, type Book } from '@/lib/apiClient';
 import { BookCard } from '@/components/ui/BookCard';
 import { getBookCoverUrl } from '@/lib/bookCover';
-import { FALLBACK_COVER } from '@/lib/constants';
 import { Loader2, Search, ArrowRight } from 'lucide-react';
 import '@/styles/pages.css';
 
@@ -77,11 +76,11 @@ export function SearchResults() {
                                 <Link to={`/book/${books[0].id}`} className="search-hero-link">
                                     <div className="search-hero-cover-wrap">
                                         <img
-                                            src={getBookCoverUrl(books[0].id, books[0].coverUrl)}
+                                            src={getBookCoverUrl(books[0].id, books[0].coverUrl, books[0].title, books[0].author)}
                                             alt={books[0].title}
                                             className="search-hero-cover"
                                             onError={(e) => {
-                                                e.currentTarget.src = FALLBACK_COVER;
+                                                e.currentTarget.src = getBookCoverUrl(books[0].id, null, books[0].title, books[0].author);
                                             }}
                                         />
                                         <div className="search-hero-glow" />

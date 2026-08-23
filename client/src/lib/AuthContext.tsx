@@ -2,10 +2,11 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { api, setToken, clearToken, wakeUpServer } from '@/lib/apiClient';
 
-interface User {
+export interface User {
     id: number;
     username: string;
     email: string;
+    avatar?: string | null;
 }
 
 interface AuthContextType {

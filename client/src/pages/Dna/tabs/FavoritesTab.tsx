@@ -54,7 +54,7 @@ export function FavoritesTab({ enabled }: FavoritesTabProps) {
 
       <div className="lb-books-posters-grid">
         {favorites.map((book, i) => {
-          const cover = getBookCoverUrl(book.id, book.coverUrl);
+          const cover = getBookCoverUrl(book.id, book.coverUrl, book.title, book.author);
           return (
             <div key={book.id || i} className="lb-book-poster-card">
               <Link to={`/book/${book.id}`} className="lb-book-poster-img-wrap">
@@ -65,7 +65,7 @@ export function FavoritesTab({ enabled }: FavoritesTabProps) {
                   loading="lazy"
                   referrerPolicy="no-referrer"
                   onError={(e) => {
-                    (e.currentTarget as HTMLElement).style.display = 'none';
+                    e.currentTarget.src = getBookCoverUrl(book.id, null, book.title, book.author);
                   }}
                 />
               </Link>

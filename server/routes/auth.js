@@ -6,8 +6,8 @@ import { JWT_SECRET } from '../config.js';
 
 const router = express.Router();
 
-function generateToken(userId) {
-    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '30d' });
+function generateToken(userId, extra = {}) {
+    return jwt.sign({ userId, ...extra }, JWT_SECRET, { expiresIn: '30d' });
 }
 
 // Verify a Google Identity Services (GSI) credential JWT
@@ -105,7 +105,7 @@ router.post('/google', async (req, res) => {
         if (!credential) return res.status(400).json({ error: 'Google credential required' });
 
         const payload = await verifyGoogleToken(credential);
-        const { email, name, sub: googleId } = payload;
+        const { email, name, picture, sub: googleId } = payload;
 
         if (!email) return res.status(400).json({ error: 'No email from Google' });
 
@@ -140,9 +140,9 @@ router.post('/google', async (req, res) => {
             });
         }
 
-        const token = generateToken(user.id);
+        const token = generateToken(user.id, { avatar: picture || null });
         res.json({
-            user: { id: user.id, username: user.username, email: user.email },
+            user: { id: user.id, username: user.username, email: user.email, avatar: picture || null },
             token
         });
     } catch (err) {
@@ -165,7 +165,7 @@ router.get('/me', async (req, res) => {
             select: { id: true, username: true, email: true, createdAt: true }
         });
         if (!user) return res.status(404).json({ error: 'User not found' });
-        res.json({ user });
+        res.json({ user: { ...user, avatar: payload.avatar || null } });
     } catch {
         res.status(401).json({ error: 'Invalid token' });
     }
