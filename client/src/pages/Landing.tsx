@@ -2,25 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, MessageSquare, Users, Star, Heart, Edit3, LayoutGrid, ChevronDown } from 'lucide-react';
 import { getBookCoverUrl } from '@/lib/bookCover';
-import { api } from '@/lib/apiClient';
+import { api, type Book } from '@/lib/apiClient';
 import '@/styles/pages.css';
 import '@/styles/bento.css';
 import '@/styles/landing.css';
 
-const MARQUEE_BOOKS = [
-    { id: 'OL27479W', title: '1984', author: 'George Orwell', cover: 'https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg' },
-    { id: 'OL82536W', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', cover: 'https://covers.openlibrary.org/b/isbn/9780743273565-L.jpg' },
-    { id: 'OL27516W', title: 'The Hobbit', author: 'J.R.R. Tolkien', cover: 'https://covers.openlibrary.org/b/isbn/9780547928227-L.jpg' },
-    { id: 'OL45804W', title: 'Pride and Prejudice', author: 'Jane Austen', cover: 'https://covers.openlibrary.org/b/isbn/9780141439518-L.jpg' },
-    { id: 'OL15125W', title: 'To Kill a Mockingbird', author: 'Harper Lee', cover: 'https://covers.openlibrary.org/b/isbn/9780061120084-L.jpg' },
-    { id: 'OL81613W', title: 'The Alchemist', author: 'Paulo Coelho', cover: 'https://covers.openlibrary.org/b/isbn/9780062315007-L.jpg' },
-    { id: 'OL12345W', title: 'Atomic Habits', author: 'James Clear', cover: 'https://covers.openlibrary.org/b/isbn/9780735211292-L.jpg' },
-    { id: 'OL27258W', title: 'Dune', author: 'Frank Herbert', cover: 'https://covers.openlibrary.org/b/isbn/9780441172719-L.jpg' },
-    { id: 'OL17075704W', title: 'Sapiens', author: 'Yuval Noah Harari', cover: 'https://covers.openlibrary.org/b/isbn/9780062316097-L.jpg' },
-    { id: 'OL17930368W', title: 'Project Hail Mary', author: 'Andy Weir', cover: 'https://covers.openlibrary.org/b/isbn/9780593135204-L.jpg' },
-    { id: 'OL20644253W', title: 'The Midnight Library', author: 'Matt Haig', cover: 'https://covers.openlibrary.org/b/isbn/9780525559474-L.jpg' },
-    { id: 'OL82563W', title: 'The Night Circus', author: 'Erin Morgenstern', cover: 'https://covers.openlibrary.org/b/isbn/9780307744432-L.jpg' },
-];
+const LANDING_MARQUEE_CACHE_KEY = 'nerdys_landing_marquee_cache';
 
 interface PlatformStats {
     totalLogs: number;
@@ -30,9 +17,35 @@ interface PlatformStats {
 }
 
 export function Landing() {
-    // Duplicate array for seamless infinite loop
-    const marqueeItems = [...MARQUEE_BOOKS, ...MARQUEE_BOOKS];
+    const [marqueeBooks, setMarqueeBooks] = useState<Book[]>(() => {
+        try {
+            const cached = localStorage.getItem(LANDING_MARQUEE_CACHE_KEY);
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+        } catch { /* ignore */ }
+        return [];
+    });
+
     const [stats, setStats] = useState<PlatformStats | null>(null);
+
+    // Fetch dynamic live trending books for the marquee
+    useEffect(() => {
+        let isMounted = true;
+        api.get<{ books: Book[] }>('/api/books/bestsellers')
+            .then(res => {
+                if (!isMounted || !res.books || res.books.length === 0) return;
+                const items = res.books.slice(0, 16);
+                setMarqueeBooks(items);
+                try {
+                    localStorage.setItem(LANDING_MARQUEE_CACHE_KEY, JSON.stringify(items));
+                } catch { /* ignore */ }
+            })
+            .catch(() => {});
+
+        return () => { isMounted = false; };
+    }, []);
 
     useEffect(() => {
         api.get<PlatformStats>('/api/stats/public')
@@ -43,29 +56,36 @@ export function Landing() {
             });
     }, []);
 
+    // Duplicate array for seamless infinite loop
+    const marqueeItems = marqueeBooks.length > 0
+        ? [...marqueeBooks, ...marqueeBooks]
+        : [];
+
     return (
         <div className="home-wrapper" style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
             {/* ── HERO SECTION ─────────────────────────────────── */}
             <section className="landing-hero">
                 {/* Infinite Book Marquee */}
-                <div className="landing-marquee-wrapper">
-                    <div className="landing-marquee-track">
-                        {marqueeItems.map((book, i) => (
-                            <Link key={`${book.id}-${i}`} to={`/book/${book.id}`} className="landing-marquee-item">
-                                <img
-                                    src={getBookCoverUrl(book.id, book.cover, book.title, book.author)}
-                                    alt={book.title}
-                                    loading="lazy"
-                                    onError={(e) => {
-                                        e.currentTarget.src = getBookCoverUrl(book.id, null, book.title, book.author);
-                                    }}
-                                />
-                            </Link>
-                        ))}
+                {marqueeItems.length > 0 && (
+                    <div className="landing-marquee-wrapper">
+                        <div className="landing-marquee-track">
+                            {marqueeItems.map((book, i) => (
+                                <Link key={`${book.id}-${i}`} to={`/book/${book.id}`} className="landing-marquee-item">
+                                    <img
+                                        src={getBookCoverUrl(book.id, book.coverUrl, book.title, book.author)}
+                                        alt={book.title}
+                                        loading="lazy"
+                                        onError={(e) => {
+                                            e.currentTarget.src = getBookCoverUrl(book.id, null, book.title, book.author);
+                                        }}
+                                    />
+                                </Link>
+                            ))}
+                        </div>
+                        <div className="landing-marquee-fade-left" />
+                        <div className="landing-marquee-fade-right" />
                     </div>
-                    <div className="landing-marquee-fade-left" />
-                    <div className="landing-marquee-fade-right" />
-                </div>
+                )}
 
                 {/* Centered Hero Content */}
                 <div className="landing-hero-content animate-fade-in-up">

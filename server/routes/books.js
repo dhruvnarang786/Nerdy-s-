@@ -8,28 +8,7 @@ import { prisma } from '../index.js';
 const router = express.Router();
 const bookService = new BookService();
 
-// In-memory buffer cache for resolved book covers (24h TTL)
-const COVER_CACHE = new Map();
-const COVER_CACHE_MAX = 500;
-const COVER_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
-
-function getCachedCover(key) {
-    const item = COVER_CACHE.get(key);
-    if (!item) return null;
-    if (Date.now() - item.timestamp > COVER_CACHE_TTL_MS) {
-        COVER_CACHE.delete(key);
-        return null;
-    }
-    return item;
-}
-
-function setCachedCover(key, buffer, contentType) {
-    if (COVER_CACHE.size >= COVER_CACHE_MAX) {
-        const oldestKey = COVER_CACHE.keys().next().value;
-        if (oldestKey) COVER_CACHE.delete(oldestKey);
-    }
-    COVER_CACHE.set(key, { buffer, contentType, timestamp: Date.now() });
-}
+import { coverCacheService } from '../services/CoverCacheService.js';
 
 // Whitelist for allowed cover image hosts
 function isAllowedCoverHost(hostname) {
@@ -49,11 +28,16 @@ function isAllowedCoverHost(hostname) {
     );
 }
 
-function sendSvgFallback(res, title, author) {
+function sendSvgFallback(res, req, title, author) {
+    const etag = coverCacheService.generateEtag(`svg:${title}:${author}`, 'svg');
+    if (req.headers['if-none-match'] === etag) {
+        return res.status(304).end();
+    }
     const svg = generateSvgCover(title || 'Untitled Work', author || 'Anonymous');
     res.set({
         'Content-Type': 'image/svg+xml',
-        'Cache-Control': 'public, max-age=86400, immutable',
+        'Cache-Control': 'public, max-age=604800, immutable',
+        'ETag': etag,
         'Access-Control-Allow-Origin': '*',
         'Cross-Origin-Resource-Policy': 'cross-origin',
     });
@@ -64,7 +48,7 @@ function sendSvgFallback(res, title, author) {
 router.get('/cover/generated', (req, res) => {
     const title = String(req.query.title || 'Untitled Work');
     const author = String(req.query.author || 'Anonymous');
-    return sendSvgFallback(res, title, author);
+    return sendSvgFallback(res, req, title, author);
 });
 
 // GET /api/books/cover/b64/:b64 — Image reverse proxy with base64 path parameter
@@ -74,78 +58,77 @@ router.get('/cover/b64/:b64', async (req, res) => {
 
     try {
         const b64 = String(req.params.b64 || '').trim();
-        if (!b64) {
-            return sendSvgFallback(res, title, author);
-        }
+        if (!b64) return sendSvgFallback(res, req, title, author);
 
         let decoded;
         try {
             const safe = decodeURIComponent(b64);
             decoded = Buffer.from(safe, 'base64').toString('utf8');
         } catch {
-            return sendSvgFallback(res, title, author);
+            return sendSvgFallback(res, req, title, author);
         }
 
         let targetUrl;
         try {
             targetUrl = new URL(decoded);
         } catch {
-            return sendSvgFallback(res, title, author);
+            return sendSvgFallback(res, req, title, author);
         }
 
         if (!isAllowedCoverHost(targetUrl.hostname)) {
-            return sendSvgFallback(res, title, author);
+            return sendSvgFallback(res, req, title, author);
         }
 
         if (targetUrl.hostname === 'localhost' || targetUrl.hostname === '127.0.0.1' || targetUrl.hostname.startsWith('192.168.') || targetUrl.hostname.startsWith('10.')) {
-            return sendSvgFallback(res, title, author);
+            return sendSvgFallback(res, req, title, author);
         }
 
-        // Check memory cache
-        const cached = getCachedCover(targetUrl.href);
-        if (cached) {
-            res.set({
-                'Content-Type': cached.contentType,
-                'Cache-Control': 'public, max-age=86400, immutable',
-                'Access-Control-Allow-Origin': '*',
-                'Cross-Origin-Resource-Policy': 'cross-origin',
+        const cacheKey = coverCacheService.getCacheKey(targetUrl.href);
+
+        // Check if browser sent ETag for 304
+        const cachedMeta = coverCacheService.get(cacheKey);
+        if (cachedMeta && req.headers['if-none-match'] === cachedMeta.etag) {
+            return res.status(304).end();
+        }
+
+        // Deduplicate in-flight upstream fetches (Singleflight)
+        const resolution = await coverCacheService.deduplicate(cacheKey, async () => {
+            const response = await fetch(targetUrl.href, {
+                headers: { 'User-Agent': 'NerdyReads/1.0 (https://nerdys.app; book-cover-proxy)' },
+                signal: AbortSignal.timeout(8000),
             });
-            return res.send(cached.buffer);
-        }
 
-        const response = await fetch(targetUrl.href, {
-            headers: {
-                'User-Agent': 'NerdyReads/1.0 (https://nerdys.app; book-cover-proxy)'
-            },
-            signal: AbortSignal.timeout(10000),
+            if (!response.ok) return null;
+
+            const arrayBuffer = await response.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            // OpenLibrary blank placeholder check (<100 bytes)
+            if (buffer.length < 100) return null;
+
+            const contentType = response.headers.get('content-type') || 'image/jpeg';
+            return {
+                coverUrl: targetUrl.href,
+                buffer,
+                contentType,
+            };
         });
 
-        if (!response.ok) {
-            return sendSvgFallback(res, title, author);
+        if (!resolution || resolution.status === 'not_found' || !resolution.buffer) {
+            return sendSvgFallback(res, req, title, author);
         }
-
-        const arrayBuffer = await response.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-
-        // OpenLibrary returns a 43-byte transparent GIF when no cover exists
-        // If image buffer is smaller than 100 bytes, it is a blank placeholder
-        if (buffer.length < 100) {
-            return sendSvgFallback(res, title, author);
-        }
-
-        const contentType = response.headers.get('content-type') || 'image/jpeg';
-        setCachedCover(targetUrl.href, buffer, contentType);
 
         res.set({
-            'Content-Type': contentType,
-            'Cache-Control': 'public, max-age=86400, immutable',
+            'Content-Type': resolution.contentType || 'image/jpeg',
+            'Cache-Control': 'public, max-age=604800, immutable',
+            'ETag': resolution.etag,
             'Access-Control-Allow-Origin': '*',
             'Cross-Origin-Resource-Policy': 'cross-origin',
         });
-        res.send(buffer);
+        res.send(resolution.buffer);
     } catch (err) {
         console.error('[Cover Proxy Error]:', err.message);
-        return sendSvgFallback(res, title, author);
+        return sendSvgFallback(res, req, title, author);
     }
 });
 
@@ -156,67 +139,68 @@ router.get('/cover', async (req, res) => {
 
     try {
         const urlParam = String(req.query.url || '').trim();
-        if (!urlParam) {
-            return sendSvgFallback(res, title, author);
-        }
+        if (!urlParam) return sendSvgFallback(res, req, title, author);
 
         let targetUrl;
         try {
             targetUrl = new URL(urlParam);
         } catch {
-            return sendSvgFallback(res, title, author);
+            return sendSvgFallback(res, req, title, author);
         }
 
         if (!isAllowedCoverHost(targetUrl.hostname)) {
-            return sendSvgFallback(res, title, author);
+            return sendSvgFallback(res, req, title, author);
         }
 
         if (targetUrl.hostname === 'localhost' || targetUrl.hostname === '127.0.0.1' || targetUrl.hostname.startsWith('192.168.') || targetUrl.hostname.startsWith('10.')) {
-            return sendSvgFallback(res, title, author);
+            return sendSvgFallback(res, req, title, author);
         }
 
-        const cached = getCachedCover(targetUrl.href);
-        if (cached) {
-            res.set({
-                'Content-Type': cached.contentType,
-                'Cache-Control': 'public, max-age=86400, immutable',
-                'Access-Control-Allow-Origin': '*',
-                'Cross-Origin-Resource-Policy': 'cross-origin',
+        const cacheKey = coverCacheService.getCacheKey(targetUrl.href);
+
+        // Check 304 ETag
+        const cachedMeta = coverCacheService.get(cacheKey);
+        if (cachedMeta && req.headers['if-none-match'] === cachedMeta.etag) {
+            return res.status(304).end();
+        }
+
+        // Singleflight deduplication
+        const resolution = await coverCacheService.deduplicate(cacheKey, async () => {
+            const response = await fetch(targetUrl.href, {
+                headers: { 'User-Agent': 'NerdyReads/1.0 (https://nerdys.app; book-cover-proxy)' },
+                signal: AbortSignal.timeout(8000),
             });
-            return res.send(cached.buffer);
-        }
 
-        const response = await fetch(targetUrl.href, {
-            headers: {
-                'User-Agent': 'NerdyReads/1.0 (https://nerdys.app; book-cover-proxy)'
-            },
-            signal: AbortSignal.timeout(10000),
+            if (!response.ok) return null;
+
+            const arrayBuffer = await response.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            if (buffer.length < 100) return null;
+
+            const contentType = response.headers.get('content-type') || 'image/jpeg';
+            return {
+                coverUrl: targetUrl.href,
+                buffer,
+                contentType,
+            };
         });
 
-        if (!response.ok) {
-            return sendSvgFallback(res, title, author);
+        if (!resolution || resolution.status === 'not_found' || !resolution.buffer) {
+            return sendSvgFallback(res, req, title, author);
         }
-
-        const arrayBuffer = await response.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-
-        if (buffer.length < 100) {
-            return sendSvgFallback(res, title, author);
-        }
-
-        const contentType = response.headers.get('content-type') || 'image/jpeg';
-        setCachedCover(targetUrl.href, buffer, contentType);
 
         res.set({
-            'Content-Type': contentType,
-            'Cache-Control': 'public, max-age=86400, immutable',
+            'Content-Type': resolution.contentType || 'image/jpeg',
+            'Cache-Control': 'public, max-age=604800, immutable',
+            'ETag': resolution.etag,
             'Access-Control-Allow-Origin': '*',
             'Cross-Origin-Resource-Policy': 'cross-origin',
         });
-        res.send(buffer);
+        res.send(resolution.buffer);
     } catch (err) {
         console.error('[Cover Proxy Error]:', err.message);
-        return sendSvgFallback(res, title, author);
+        return sendSvgFallback(res, req, title, author);
     }
 });
 
@@ -377,8 +361,8 @@ router.get('/bestsellers', async (_req, res) => {
             books = catalogSyncService.getBestsellers();
         }
         if (!books || books.length === 0) {
-            const searchRes = await bookService.search('bestseller', 20, 0);
-            books = (searchRes && searchRes.books) ? searchRes.books.map(toApiFormat) : [];
+            const trendingRes = await bookService.searchTrending('', 25, 0);
+            books = (trendingRes && trendingRes.books) ? trendingRes.books.map(toApiFormat) : [];
         }
         res.json({ books, totalItems: books.length });
     } catch (err) {
@@ -392,8 +376,8 @@ router.get('/daily', async (_req, res) => {
     try {
         let book = catalogSyncService.getBookOfTheDay();
         if (!book) {
-            const searchRes = await bookService.search('popular bestselling masterpiece', 5, 0);
-            book = (searchRes && searchRes.books && searchRes.books[0]) ? toApiFormat(searchRes.books[0]) : null;
+            const trendingRes = await bookService.searchTrending('', 5, 0);
+            book = (trendingRes && trendingRes.books && trendingRes.books[0]) ? toApiFormat(trendingRes.books[0]) : null;
         }
         if (!book) return res.status(404).json({ error: 'No daily book found' });
         res.json(book);

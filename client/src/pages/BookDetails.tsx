@@ -60,12 +60,14 @@ export function BookDetails() {
                     setIsFav(false);
                 }
 
-                // Track recent views in localStorage
-                const recentKey = 'nerdys_recent_views';
-                const recent: string[] = JSON.parse(localStorage.getItem(recentKey) || '[]');
-                const filtered = recent.filter(rid => rid !== id);
-                filtered.unshift(id);
-                localStorage.setItem(recentKey, JSON.stringify(filtered.slice(0, 10)));
+                // Track recent views in localStorage only for valid books
+                if (data && data.id) {
+                    const recentKey = 'nerdys_recent_views';
+                    const recent: string[] = JSON.parse(localStorage.getItem(recentKey) || '[]');
+                    const filtered = recent.filter(rid => rid !== data.id);
+                    filtered.unshift(data.id);
+                    localStorage.setItem(recentKey, JSON.stringify(filtered.slice(0, 10)));
+                }
             } catch (error) {
                 console.error("Failed to fetch book details", error);
             } finally {

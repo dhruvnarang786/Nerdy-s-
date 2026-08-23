@@ -1,17 +1,17 @@
-import { BookService } from './BookService.js';
+import { OpenLibraryProvider } from '../providers/OpenLibraryProvider.js';
 import { toApiFormat } from '../utils/normalizeBook.js';
 
-const bookService = new BookService();
+const openLibrary = new OpenLibraryProvider();
 
 export const GENRE_CATEGORIES = [
-    { genre: 'Fiction', query: 'subject:fiction' },
-    { genre: 'Mystery & Thriller', query: 'subject:mystery' },
-    { genre: 'Science Fiction', query: 'subject:science_fiction' },
-    { genre: 'Fantasy', query: 'subject:fantasy' },
-    { genre: 'Romance', query: 'subject:romance' },
-    { genre: 'History', query: 'subject:history' },
-    { genre: 'Biography', query: 'subject:biography' },
-    { genre: 'Self-Help', query: 'subject:self-help' },
+    { genre: 'Fiction', subject: 'fiction' },
+    { genre: 'Mystery & Thriller', subject: 'thriller' },
+    { genre: 'Science Fiction', subject: 'science_fiction' },
+    { genre: 'Fantasy', subject: 'fantasy' },
+    { genre: 'Romance', subject: 'romance' },
+    { genre: 'History', subject: 'historical_fiction' },
+    { genre: 'Biography', subject: 'biography' },
+    { genre: 'Self-Help', subject: 'self-help' },
 ];
 
 class CatalogSyncService {
@@ -43,35 +43,39 @@ class CatalogSyncService {
     }
 
     /**
-     * Core ingestion pipeline that fetches live trending books
+     * Core ingestion pipeline that fetches live trending books from Open Library
+     * (Letterboxd / Netflix discovery architecture)
      */
     async syncCatalog() {
         if (this.isSyncing) return;
         this.isSyncing = true;
         const startTime = Date.now();
-        console.log('🔄 [CatalogSyncService] Ingesting latest trending books from catalog providers...');
+        console.log('🔄 [CatalogSyncService] Ingesting live trending books from Open Library discovery stream...');
 
         try {
-            // 1. Fetch Bestsellers / Popular This Week (20 top titles)
-            const popularRes = await bookService.search('bestseller', 20, 0);
-            if (popularRes && popularRes.books && popularRes.books.length > 0) {
-                this.bestsellersCache = popularRes.books.map(toApiFormat);
+            // 1. Fetch live trending books across millions of readers (Weekly Popular)
+            const weeklyTrending = await openLibrary.getTrending('weekly', 30);
+            if (weeklyTrending && weeklyTrending.length > 0) {
+                this.bestsellersCache = weeklyTrending.map(toApiFormat);
             }
 
-            // 2. Compute Book of the Day
-            if (this.bestsellersCache.length > 0) {
+            // 2. Fetch daily trending books for dynamic Book of the Day selection
+            const dailyTrending = await openLibrary.getTrending('daily', 15);
+            if (dailyTrending && dailyTrending.length > 0) {
                 const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 1000 / 60 / 60 / 24);
-                const pickIndex = dayOfYear % this.bestsellersCache.length;
-                this.dailyBookCache = this.bestsellersCache[pickIndex];
+                const pickIndex = dayOfYear % dailyTrending.length;
+                this.dailyBookCache = toApiFormat(dailyTrending[pickIndex]);
+            } else if (this.bestsellersCache.length > 0) {
+                this.dailyBookCache = this.bestsellersCache[0];
             }
 
-            // 3. Fetch all 8 Trending Genres in parallel batches
+            // 3. Fetch 8 trending genre rows in parallel (Netflix category feeds)
             const updatedGenres = {};
-            await Promise.all(GENRE_CATEGORIES.map(async ({ genre, query }) => {
+            await Promise.all(GENRE_CATEGORIES.map(async ({ genre, subject }) => {
                 try {
-                    const res = await bookService.search(query, 18, 0);
-                    if (res && res.books && res.books.length > 0) {
-                        updatedGenres[genre] = res.books.map(toApiFormat);
+                    const books = await openLibrary.getBySubject(subject, 18);
+                    if (books && books.length > 0) {
+                        updatedGenres[genre] = books.map(toApiFormat);
                     }
                 } catch (err) {
                     console.error(`[CatalogSyncService] Failed to sync genre "${genre}":`, err.message);
@@ -114,3 +118,4 @@ class CatalogSyncService {
 }
 
 export const catalogSyncService = new CatalogSyncService();
+

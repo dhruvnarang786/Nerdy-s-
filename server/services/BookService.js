@@ -38,9 +38,13 @@ export class BookService {
 
         // Only fall back to Google Books if Open Library returned insufficient results
         if (olBooks.length < SUFFICIENT_RESULTS) {
-            const gbBooks = await this.googleBooks.search(query, maxResults, startIndex);
-            if (gbBooks.length > 0) {
-                merged = deduplicateBooks([...olBooks, ...gbBooks]);
+            try {
+                const gbBooks = await this.googleBooks.search(query, maxResults, startIndex);
+                if (gbBooks.length > 0) {
+                    merged = deduplicateBooks([...olBooks, ...gbBooks]);
+                }
+            } catch (err) {
+                console.warn('[BookService] Google Books search fallback error:', err.message);
             }
         }
 
@@ -50,34 +54,63 @@ export class BookService {
         return result;
     }
 
-    async searchTrending(query, maxResults = 15, startIndex = 0) {
+    async searchTrending(query = '', maxResults = 15, startIndex = 0) {
+        const clean = String(query).toLowerCase().trim();
+        if (!clean || clean.includes('trending') || clean.includes('popular') || clean.includes('bestsell')) {
+            const cacheKey = `trending:weekly:${maxResults}:${startIndex}`;
+            const cached = getCached(cacheKey);
+            if (cached) return cached;
+
+            const trending = await this.openLibrary.getTrending('weekly', maxResults + startIndex);
+            const sliced = trending.slice(startIndex, startIndex + maxResults);
+            const result = { books: sliced, totalItems: trending.length };
+            setCache(cacheKey, result);
+            return result;
+        }
+
         return this.search(query, maxResults, startIndex);
     }
 
     async getById(id) {
         if (!id) return null;
-        const cacheKey = `book:${id}`;
+        const cleanId = String(id).trim();
+        const cacheKey = `book:${cleanId}`;
         const cached = getCached(cacheKey);
         if (cached) return cached;
 
-        // 1. Open Library is the primary source - try it first
-        const olBook = await this.openLibrary.getById(id);
-        if (olBook) {
-            setCache(cacheKey, olBook);
-            return olBook;
+        const isOlId = cleanId.startsWith('OL') || cleanId.startsWith('/works/') || cleanId.startsWith('/books/');
+
+        // 1. If Open Library ID, query Open Library first
+        if (isOlId) {
+            const olBook = await this.openLibrary.getById(cleanId);
+            if (olBook) {
+                setCache(cacheKey, olBook);
+                return olBook;
+            }
+        } else {
+            // 2. Try Google Books for non-OL IDs
+            try {
+                const gbBook = await this.googleBooks.getById(cleanId);
+                if (gbBook) {
+                    setCache(cacheKey, gbBook);
+                    return gbBook;
+                }
+            } catch (err) {
+                console.warn(`[BookService] Google Books lookup failed for ${cleanId}:`, err.message);
+            }
+
+            // Also check Open Library in case ID is an ISBN / custom identifier
+            const olBook = await this.openLibrary.getById(cleanId);
+            if (olBook) {
+                setCache(cacheKey, olBook);
+                return olBook;
+            }
         }
 
-        // 2. Try Google Books
-        const gbBook = await this.googleBooks.getById(id);
-        if (gbBook) {
-            setCache(cacheKey, gbBook);
-            return gbBook;
-        }
-
-        // 3. Fallback: Check local Database (BookLogs & Favorites) in case external APIs fail or are rate-limited
+        // 3. Fallback: Check local Database (BookLogs & Favorites)
         try {
             const logEntry = await prisma.bookLog.findFirst({
-                where: { bookId: id },
+                where: { bookId: cleanId },
                 select: { bookId: true, bookTitle: true, author: true, coverUrl: true }
             });
             if (logEntry && logEntry.bookTitle) {
@@ -97,7 +130,7 @@ export class BookService {
             }
 
             const favEntry = await prisma.favorite.findFirst({
-                where: { bookId: id },
+                where: { bookId: cleanId },
                 select: { bookId: true, bookTitle: true, author: true, coverUrl: true }
             });
             if (favEntry && favEntry.bookTitle) {

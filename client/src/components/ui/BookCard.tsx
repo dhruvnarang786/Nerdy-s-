@@ -1,28 +1,26 @@
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { type Book } from '@/lib/apiClient';
-import { getBookCoverUrl } from '@/lib/bookCover';
+import { BookCoverImage } from '@/components/ui/BookCoverImage';
 import '@/styles/components.css';
 
 interface BookCardProps {
     book: Book;
+    priority?: boolean;
 }
 
-export const BookCard = memo(function BookCard({ book }: BookCardProps) {
-    const [imgError, setImgError] = useState(false);
-    const coverUrl = getBookCoverUrl(book.id, book.coverUrl, book.title, book.author);
-
+export const BookCard = memo(function BookCard({ book, priority = false }: BookCardProps) {
     return (
         <Link to={`/book/${book.id}`} className="book-card group">
             <div className="book-cover-container">
-                <img
-                    src={imgError ? getBookCoverUrl(book.id, null, book.title, book.author) : coverUrl}
+                <BookCoverImage
+                    bookId={book.id}
+                    coverUrl={book.coverUrl}
+                    title={book.title}
+                    author={book.author}
                     alt={book.title}
-                    className="book-card-cover"
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                    onError={() => setImgError(true)}
+                    priority={priority}
                 />
             </div>
             <div className="book-card-info">
@@ -38,3 +36,4 @@ export const BookCard = memo(function BookCard({ book }: BookCardProps) {
         </Link>
     );
 });
+

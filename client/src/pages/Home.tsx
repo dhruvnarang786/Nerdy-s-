@@ -251,7 +251,7 @@ export function Home() {
             })
             .catch(() => {
                 // Fallback live search if endpoint fails
-                searchBooks('bestselling popular award fiction', 0, 15).then(res => {
+                searchBooks('classic fiction', 0, 15).then(res => {
                     if (isMounted && res.books && res.books.length > 0) {
                         setShowcaseBooks(res.books);
                     }
@@ -278,7 +278,13 @@ export function Home() {
             const recentIds: string[] = JSON.parse(localStorage.getItem('nerdys_recent_views') || '[]');
             if (recentIds.length > 0) {
                 const fetched = await Promise.all(recentIds.slice(0, 4).map(id => getBookDetails(id)));
-                setRecentBooks(fetched.filter((b): b is Book => b !== null));
+                const validBooks = fetched.filter((b): b is Book => b !== null && !!b.id);
+                setRecentBooks(validBooks);
+                // Prune dead/invalid IDs from localStorage to stop repeat 404s
+                const validIds = validBooks.map(b => b.id);
+                if (validIds.length !== recentIds.length) {
+                    localStorage.setItem('nerdys_recent_views', JSON.stringify(validIds));
+                }
             }
         })();
     }, [isAuthenticated]);
