@@ -1,8 +1,6 @@
 import { normalizeOpenLibraryBook, normalizeOpenLibraryBookDetail } from '../utils/normalizeBook.js';
 
 const SEARCH_URL = 'https://openlibrary.org/search.json';
-const WORKS_URL = 'https://openlibrary.org/works';
-
 const FETCH_TIMEOUT_MS = 10000;
 
 export class OpenLibraryProvider {
@@ -32,7 +30,24 @@ export class OpenLibraryProvider {
 
     async getById(id) {
         try {
-            const response = await fetch(`${WORKS_URL}/${id}.json`, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+            const cleanId = String(id).replace('/works/', '').replace('/books/', '').trim();
+            
+            // Check whether it's an Edition (M) or Work (W) or other identifier
+            const isEdition = cleanId.endsWith('M');
+            const primaryUrl = isEdition 
+                ? `https://openlibrary.org/books/${cleanId}.json`
+                : `https://openlibrary.org/works/${cleanId}.json`;
+
+            let response = await fetch(primaryUrl, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+
+            // If not found, try alternate endpoint
+            if (!response.ok) {
+                const secondaryUrl = isEdition
+                    ? `https://openlibrary.org/works/${cleanId}.json`
+                    : `https://openlibrary.org/books/${cleanId}.json`;
+                response = await fetch(secondaryUrl, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+            }
+
             if (!response.ok) return null;
 
             const data = await response.json();

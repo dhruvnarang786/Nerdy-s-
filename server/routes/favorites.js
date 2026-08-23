@@ -1,6 +1,7 @@
 import express from 'express';
 import { prisma } from '../index.js';
 import { requireAuth } from '../middleware/auth.js';
+import { dnaEventService } from '../services/dna/index.js';
 
 const router = express.Router();
 
@@ -28,6 +29,7 @@ router.post('/', requireAuth, async (req, res) => {
             update: {},
             create: { bookId, bookTitle, coverUrl, author, userId: req.user.id },
         });
+        try { dnaEventService.emit('favorite.added', { userId: req.user.id, favorite }); } catch (_) {}
         res.status(201).json({ favorite });
     } catch (err) {
         console.error(err);
@@ -41,6 +43,7 @@ router.delete('/:bookId', requireAuth, async (req, res) => {
         await prisma.favorite.deleteMany({
             where: { userId: req.user.id, bookId: req.params.bookId }
         });
+        try { dnaEventService.emit('favorite.removed', { userId: req.user.id, favorite: { bookId: req.params.bookId } }); } catch (_) {}
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: 'Server error' });

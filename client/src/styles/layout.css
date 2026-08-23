@@ -18,7 +18,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 5.5rem;
+    height: 4rem;
 }
 
 .navbar-brand {
@@ -29,21 +29,21 @@
 }
 
 .navbar-logo {
-    height: 2.5rem;
-    width: 2.5rem;
+    height: 1.85rem;
+    width: 1.85rem;
     color: var(--primary);
 }
 
 .navbar-title {
     font-weight: 800;
-    font-size: 1.75rem;
+    font-size: 1.4rem;
     letter-spacing: -0.025em;
     color: var(--foreground);
 }
 
 .navbar-links {
     display: flex;
-    gap: var(--spacing-4);
+    gap: var(--spacing-3);
     align-items: center;
 }
 
@@ -55,9 +55,9 @@
 
 .nav-link {
     color: var(--foreground);
-    padding: var(--spacing-2) var(--spacing-3);
+    padding: 0.35rem 0.65rem;
     border-radius: var(--radius);
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     transition: color 0.2s, background-color 0.2s;
     position: relative;
@@ -238,7 +238,7 @@
     background-color: var(--secondary);
     border-top: 1px solid var(--border);
     margin-top: auto;
-    padding: var(--spacing-8) 0;
+    padding: var(--spacing-4) 0;
 }
 
 .footer-container {

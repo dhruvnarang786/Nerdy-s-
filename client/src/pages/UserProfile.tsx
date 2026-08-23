@@ -3,17 +3,19 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Star, BookOpen, Calendar, ArrowLeft, Loader2 } from 'lucide-react';
 import { getUserLogs, type BookLog } from '@/lib/storage';
+import { displayName, userInitial, getAvatarColor } from '@/lib/displayName';
+import { getBookCoverUrl } from '@/lib/bookCover';
+import { useAuth } from '@/lib/AuthContext';
 import '@/styles/pages.css';
 
 export function UserProfile() {
     const { username } = useParams<{ username: string }>();
+    const { user: currentUser } = useAuth();
     const [logs, setLogs] = useState<BookLog[]>([]);
-
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (!username) return;
-        setLoading(true);
         getUserLogs(username)
             .then(userLogs => {
                 userLogs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -27,7 +29,10 @@ export function UserProfile() {
         ? (logs.reduce((s, l) => s + l.rating, 0) / logs.length).toFixed(1)
         : '—';
 
-    const avatarColor = stringToColor(username || '');
+    const isOwnProfile = currentUser?.username === username;
+    const profileAvatar = isOwnProfile ? currentUser?.avatar : null;
+    const avatarColor = getAvatarColor(isOwnProfile ? (currentUser?.email || currentUser?.username) : username);
+    const cleanName = displayName(username);
 
     if (loading) {
         return (
@@ -46,11 +51,25 @@ export function UserProfile() {
 
             {/* Profile Header */}
             <div className="profile-header">
-                <div className="profile-avatar-lg" style={{ background: avatarColor }}>
-                    {(username || '?')[0].toUpperCase()}
+                <div className="profile-avatar-lg" style={{ backgroundColor: profileAvatar ? '#1a1614' : avatarColor }}>
+                    {profileAvatar ? (
+                        <img
+                            src={profileAvatar}
+                            alt={cleanName}
+                            className="profile-avatar-lg-img"
+                            referrerPolicy="no-referrer"
+                            onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                const parent = e.currentTarget.parentElement;
+                                if (parent) parent.style.backgroundColor = avatarColor;
+                            }}
+                        />
+                    ) : (
+                        <span style={{ color: '#ffffff', fontWeight: 800 }}>{userInitial(username)}</span>
+                    )}
                 </div>
                 <div className="profile-info">
-                    <h1 className="profile-username">@{username}</h1>
+                    <h1 className="profile-username">@{cleanName}</h1>
                     <p className="profile-sub">Member of Nerdy's</p>
                     <div className="profile-stats">
                         <div className="profile-stat">
@@ -88,30 +107,42 @@ export function UserProfile() {
                 ) : (
                     <div className="profile-logs">
                         {logs.map((log, i) => (
-                            <div key={i} className="profile-log-card">
-                                <div className="profile-log-header">
-                                    <div>
-                                        <Link
-                                            to={`/book/${log.bookId}`}
-                                            className="profile-log-book-title"
-                                        >
-                                            {log.bookTitle || `Book #${log.bookId.slice(0, 8)}`}
-                                        </Link>
-                                        <div className="profile-log-meta">
-                                            <Calendar className="w-3 h-3" />
-                                            <span>Read on {log.dateRead}</span>
+                            <div key={i} className="profile-log-card" style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                                <Link to={`/book/${log.bookId}`} style={{ flexShrink: 0 }}>
+                                    <img
+                                        src={getBookCoverUrl(log.bookId, log.coverUrl, log.bookTitle, log.author)}
+                                        alt={log.bookTitle || 'Book'}
+                                        style={{ width: '48px', height: '72px', objectFit: 'cover', borderRadius: '4px' }}
+                                        onError={(e) => {
+                                            (e.currentTarget as HTMLImageElement).src = getBookCoverUrl(log.bookId, null, log.bookTitle, log.author);
+                                        }}
+                                    />
+                                </Link>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div className="profile-log-header">
+                                        <div>
+                                            <Link
+                                                to={`/book/${log.bookId}`}
+                                                className="profile-log-book-title"
+                                            >
+                                                {log.bookTitle || `Book #${log.bookId.slice(0, 8)}`}
+                                            </Link>
+                                            <div className="profile-log-meta">
+                                                <Calendar className="w-3 h-3" />
+                                                <span>Read on {log.dateRead}</span>
+                                            </div>
+                                        </div>
+                                        <div className="profile-log-rating">
+                                            {Array.from({ length: log.rating }).map((_, si) => (
+                                                <Star key={si} className="profile-star" />
+                                            ))}
+                                            <span className="profile-log-rating-num">{log.rating}/5</span>
                                         </div>
                                     </div>
-                                    <div className="profile-log-rating">
-                                        {Array.from({ length: log.rating }).map((_, si) => (
-                                            <Star key={si} className="profile-star" />
-                                        ))}
-                                        <span className="profile-log-rating-num">{log.rating}/5</span>
-                                    </div>
+                                    {log.notes && (
+                                        <p className="profile-log-notes">"{log.notes}"</p>
+                                    )}
                                 </div>
-                                {log.notes && (
-                                    <p className="profile-log-notes">"{log.notes}"</p>
-                                )}
                             </div>
                         ))}
                     </div>
@@ -119,19 +150,4 @@ export function UserProfile() {
             </div>
         </div>
     );
-}
-
-// Generate a deterministic color from a string
-function stringToColor(str: string): string {
-    const colors = [
-        'linear-gradient(135deg, #7c3aed, #a855f7)',
-        'linear-gradient(135deg, #0891b2, #06b6d4)',
-        'linear-gradient(135deg, #e11d48, #f43f5e)',
-        'linear-gradient(135deg, #d97706, #f59e0b)',
-        'linear-gradient(135deg, #059669, #10b981)',
-        'linear-gradient(135deg, #7c3aed, #3b82f6)',
-    ];
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    return colors[Math.abs(hash) % colors.length];
 }

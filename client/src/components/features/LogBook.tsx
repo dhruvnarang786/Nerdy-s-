@@ -8,11 +8,13 @@ import '@/styles/components.css';
 interface LogBookProps {
     bookId: string;
     bookTitle: string;
+    coverUrl?: string;
+    author?: string;
     onClose: () => void;
     onSave: () => void;
 }
 
-export function LogBook({ bookId, bookTitle, onClose, onSave }: LogBookProps) {
+export function LogBook({ bookId, bookTitle, coverUrl, author, onClose, onSave }: LogBookProps) {
     const { user } = useAuth();
     const [rating, setRating] = useState(0);
     const [dateRead, setDateRead] = useState(new Date().toISOString().split('T')[0]);
@@ -27,6 +29,8 @@ export function LogBook({ bookId, bookTitle, onClose, onSave }: LogBookProps) {
         const newLog: BookLog = {
             bookId,
             bookTitle,
+            coverUrl: coverUrl || undefined,
+            author: author || undefined,
             rating,
             dateRead,
             notes,

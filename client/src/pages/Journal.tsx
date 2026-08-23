@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Star, BookOpen, Calendar, Loader2 } from 'lucide-react';
 import { getUserLogs, type BookLog } from '@/lib/storage';
 import { useAuth } from '@/lib/AuthContext';
+import { displayName } from '@/lib/displayName';
 import { getBookDetails, type Book } from '@/lib/apiClient';
 import '@/styles/pages.css';
 
@@ -67,7 +68,7 @@ export function Journal() {
                     <h1 className="page-title" style={{ marginBottom: '0.25rem' }}>
                         📖 My Journal
                     </h1>
-                    <p className="page-description">Everything you've read and reviewed, {user?.username}.</p>
+                    <p className="page-description">Everything you've read and reviewed, {displayName(user?.username)}.</p>
                 </div>
                 <Link to={`/user/${user?.username}`} className="btn btn-secondary" style={{ fontSize: '0.85rem' }}>
                     View Public Profile

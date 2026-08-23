@@ -1,6 +1,7 @@
 import { OpenLibraryProvider } from '../providers/OpenLibraryProvider.js';
 import { GoogleBooksProvider } from '../providers/GoogleBooksProvider.js';
 import { deduplicateBooks } from '../utils/deduplicateBooks.js';
+import { prisma } from '../db.js';
 
 const SUFFICIENT_RESULTS = 5;
 const CACHE = new Map();
@@ -36,7 +37,6 @@ export class BookService {
         let merged = [...olBooks];
 
         // Only fall back to Google Books if Open Library returned insufficient results
-        // Google Books is unreliable due to rate limiting
         if (olBooks.length < SUFFICIENT_RESULTS) {
             const gbBooks = await this.googleBooks.search(query, maxResults, startIndex);
             if (gbBooks.length > 0) {
@@ -55,23 +55,67 @@ export class BookService {
     }
 
     async getById(id) {
+        if (!id) return null;
         const cacheKey = `book:${id}`;
         const cached = getCached(cacheKey);
         if (cached) return cached;
 
-        // Open Library is the primary source - try it first
+        // 1. Open Library is the primary source - try it first
         const olBook = await this.openLibrary.getById(id);
         if (olBook) {
             setCache(cacheKey, olBook);
             return olBook;
         }
 
-        // Fall back to Google Books
+        // 2. Try Google Books
         const gbBook = await this.googleBooks.getById(id);
         if (gbBook) {
             setCache(cacheKey, gbBook);
             return gbBook;
         }
+
+        // 3. Fallback: Check local Database (BookLogs & Favorites) in case external APIs fail or are rate-limited
+        try {
+            const logEntry = await prisma.bookLog.findFirst({
+                where: { bookId: id },
+                select: { bookId: true, bookTitle: true, author: true, coverUrl: true }
+            });
+            if (logEntry && logEntry.bookTitle) {
+                const fallbackBook = {
+                    id: logEntry.bookId,
+                    title: logEntry.bookTitle,
+                    author: logEntry.author || 'Unknown Author',
+                    coverUrl: logEntry.coverUrl || '',
+                    description: '',
+                    rating: 0,
+                    publishedDate: '',
+                    pages: 0,
+                    genre: [],
+                };
+                setCache(cacheKey, fallbackBook);
+                return fallbackBook;
+            }
+
+            const favEntry = await prisma.favorite.findFirst({
+                where: { bookId: id },
+                select: { bookId: true, bookTitle: true, author: true, coverUrl: true }
+            });
+            if (favEntry && favEntry.bookTitle) {
+                const fallbackBook = {
+                    id: favEntry.bookId,
+                    title: favEntry.bookTitle,
+                    author: favEntry.author || 'Unknown Author',
+                    coverUrl: favEntry.coverUrl || '',
+                    description: '',
+                    rating: 0,
+                    publishedDate: '',
+                    pages: 0,
+                    genre: [],
+                };
+                setCache(cacheKey, fallbackBook);
+                return fallbackBook;
+            }
+        } catch (_) { /* non-blocking */ }
 
         return null;
     }

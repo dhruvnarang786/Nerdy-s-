@@ -148,7 +148,7 @@ export async function searchBooks(query: string, startIndex = 0, maxResults = 20
         }
         const data = await res.json();
         return data;
-    } catch (error) {
+    } catch {
         return { books: [], totalItems: 0 };
     }
 }
@@ -160,7 +160,7 @@ export async function getBookDetails(id: string): Promise<Book | null> {
             return null;
         }
         return await res.json();
-    } catch (error) {
+    } catch {
         return null;
     }
 }

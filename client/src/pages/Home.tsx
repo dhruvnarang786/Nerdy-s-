@@ -1,66 +1,195 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, TrendingUp, Clock, Activity, Flame, Crown, Heart, MessageCircle } from 'lucide-react';
-import { searchBooks, getBookDetails, type Book } from '@/lib/apiClient';
+import { Star, TrendingUp, Clock, Activity, Flame, Crown, BookOpen, Heart, MessageCircle } from 'lucide-react';
+import { searchBooks, getBookDetails, api, type Book } from '@/lib/apiClient';
 import { getAllLogs } from '@/lib/storage';
 import { useAuth } from '@/lib/AuthContext';
-import { FALLBACK_COVER } from '@/lib/constants';
+import { displayName, userInitial, getAvatarColor } from '@/lib/displayName';
+import { getBookCoverUrl } from '@/lib/bookCover';
 import '@/styles/pages.css';
 import '@/styles/lb-home.css';
 
 import { Landing } from './Landing';
 
-const SAMPLE_REVIEWS = [
-    { user: 'alice_reads', book: 'The Night Circus', bookId: '', rating: 5, comment: 'Absolutely magical. One of the most atmospheric books I\'ve ever read. The world-building is top notch.' },
-    { user: 'bookworm91', book: 'Project Hail Mary', bookId: '', rating: 5, comment: 'Andy Weir at the peak of his craft. Couldn\'t put it down. Science meets heart.' },
-    { user: 'literary_leo', book: 'Tomorrow, and Tomorrow, and Tomorrow', bookId: '', rating: 4, comment: 'A gorgeous meditation on friendship, creativity and loss.' },
-    { user: 'sarah_pages', book: 'Piranesi', bookId: '', rating: 5, comment: 'Strange, beautiful, and unlike anything else. A modern classic.' },
-    { user: 'readsalot', book: 'The Midnight Library', bookId: '', rating: 4, comment: 'A philosophical page-turner. Made me rethink my choices.' },
+// Local cache keys for instant SWR rendering
+const BESTSELLERS_CACHE_KEY = 'nerdys_home_bestsellers_cache_v2';
+const DAILY_CACHE_KEY = 'nerdys_home_daily_cache_v2';
+
+const SAMPLE_REVIEWS: ReviewItem[] = [
+    {
+        user: 'alice_reads',
+        book: 'The Night Circus',
+        bookId: 'OL82563W',
+        rating: 5,
+        comment: "Absolutely magical. One of the most atmospheric books I've ever read. The world-building is top notch.",
+        date: 'Yesterday'
+    },
+    {
+        user: 'bookworm91',
+        book: 'Project Hail Mary',
+        bookId: 'OL17930368W',
+        rating: 5,
+        comment: "Andy Weir at the peak of his craft. Couldn't put it down. Science meets heart.",
+        date: 'Yesterday'
+    },
+    {
+        user: 'literary_leo',
+        book: 'Tomorrow, and Tomorrow, and Tomorrow',
+        bookId: 'OL20897277W',
+        rating: 4,
+        comment: 'A gorgeous meditation on friendship, creativity and loss.',
+        date: 'Yesterday'
+    },
+    {
+        user: 'sarah_pages',
+        book: 'Piranesi',
+        bookId: 'OL19631252W',
+        rating: 5,
+        comment: 'Strange, beautiful, and unlike anything else. A modern classic.',
+        date: 'Yesterday'
+    },
+    {
+        user: 'readsalot',
+        book: 'The Midnight Library',
+        bookId: 'OL20644253W',
+        rating: 4,
+        comment: 'A philosophical page-turner. Made me rethink my choices.',
+        date: '2 days ago'
+    },
 ];
 
-const POPULAR_LISTS = [
-    { name: 'Books that changed my life', curator: 'alice_reads', count: 12, likes: 2400, comments: 156, coverIndices: [0, 3, 7, 9, 12] },
-    { name: 'Best sci-fi of the decade', curator: 'bookworm91', count: 20, likes: 1800, comments: 89, coverIndices: [1, 5, 10, 14, 8] },
-    { name: 'Comfort reads for rainy days', curator: 'sarah_pages', count: 15, likes: 3100, comments: 203, coverIndices: [4, 2, 6, 11, 13] },
-    { name: 'Literary fiction masterworks', curator: 'literary_leo', count: 18, likes: 950, comments: 67, coverIndices: [7, 0, 3, 6, 9] },
-    { name: 'Dark academia essentials', curator: 'page_turner', count: 14, likes: 4200, comments: 312, coverIndices: [8, 5, 12, 10, 1] },
-    { name: 'Unputdownable thrillers', curator: 'mystery_maven', count: 22, likes: 1500, comments: 104, coverIndices: [14, 13, 11, 4, 2] },
+const DEFAULT_COLLECTIONS: BookCollection[] = [
+    {
+        name: 'Books that changed my life',
+        curator: 'alice_reads',
+        count: 12,
+        likes: 2400,
+        comments: 156,
+        books: [
+            { id: 'OL82563W', title: 'The Night Circus', author: 'Erin Morgenstern', coverUrl: 'https://covers.openlibrary.org/b/olid/OL25429920M-M.jpg' },
+            { id: 'OL19631252W', title: 'Piranesi', author: 'Susanna Clarke', coverUrl: 'https://covers.openlibrary.org/b/olid/OL28553425M-M.jpg' },
+            { id: 'OL45804W', title: 'Pride and Prejudice', author: 'Jane Austen', coverUrl: 'https://covers.openlibrary.org/b/olid/OL7177684M-M.jpg' },
+            { id: 'OL23919W', title: 'Harry Potter', author: 'J.K. Rowling', coverUrl: 'https://covers.openlibrary.org/b/olid/OL22856696M-M.jpg' },
+            { id: 'OL81613W', title: 'The Alchemist', author: 'Paulo Coelho', coverUrl: 'https://covers.openlibrary.org/b/olid/OL7358422M-M.jpg' },
+        ],
+    },
+    {
+        name: 'Best sci-fi of the decade',
+        curator: 'bookworm91',
+        count: 20,
+        likes: 1800,
+        comments: 89,
+        books: [
+            { id: 'OL17930368W', title: 'Project Hail Mary', author: 'Andy Weir', coverUrl: 'https://covers.openlibrary.org/b/olid/OL28384937M-M.jpg' },
+            { id: 'OL27258W', title: 'Dune', author: 'Frank Herbert', coverUrl: 'https://covers.openlibrary.org/b/olid/OL34621109M-M.jpg' },
+            { id: 'OL27516W', title: 'The Hobbit', author: 'J.R.R. Tolkien', coverUrl: 'https://covers.openlibrary.org/b/olid/OL33891507M-M.jpg' },
+            { id: 'OL23919W', title: 'Harry Potter', author: 'J.K. Rowling', coverUrl: 'https://covers.openlibrary.org/b/olid/OL22856696M-M.jpg' },
+        ],
+    },
+    {
+        name: 'Comfort reads for rainy days',
+        curator: 'sarah_pages',
+        count: 15,
+        likes: 3100,
+        comments: 203,
+        books: [
+            { id: 'OL20644253W', title: 'The Midnight Library', author: 'Matt Haig', coverUrl: 'https://covers.openlibrary.org/b/olid/OL28423208M-M.jpg' },
+            { id: 'OL20897277W', title: 'Tomorrow, and Tomorrow', author: 'Gabrielle Zevin', coverUrl: 'https://covers.openlibrary.org/b/olid/OL37823790M-M.jpg' },
+            { id: 'OL82536W', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', coverUrl: 'https://covers.openlibrary.org/b/olid/OL22570024M-M.jpg' },
+            { id: 'OL12345W', title: 'Atomic Habits', author: 'James Clear', coverUrl: 'https://covers.openlibrary.org/b/olid/OL27912450M-M.jpg' },
+            { id: 'OL15125W', title: 'To Kill a Mockingbird', author: 'Harper Lee', coverUrl: 'https://covers.openlibrary.org/b/olid/OL46874127M-M.jpg' },
+        ],
+    },
+    {
+        name: 'Literary fiction masterworks',
+        curator: 'literary_leo',
+        count: 18,
+        likes: 950,
+        comments: 67,
+        books: [
+            { id: 'OL45804W', title: 'Pride and Prejudice', author: 'Jane Austen', coverUrl: 'https://covers.openlibrary.org/b/olid/OL7177684M-M.jpg' },
+            { id: 'OL82563W', title: 'The Night Circus', author: 'Erin Morgenstern', coverUrl: 'https://covers.openlibrary.org/b/olid/OL25429920M-M.jpg' },
+            { id: 'OL19631252W', title: 'Piranesi', author: 'Susanna Clarke', coverUrl: 'https://covers.openlibrary.org/b/olid/OL28553425M-M.jpg' },
+            { id: 'OL82536W', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', coverUrl: 'https://covers.openlibrary.org/b/olid/OL22570024M-M.jpg' },
+            { id: 'OL23919W', title: 'Harry Potter', author: 'J.K. Rowling', coverUrl: 'https://covers.openlibrary.org/b/olid/OL22856696M-M.jpg' },
+        ],
+    },
+    {
+        name: 'Dark academia essentials',
+        curator: 'page_turner',
+        count: 14,
+        likes: 4200,
+        comments: 312,
+        books: [
+            { id: 'OL27479W', title: '1984', author: 'George Orwell', coverUrl: 'https://covers.openlibrary.org/b/olid/OL46903932M-M.jpg' },
+            { id: 'OL27258W', title: 'Dune', author: 'Frank Herbert', coverUrl: 'https://covers.openlibrary.org/b/olid/OL34621109M-M.jpg' },
+            { id: 'OL81613W', title: 'The Alchemist', author: 'Paulo Coelho', coverUrl: 'https://covers.openlibrary.org/b/olid/OL7358422M-M.jpg' },
+            { id: 'OL27516W', title: 'The Hobbit', author: 'J.R.R. Tolkien', coverUrl: 'https://covers.openlibrary.org/b/olid/OL33891507M-M.jpg' },
+            { id: 'OL17930368W', title: 'Project Hail Mary', author: 'Andy Weir', coverUrl: 'https://covers.openlibrary.org/b/olid/OL28384937M-M.jpg' },
+        ],
+    },
+    {
+        name: 'Unputdownable thrillers',
+        curator: 'mystery_maven',
+        count: 22,
+        likes: 1500,
+        comments: 104,
+        books: [
+            { id: 'OL6769228W', title: 'The Hunger Games', author: 'Suzanne Collins', coverUrl: 'https://covers.openlibrary.org/b/olid/OL22597972M-M.jpg' },
+            { id: 'OL15125W', title: 'To Kill a Mockingbird', author: 'Harper Lee', coverUrl: 'https://covers.openlibrary.org/b/olid/OL46874127M-M.jpg' },
+            { id: 'OL12345W', title: 'Atomic Habits', author: 'James Clear', coverUrl: 'https://covers.openlibrary.org/b/olid/OL27912450M-M.jpg' },
+            { id: 'OL20644253W', title: 'The Midnight Library', author: 'Matt Haig', coverUrl: 'https://covers.openlibrary.org/b/olid/OL28423208M-M.jpg' },
+            { id: 'OL20897277W', title: 'Tomorrow, and Tomorrow', author: 'Gabrielle Zevin', coverUrl: 'https://covers.openlibrary.org/b/olid/OL37823790M-M.jpg' },
+        ],
+    },
 ];
 
-// Fallback books with Open Library covers — shown when Google Books API is rate-limited
-const FALLBACK_SHOWCASE: Book[] = [
-    { id: 'OL82563W', title: 'The Night Circus', author: 'Erin Morgenstern', coverUrl: 'https://covers.openlibrary.org/b/olid/OL25429920M-M.jpg', description: 'A breathtaking tale of two young magicians pitted against each other in a competition linked to a mysterious travelling circus that only appears at night. Rich with enchantment and wonder.', rating: 4.5, publishedDate: '2011', pages: 387, genre: ['Fantasy', 'Romance'] },
-    { id: 'OL17930368W', title: 'Project Hail Mary', author: 'Andy Weir', coverUrl: 'https://covers.openlibrary.org/b/olid/OL28384937M-M.jpg', description: 'A lone astronaut must save humanity from extinction in this interstellar adventure. Waking up with amnesia millions of miles from home, he must piece together his mission and find a way back.', rating: 4.7, publishedDate: '2021', pages: 476, genre: ['Sci-Fi', 'Adventure'] },
-    { id: 'OL20897277W', title: 'Tomorrow, and Tomorrow, and Tomorrow', author: 'Gabrielle Zevin', coverUrl: 'https://covers.openlibrary.org/b/olid/OL37823790M-M.jpg', description: 'Two friends, connected by their love of video games, embark on a decades-long creative partnership that tests the boundaries of love, friendship, and art.', rating: 4.3, publishedDate: '2022', pages: 416, genre: ['Literary Fiction'] },
-    { id: 'OL19631252W', title: 'Piranesi', author: 'Susanna Clarke', coverUrl: 'https://covers.openlibrary.org/b/olid/OL28553425M-M.jpg', description: 'In a mysterious house of infinite halls and ocean tides, Piranesi lives alone, cataloguing its wonders. But when messages from a stranger appear, reality begins to unravel.', rating: 4.2, publishedDate: '2020', pages: 272, genre: ['Fantasy', 'Mystery'] },
-    { id: 'OL20644253W', title: 'The Midnight Library', author: 'Matt Haig', coverUrl: 'https://covers.openlibrary.org/b/olid/OL28423208M-M.jpg', description: 'Between life and death lies a library where every book offers a different life Nora could have lived. A moving exploration of regret, hope, and the choices that define us.', rating: 4.1, publishedDate: '2020', pages: 304, genre: ['Fiction', 'Philosophy'] },
-    { id: 'OL27258W', title: 'Dune', author: 'Frank Herbert', coverUrl: 'https://covers.openlibrary.org/b/olid/OL34621109M-M.jpg', description: 'Set on the desert planet Arrakis, this epic saga follows Paul Atreides as he navigates politics, religion, and ecology in a fight for control of the universe\'s most valuable substance.', rating: 4.6, publishedDate: '1965', pages: 688, genre: ['Sci-Fi', 'Epic'] },
-    { id: 'OL82536W', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', coverUrl: 'https://covers.openlibrary.org/b/olid/OL22570024M-M.jpg', description: 'A portrait of the Jazz Age in all its decadence and excess. Jay Gatsby\'s obsessive pursuit of Daisy Buchanan reveals the dark underside of the American Dream.', rating: 4.0, publishedDate: '1925', pages: 180, genre: ['Classic', 'Literary Fiction'] },
-    { id: 'OL45804W', title: 'Pride and Prejudice', author: 'Jane Austen', coverUrl: 'https://covers.openlibrary.org/b/olid/OL7177684M-M.jpg', description: 'The witty and headstrong Elizabeth Bennet clashes with the proud Mr. Darcy in this timeless romance that skewers social class and celebrates the triumph of love over vanity.', rating: 4.5, publishedDate: '1813', pages: 432, genre: ['Classic', 'Romance'] },
-    { id: 'OL27479W', title: '1984', author: 'George Orwell', coverUrl: 'https://covers.openlibrary.org/b/olid/OL46903932M-M.jpg', description: 'In a totalitarian society ruled by Big Brother, Winston Smith dares to dream of freedom. A chilling prophecy about surveillance, propaganda, and the power of language.', rating: 4.4, publishedDate: '1949', pages: 328, genre: ['Dystopian', 'Classic'] },
-    { id: 'OL23919W', title: 'Harry Potter and the Sorcerer\'s Stone', author: 'J.K. Rowling', coverUrl: 'https://covers.openlibrary.org/b/olid/OL22856696M-M.jpg', description: 'An orphaned boy discovers he is a wizard and enters Hogwarts School, where he finds friendship, magic, and a dark mystery connected to his past. The book that launched a generation of readers.', rating: 4.7, publishedDate: '1997', pages: 309, genre: ['Fantasy', 'Young Adult'] },
-    { id: 'OL27516W', title: 'The Hobbit', author: 'J.R.R. Tolkien', coverUrl: 'https://covers.openlibrary.org/b/olid/OL33891507M-M.jpg', description: 'Bilbo Baggins is swept into an epic quest to reclaim a lost kingdom from a fearsome dragon. A timeless adventure of courage, friendship, and the unexpected hero within us all.', rating: 4.5, publishedDate: '1937', pages: 310, genre: ['Fantasy', 'Adventure'] },
-    { id: 'OL12345W', title: 'Atomic Habits', author: 'James Clear', coverUrl: 'https://covers.openlibrary.org/b/olid/OL27912450M-M.jpg', description: 'A revolutionary guide to building good habits and breaking bad ones. Small changes, remarkable results — learn how tiny behavioral shifts can transform your life completely.', rating: 4.6, publishedDate: '2018', pages: 320, genre: ['Self-Help', 'Productivity'] },
-    { id: 'OL81613W', title: 'The Alchemist', author: 'Paulo Coelho', coverUrl: 'https://covers.openlibrary.org/b/olid/OL7358422M-M.jpg', description: 'A shepherd boy\'s journey from Spain to Egypt in search of treasure becomes a profound allegory about following your dreams and listening to your heart.', rating: 4.2, publishedDate: '1988', pages: 197, genre: ['Fiction', 'Philosophy'] },
-    { id: 'OL15125W', title: 'To Kill a Mockingbird', author: 'Harper Lee', coverUrl: 'https://covers.openlibrary.org/b/olid/OL46874127M-M.jpg', description: 'Through the eyes of young Scout Finch, this Pulitzer Prize-winning novel explores racial injustice and moral growth in the American South during the 1930s.', rating: 4.6, publishedDate: '1960', pages: 336, genre: ['Classic', 'Literary Fiction'] },
-    { id: 'OL6769228W', title: 'The Hunger Games', author: 'Suzanne Collins', coverUrl: 'https://covers.openlibrary.org/b/olid/OL22597972M-M.jpg', description: 'In a dystopian future, Katniss Everdeen volunteers to take her sister\'s place in a televised fight to the death. A gripping tale of survival, rebellion, and defiance.', rating: 4.4, publishedDate: '2008', pages: 374, genre: ['Dystopian', 'Young Adult'] },
-];
-
-function getDailyBook(books: Book[]): Book | null {
-    if (!books.length) return null;
-    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
-    return books[dayOfYear % books.length];
+interface ReviewItem {
+    user: string;
+    book: string;
+    bookId: string;
+    rating: number;
+    comment: string;
+    isReal?: boolean;
+    date?: string;
 }
 
-type ReviewItem = { user: string; book: string; bookId: string; rating: number; comment: string; isReal?: boolean, date?: string };
+interface BookCollection {
+    name: string;
+    description?: string;
+    curator: string;
+    count: number;
+    likes?: number;
+    comments?: number;
+    books: { id: string; title: string; author?: string; coverUrl?: string }[];
+}
 
 export function Home() {
     const { user, isAuthenticated } = useAuth();
-    const [heroBook, setHeroBook] = useState<Book | null>(getDailyBook(FALLBACK_SHOWCASE));
-    const [showcaseBooks, setShowcaseBooks] = useState<Book[]>(FALLBACK_SHOWCASE);
+
+    // 1. Initial State from browser local cache (0ms instant display)
+    const [heroBook, setHeroBook] = useState<Book | null>(() => {
+        try {
+            const saved = localStorage.getItem(DAILY_CACHE_KEY);
+            if (saved) return JSON.parse(saved);
+        } catch { /* ignore */ }
+        return null;
+    });
+
+    const [showcaseBooks, setShowcaseBooks] = useState<Book[]>(() => {
+        try {
+            const saved = localStorage.getItem(BESTSELLERS_CACHE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+        } catch { /* ignore */ }
+        return [];
+    });
+
     const [recentBooks, setRecentBooks] = useState<Book[]>([]);
     const [communityReviews, setCommunityReviews] = useState<ReviewItem[]>(SAMPLE_REVIEWS);
-
+    const [collections, setCollections] = useState<BookCollection[]>(DEFAULT_COLLECTIONS);
 
     // Load real user reviews from API
     useEffect(() => {
@@ -68,33 +197,78 @@ export function Home() {
         
         getAllLogs().then(realLogs => {
             const withNotes = realLogs.filter(l => l.notes && l.notes.trim() && (l.username || l.user?.username));
-            if (withNotes.length >= 3) {
+            if (withNotes.length > 0) {
                 const sorted = [...withNotes].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-                setCommunityReviews(sorted.slice(0, 10).map(l => ({
-                    user: l.username || l.user?.username || 'Anonymous',
+                const realItems: ReviewItem[] = sorted.slice(0, 10).map(l => ({
+                    user: displayName(l.username || l.user?.username || 'Anonymous'),
                     book: l.bookTitle || 'a book',
                     bookId: l.bookId,
                     rating: l.rating,
                     comment: l.notes,
                     isReal: true,
-                    date: 'Today'
-                })));
+                    date: new Date(l.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+                }));
+                
+                // If fewer than 5 real reviews, blend with sample community reviews so the left column is always filled and balanced
+                if (realItems.length < 5) {
+                    setCommunityReviews([...realItems, ...SAMPLE_REVIEWS.slice(0, 5 - realItems.length)]);
+                } else {
+                    setCommunityReviews(realItems);
+                }
+            } else {
+                setCommunityReviews(SAMPLE_REVIEWS);
             }
-        }).catch(() => { });
+        }).catch(() => {
+            setCommunityReviews(SAMPLE_REVIEWS);
+        });
     }, [isAuthenticated]);
 
-    // Fetch hero & showcase books — now 15 for bigger grid
+    // Fetch dynamic collections
     useEffect(() => {
         if (!isAuthenticated) return;
-        (async () => {
-            try {
-                const bestsellers = await searchBooks('bestselling fiction 2024', 0, 20);
-                if (bestsellers.books.length > 0) {
-                    setHeroBook(getDailyBook(bestsellers.books));
-                    setShowcaseBooks(bestsellers.books.slice(0, 15));
+        api.get<{ collections: BookCollection[] }>('/api/books/collections')
+            .then(res => {
+                if (res.collections && res.collections.length > 0) {
+                    setCollections(res.collections);
                 }
-            } catch { /* keep fallbacks */ }
-        })();
+            })
+            .catch(() => {});
+    }, [isAuthenticated]);
+
+    // Fetch live bestsellers & daily book from server background ingestion cache (<10ms)
+    useEffect(() => {
+        if (!isAuthenticated) return;
+        let isMounted = true;
+
+        api.get<{ books: Book[] }>('/api/books/bestsellers')
+            .then(res => {
+                if (!isMounted || !res.books || res.books.length === 0) return;
+                const books = res.books.slice(0, 15);
+                setShowcaseBooks(books);
+                try {
+                    localStorage.setItem(BESTSELLERS_CACHE_KEY, JSON.stringify(books));
+                } catch { /* ignore */ }
+            })
+            .catch(() => {
+                // Fallback live search if endpoint fails
+                searchBooks('bestselling popular award fiction', 0, 15).then(res => {
+                    if (isMounted && res.books && res.books.length > 0) {
+                        setShowcaseBooks(res.books);
+                    }
+                }).catch(() => {});
+            });
+
+        api.get<Book>('/api/books/daily')
+            .then(book => {
+                if (!isMounted || !book || !book.id) return;
+                setHeroBook(book);
+                try {
+                    localStorage.setItem(DAILY_CACHE_KEY, JSON.stringify(book));
+                } catch { /* ignore */ }
+            })
+            .catch(() => {});
+
+        return () => { isMounted = false; };
     }, [isAuthenticated]);
 
     // Fetch recent views
@@ -120,7 +294,7 @@ export function Home() {
             {/* ── COMPACT WELCOME BAR (just below navbar) ───────── */}
             <section className="lb-welcome-bar animate-fade-in-up">
                 <h1 className="lb-welcome-greeting">
-                    Welcome back, <span className="lb-welcome-username">{user?.username}</span>.
+                    Welcome back, <span className="lb-welcome-username">{displayName(user?.username)}</span>.
                 </h1>
                 <p className="lb-welcome-sub">Here's what your friends have been reading.</p>
             </section>
@@ -136,7 +310,14 @@ export function Home() {
                     </div>
                     <Link to={`/book/${heroBook.id}`} className="lb-botd-content">
                         <div className="lb-botd-cover-wrap">
-                            <img src={heroBook.coverUrl || FALLBACK_COVER} alt={heroBook.title} className="lb-botd-cover" />
+                            <img
+                                src={getBookCoverUrl(heroBook.id, heroBook.coverUrl, heroBook.title, heroBook.author)}
+                                alt={heroBook.title}
+                                className="lb-botd-cover"
+                                onError={(e) => {
+                                    e.currentTarget.src = getBookCoverUrl(heroBook.id, null, heroBook.title, heroBook.author);
+                                }}
+                            />
                         </div>
                         <div className="lb-botd-info">
                             <h2 className="lb-botd-title">{heroBook.title}</h2>
@@ -171,47 +352,64 @@ export function Home() {
                     <div className="lb-section-header">
                         <h2 className="lb-section-title">
                             <Activity style={{ display: 'inline', width: '1.1rem', height: '1.1rem', marginRight: '0.4rem', verticalAlign: 'middle' }} />
-                            NEW FROM FRIENDS
+                            NEW FROM FRIENDS & COMMUNITY
                         </h2>
                     </div>
                     
                     <div className="lb-activity-feed">
-                        {communityReviews.map((r, i) => (
-                            <div key={i} className="lb-activity-card">
-                                <div className="lb-activity-header">
-                                    <Link to={r.isReal ? `/user/${r.user}` : '#'} className="lb-activity-avatar">
-                                        {r.user[0].toUpperCase()}
-                                    </Link>
-                                    <div className="lb-activity-meta">
-                                        <div className="lb-activity-user-row">
-                                            <Link to={r.isReal ? `/user/${r.user}` : '#'} className="lb-activity-user">
-                                                {r.user}
-                                            </Link>
-                                            <span className="lb-activity-action"> reviewed </span>
-                                            {r.bookId ? (
-                                                <Link to={`/book/${r.bookId}`} className="lb-activity-book">{r.book}</Link>
-                                            ) : (
-                                                <span className="lb-activity-book">{r.book}</span>
-                                            )}
-                                        </div>
-                                        <div className="lb-activity-stars">
-                                            {Array.from({ length: r.rating }).map((_, si) => (
-                                                <Star key={si} className="lb-star" size={14} />
-                                            ))}
-                                            <span className="lb-activity-date">{r.date || 'Yesterday'}</span>
+                        {communityReviews.length > 0 ? (
+                            communityReviews.map((r, i) => (
+                                <div key={i} className="lb-activity-card">
+                                    <div className="lb-activity-header">
+                                        <Link
+                                            to={r.isReal ? `/user/${r.user}` : '#'}
+                                            className="lb-activity-avatar"
+                                            style={{ backgroundColor: getAvatarColor(r.user), color: '#ffffff' }}
+                                        >
+                                            {userInitial(r.user)}
+                                        </Link>
+                                        <div className="lb-activity-meta">
+                                            <div className="lb-activity-user-row">
+                                                <Link to={r.isReal ? `/user/${r.user}` : '#'} className="lb-activity-user">
+                                                    {r.user}
+                                                </Link>
+                                                <span className="lb-activity-action"> reviewed </span>
+                                                {r.bookId ? (
+                                                    <Link to={`/book/${r.bookId}`} className="lb-activity-book">{r.book}</Link>
+                                                ) : (
+                                                    <span className="lb-activity-book">{r.book}</span>
+                                                )}
+                                            </div>
+                                            <div className="lb-activity-stars">
+                                                {Array.from({ length: r.rating }).map((_, si) => (
+                                                    <Star key={si} className="lb-star" size={14} />
+                                                ))}
+                                                <span className="lb-activity-date">{r.date || 'Recently'}</span>
+                                            </div>
                                         </div>
                                     </div>
+                                    <p className="lb-activity-comment">"{r.comment}"</p>
                                 </div>
-                                <p className="lb-activity-comment">"{r.comment}"</p>
+                            ))
+                        ) : (
+                            <div className="lb-activity-empty-box" style={{ padding: '2rem', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px dashed rgba(212,175,55,0.2)' }}>
+                                <BookOpen size={32} style={{ color: 'var(--primary)', margin: '0 auto 0.75rem auto', opacity: 0.8 }} />
+                                <h3 style={{ color: 'var(--primary)', fontFamily: 'Cinzel, Georgia, serif', marginBottom: '0.4rem', fontSize: '1.1rem' }}>No Community Reviews Yet Today</h3>
+                                <p style={{ color: 'var(--muted-foreground)', fontSize: '0.88rem', maxWidth: '380px', margin: '0 auto 1.25rem auto' }}>
+                                    Be the first reader to write a review and share your perspective with the community!
+                                </p>
+                                <Link to="/trending" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.85rem' }}>
+                                    Discover Books to Review
+                                </Link>
                             </div>
-                        ))}
+                        )}
                     </div>
                 </div>
 
-                {/* RIGHT COLUMN — Popular This Week (bigger) */}
+                {/* RIGHT COLUMN — Popular This Week */}
                 <div className="lb-sidebar-column">
                     
-                    {/* Popular This Week — Now 15 books in a 5-col grid */}
+                    {/* Popular This Week — 15 books in a responsive grid */}
                     <div className="lb-sidebar-widget lb-popular-week-widget">
                         <div className="lb-section-header">
                             <h2 className="lb-section-title">
@@ -220,14 +418,27 @@ export function Home() {
                             </h2>
                         </div>
                         <div className="lb-popular-grid">
-                            {showcaseBooks.map(book => (
-                                <Link key={book.id} to={`/book/${book.id}`} className="lb-popular-cover-link">
-                                    <img src={book.coverUrl || FALLBACK_COVER} alt={book.title} className="lb-popular-cover" />
-                                    <div className="lb-popular-cover-overlay">
-                                        <span className="lb-popular-cover-title">{book.title}</span>
-                                    </div>
-                                </Link>
-                            ))}
+                            {showcaseBooks.length > 0 ? (
+                                showcaseBooks.map(book => (
+                                    <Link key={book.id} to={`/book/${book.id}`} className="lb-popular-cover-link">
+                                        <img
+                                            src={getBookCoverUrl(book.id, book.coverUrl, book.title, book.author)}
+                                            alt={book.title}
+                                            className="lb-popular-cover"
+                                            onError={(e) => {
+                                                e.currentTarget.src = getBookCoverUrl(book.id, null, book.title, book.author);
+                                            }}
+                                        />
+                                        <div className="lb-popular-cover-overlay">
+                                            <span className="lb-popular-cover-title">{book.title}</span>
+                                        </div>
+                                    </Link>
+                                ))
+                            ) : (
+                                Array.from({ length: 15 }).map((_, i) => (
+                                    <div key={i} className="lb-popular-cover-link" style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '6px', aspectRatio: '2/3', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                                ))
+                            )}
                         </div>
                         <Link to="/trending" className="lb-sidebar-more">Browse more trending books →</Link>
                     </div>
@@ -244,7 +455,14 @@ export function Home() {
                             <div className="lb-sidebar-grid">
                                 {recentBooks.map(book => (
                                     <Link key={book.id} to={`/book/${book.id}`} className="lb-sidebar-cover-link">
-                                        <img src={book.coverUrl || FALLBACK_COVER} alt={book.title} className="lb-sidebar-cover" />
+                                        <img
+                                            src={getBookCoverUrl(book.id, book.coverUrl, book.title, book.author)}
+                                            alt={book.title}
+                                            className="lb-sidebar-cover"
+                                            onError={(e) => {
+                                                e.currentTarget.src = getBookCoverUrl(book.id, null, book.title, book.author);
+                                            }}
+                                        />
                                     </Link>
                                 ))}
                             </div>
@@ -254,44 +472,58 @@ export function Home() {
             </div>
 
             {/* ── POPULAR LISTS (Letterboxd style with cover previews) ── */}
-            <section className="lb-popular-lists-section animate-fade-in-up delay-300">
-                <div className="lb-section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h2 className="lb-section-title lb-section-title-lg">
-                        <Flame style={{ display: 'inline', width: '1.2rem', height: '1.2rem', marginRight: '0.5rem', verticalAlign: 'middle' }} />
-                        POPULAR LISTS
-                    </h2>
-                    <Link to="/trending" className="lb-lists-more-link">MORE</Link>
-                </div>
-                <div className="lb-popular-lists-stack">
-                    {POPULAR_LISTS.map((list, i) => {
-                        const covers = list.coverIndices.map(idx => FALLBACK_SHOWCASE[idx]);
-                        return (
+            {collections.length > 0 && (
+                <section className="lb-popular-lists-section animate-fade-in-up delay-300">
+                    <div className="lb-section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h2 className="lb-section-title lb-section-title-lg">
+                            <Flame style={{ display: 'inline', width: '1.2rem', height: '1.2rem', marginRight: '0.5rem', verticalAlign: 'middle' }} />
+                            POPULAR LISTS
+                        </h2>
+                        <Link to="/trending" className="lb-lists-more-link">MORE</Link>
+                    </div>
+                    <div className="lb-popular-lists-stack">
+                        {collections.map((list, i) => (
                             <div key={i} className="lb-plist-card">
                                 <div className="lb-plist-covers">
-                                    {covers.map((book, ci) => (
+                                    {list.books.map((book, ci) => (
                                         <div key={ci} className="lb-plist-cover-slot">
-                                            <img src={book.coverUrl || FALLBACK_COVER} alt={book.title} className="lb-plist-cover-img" />
+                                            <img
+                                                src={getBookCoverUrl(book.id, book.coverUrl, book.title, book.author)}
+                                                alt={book.title}
+                                                className="lb-plist-cover-img"
+                                                onError={(e) => {
+                                                    e.currentTarget.src = getBookCoverUrl(book.id, null, book.title, book.author);
+                                                }}
+                                            />
                                         </div>
                                     ))}
                                 </div>
                                 <div className="lb-plist-info">
                                     <h3 className="lb-plist-name">{list.name}</h3>
                                     <div className="lb-plist-curator-row">
-                                        <span className="lb-plist-curator-avatar">{list.curator[0].toUpperCase()}</span>
+                                        <span
+                                            className="lb-plist-curator-avatar"
+                                            style={{ backgroundColor: getAvatarColor(list.curator), color: '#ffffff' }}
+                                        >
+                                            {userInitial(list.curator)}
+                                        </span>
                                         <span className="lb-plist-curator-name">{list.curator}</span>
                                     </div>
                                     <div className="lb-plist-stats">
                                         <span className="lb-plist-stat">{list.count} books</span>
-                                        <span className="lb-plist-stat"><Heart size={13} /> {list.likes >= 1000 ? (list.likes / 1000).toFixed(1) + 'K' : list.likes}</span>
-                                        <span className="lb-plist-stat"><MessageCircle size={13} /> {list.comments}</span>
+                                        <span className="lb-plist-stat">
+                                            <Heart size={13} style={{ fill: '#888', color: '#888' }} /> {list.likes ? (list.likes >= 1000 ? (list.likes / 1000).toFixed(1) + 'K' : list.likes) : '2.4K'}
+                                        </span>
+                                        <span className="lb-plist-stat">
+                                            <MessageCircle size={13} /> {list.comments || 89}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
-                        );
-                    })}
-                </div>
-            </section>
+                        ))}
+                    </div>
+                </section>
+            )}
         </div>
     );
 }
-

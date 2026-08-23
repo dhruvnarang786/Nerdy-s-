@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Sparkles, Clock, Smile, Search, BookOpen, Send, Mic, MicOff, Volume2 } from 'lucide-react';
 import { searchBooks, type Book } from '@/lib/apiClient';
-import { FALLBACK_COVER } from '@/lib/constants';
+import { getBookCoverUrl } from '@/lib/bookCover';
 import '@/styles/pages.css';
 import '@/styles/ai-chat.css';
 
@@ -86,14 +86,24 @@ interface Message {
 }
 
 // ─── Speech Recognition Type ─────────────────────────────────────────────────
-interface SpeechRecognitionType extends EventTarget {
+interface SpeechRecognitionEvent {
+    results: {
+        [index: number]: {
+            [index: number]: {
+                transcript: string;
+            };
+        };
+    };
+}
+
+interface SpeechRecognitionType {
     lang: string;
     continuous: boolean;
     interimResults: boolean;
     start(): void;
     stop(): void;
-    onresult: ((event: any) => void) | null;
-    onerror: ((event: any) => void) | null;
+    onresult: ((event: SpeechRecognitionEvent) => void) | null;
+    onerror: ((event: Event) => void) | null;
     onend: (() => void) | null;
 }
 
@@ -179,7 +189,7 @@ export function AiRecommend() {
                 utterance.pitch = 1;
                 window.speechSynthesis.speak(utterance);
             }
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error('[AI Chat] Network error:', e);
             setMessages(prev => [...prev, {
                 role: 'model',
@@ -211,7 +221,7 @@ export function AiRecommend() {
         recognition.lang = 'en-US';
         recognition.continuous = false;
         recognition.interimResults = false;
-        recognition.onresult = (event: any) => {
+        recognition.onresult = (event: SpeechRecognitionEvent) => {
             const transcript = event.results[0][0].transcript;
             setChatInput(transcript);
         };
@@ -311,8 +321,14 @@ export function AiRecommend() {
                                     {recommendations.map((book) => (
                                         <a key={book.id} href={`/book/${book.id}`} className="ai-result-card">
                                             <div className="ai-result-cover-wrap">
-                                                <img src={book.coverUrl || FALLBACK_COVER} alt={book.title} className="ai-result-cover"
-                                                    onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_COVER; }} />
+                                                <img
+                                                    src={getBookCoverUrl(book.id, book.coverUrl, book.title, book.author)}
+                                                    alt={book.title}
+                                                    className="ai-result-cover"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).src = getBookCoverUrl(book.id, null, book.title, book.author);
+                                                    }}
+                                                />
                                             </div>
                                             <div className="ai-result-info">
                                                 <p className="ai-result-title">{book.title}</p>

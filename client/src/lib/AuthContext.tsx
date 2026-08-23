@@ -1,10 +1,12 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { api, setToken, clearToken, wakeUpServer } from '@/lib/apiClient';
 
-interface User {
+export interface User {
     id: number;
     username: string;
     email: string;
+    avatar?: string | null;
 }
 
 interface AuthContextType {
@@ -21,7 +23,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(() => !!localStorage.getItem('nerdys_token'));
 
     // Wake up the Render server as early as possible (fire-and-forget)
     useEffect(() => {
@@ -31,7 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Restore session on mount
     useEffect(() => {
         const token = localStorage.getItem('nerdys_token');
-        if (!token) { setLoading(false); return; }
+        if (!token) return;
 
         api.get<{ user: User }>('/api/auth/me')
             .then(({ user }) => setUser(user))

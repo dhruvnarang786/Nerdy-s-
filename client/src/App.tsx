@@ -13,7 +13,7 @@ import { Register } from '@/pages/Register';
 import { Journal } from '@/pages/Journal';
 import { UserProfile } from '@/pages/UserProfile';
 import { Community } from '@/pages/Community';
-import { ReadingDNA } from '@/pages/ReadingDNA';
+import { DnaPage } from '@/pages/Dna/DnaPage';
 
 function App() {
   return (
@@ -33,7 +33,7 @@ function App() {
             <Route path="/user/:username" element={<UserProfile />} />
             <Route path="/community" element={<Community />} />
             <Route path="/community/:slug" element={<Community />} />
-            <Route path="/dna" element={<ReadingDNA />} />
+            <Route path="/dna" element={<DnaPage />} />
           </Routes>
         </Layout>
       </Router>

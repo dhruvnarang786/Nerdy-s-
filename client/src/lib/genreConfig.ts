@@ -5,12 +5,13 @@ export interface GenreConfigItem {
 }
 
 export const GENRE_CONFIG: GenreConfigItem[] = [
-    { genre: 'Fiction', emoji: '✨', query: 'fiction bestsellers' },
-    { genre: 'Mystery & Thriller', emoji: '🕵️', query: 'mystery thriller' },
-    { genre: 'Science Fiction', emoji: '🚀', query: 'science fiction' },
-    { genre: 'Fantasy', emoji: '🧙', query: 'fantasy popular' },
-    { genre: 'Romance', emoji: '💕', query: 'romance novels' },
-    { genre: 'History', emoji: '📜', query: 'history nonfiction' },
-    { genre: 'Biography', emoji: '👤', query: 'biography memoir' },
-    { genre: 'Self-Help', emoji: '💡', query: 'self help personal development' },
+    { genre: 'Fiction', emoji: '✨', query: 'subject:fiction bestsellers' },
+    { genre: 'Mystery & Thriller', emoji: '🕵️', query: 'subject:mystery thriller suspense' },
+    { genre: 'Science Fiction', emoji: '🚀', query: 'subject:science_fiction space cyberpunk' },
+    { genre: 'Fantasy', emoji: '🧙', query: 'subject:fantasy magic epic' },
+    { genre: 'Romance', emoji: '💕', query: 'subject:romance love contemporary' },
+    { genre: 'History', emoji: '📜', query: 'subject:history narrative civilization' },
+    { genre: 'Biography', emoji: '👤', query: 'subject:biography memoir autobiography' },
+    { genre: 'Self-Help', emoji: '💡', query: 'subject:self-help personal_development psychology' },
 ];
+

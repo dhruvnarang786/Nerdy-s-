@@ -16,22 +16,32 @@ export function Layout({ children }: LayoutProps) {
 
     return (
         <div className="layout">
-            {/* GLOBAL BOOKSHELF BACKGROUND - Applied to all pages */}
+            {/* GLOBAL BOOKSHELF BACKGROUND - Applied cleanly across all pages */}
             <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1, pointerEvents: 'none' }}>
-                <div className="lb-hero-bg hero-gradient-bg" style={{ 
-                    position: 'absolute', 
-                    inset: 0, 
-                    opacity: 0.95, 
-                    mixBlendMode: 'normal', 
-                    backgroundImage: 'url("https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2000&auto=format&fit=crop")', 
-                    backgroundSize: 'cover', 
-                    backgroundPosition: 'center', 
-                    filter: 'sepia(0.3) opacity(0.3) brightness(1.2) contrast(0.9)' 
-                }}>
-                    <div className="lb-hero-overlay" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.8) 100%)' }} />
-                </div>
-                <div className="hero-noise-overlay" style={{ position: 'absolute', inset: 0 }}></div>
-                <div className="hero-radial-glow" style={{ position: 'absolute', inset: 0 }}></div>
+                <div
+                    style={{
+                        position: 'absolute',
+                        inset: 0,
+                        backgroundImage: 'url("https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2000&auto=format&fit=crop")',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        filter: 'brightness(0.64) contrast(1.08) saturate(0.88)'
+                    }}
+                />
+                <div
+                    style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'linear-gradient(to bottom, rgba(18,14,12,0.64) 0%, rgba(16,13,11,0.78) 45%, rgba(14,11,10,0.92) 100%)'
+                    }}
+                />
+                <div
+                    style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.08) 0%, transparent 65%)'
+                    }}
+                />
             </div>
             
             <Navbar />

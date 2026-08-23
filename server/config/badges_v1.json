@@ -1,0 +1,122 @@
+{
+  "version": "v1",
+  "createdAt": "2026-07-09T00:00:00Z",
+  "families": {
+    "exploration": {
+      "label": "World Traveler",
+      "icon": "globe",
+      "description": "Read authors from around the world",
+      "metric": "countryDiversity",
+      "tiers": {
+        "bronze": { "threshold": 3, "label": "World Traveler I", "xpReward": 50 },
+        "silver": { "threshold": 10, "label": "World Traveler II", "xpReward": 150 },
+        "gold":   { "threshold": 25, "label": "World Traveler III", "xpReward": 500 }
+      }
+    },
+    "reviewer": {
+      "label": "Guide",
+      "icon": "book-open",
+      "description": "Write thoughtful reviews",
+      "metric": "reviewFrequency",
+      "qualifier": { "metric": "reviewDepth", "threshold": 20 },
+      "tiers": {
+        "bronze": { "threshold": 5, "label": "Guide I", "xpReward": 50,
+          "qualifier": { "metric": "reviewDepth", "threshold": 20 } },
+        "silver": { "threshold": 25, "label": "Guide II", "xpReward": 150,
+          "qualifier": { "metric": "reviewDepth", "threshold": 50 } },
+        "gold":   { "threshold": 100, "label": "Guide III", "xpReward": 500,
+          "qualifier": { "metric": "reviewDepth", "threshold": 100 } }
+      }
+    },
+    "discovery": {
+      "label": "Pioneer",
+      "icon": "compass",
+      "description": "Discover hidden gems",
+      "metric": "discoveryScore",
+      "tiers": {
+        "bronze": { "threshold": 40, "label": "Pioneer I", "xpReward": 50 },
+        "silver": { "threshold": 70, "label": "Pioneer II", "xpReward": 150 },
+        "gold":   { "threshold": 90, "label": "Pioneer III", "xpReward": 500 }
+      }
+    },
+    "dedication": {
+      "label": "Marathon",
+      "icon": "flame",
+      "description": "Maintain a reading streak",
+      "metric": "currentStreak",
+      "tiers": {
+        "bronze": { "threshold": 7, "label": "Marathon I", "xpReward": 50 },
+        "silver": { "threshold": 30, "label": "Marathon II", "xpReward": 150 },
+        "gold":   { "threshold": 100, "label": "Marathon III", "xpReward": 500 }
+      }
+    },
+    "genre": {
+      "label": "Genre Devotee",
+      "icon": "book-marked",
+      "description": "Deep dive into a genre",
+      "perGenre": true,
+      "metric": "genreBookCount",
+      "tiers": {
+        "bronze": { "threshold": 5, "label": "Devotee I", "xpReward": 50 },
+        "silver": { "threshold": 20, "label": "Devotee II", "xpReward": 150 },
+        "gold":   { "threshold": 50, "label": "Devotee III", "xpReward": 500 }
+      }
+    }
+  },
+  "personalityBadges": [
+    { "id": "archetype.curator", "label": "Curator's Seal", "icon": "award", "archetype": "curator", "requiredConsecutiveSnapshots": 3, "xpReward": 250 },
+    { "id": "archetype.completionist", "label": "Completionist's Mark", "icon": "award", "archetype": "completionist", "requiredConsecutiveSnapshots": 3, "xpReward": 250 },
+    { "id": "archetype.critic", "label": "Critic's Quill", "icon": "award", "archetype": "critic", "requiredConsecutiveSnapshots": 3, "xpReward": 250 },
+    { "id": "archetype.enthusiast", "label": "Enthusiast's Heart", "icon": "award", "archetype": "enthusiast", "requiredConsecutiveSnapshots": 3, "xpReward": 250 },
+    { "id": "archetype.explorer", "label": "Explorer's Map", "icon": "award", "archetype": "explorer", "requiredConsecutiveSnapshots": 3, "xpReward": 250 },
+    { "id": "archetype.connoisseur", "label": "Connoisseur's Taste", "icon": "award", "archetype": "connoisseur", "requiredConsecutiveSnapshots": 3, "xpReward": 250 },
+    { "id": "archetype.snob", "label": "Snob's Nose", "icon": "award", "archetype": "snob", "requiredConsecutiveSnapshots": 3, "xpReward": 250 },
+    { "id": "archetype.marathonRunner", "label": "Runner's Medal", "icon": "award", "archetype": "marathonRunner", "requiredConsecutiveSnapshots": 3, "xpReward": 250 },
+    { "id": "archetype.fanButterfly", "label": "Butterfly's Wings", "icon": "award", "archetype": "fanButterfly", "requiredConsecutiveSnapshots": 3, "xpReward": 250 },
+    { "id": "archetype.loner", "label": "Loner's Shield", "icon": "award", "archetype": "loner", "requiredConsecutiveSnapshots": 3, "xpReward": 250 },
+    { "id": "archetype.nostalgist", "label": "Nostalgist's Memory", "icon": "award", "archetype": "nostalgist", "requiredConsecutiveSnapshots": 3, "xpReward": 250 },
+    { "id": "archetype.polymath", "label": "Polymath's Library", "icon": "award", "archetype": "polymath", "requiredConsecutiveSnapshots": 3, "xpReward": 250 }
+  ],
+  "hiddenBadges": [
+    {
+      "id": "nightOwl",
+      "label": "Night Owl",
+      "icon": "moon",
+      "description": "Burning the midnight oil with a good book",
+      "condition": "log.createdAt.hour >= 2 && log.createdAt.hour < 5",
+      "xpReward": 100
+    },
+    {
+      "id": "easterEgg",
+      "label": "Easter Egg Hunter",
+      "icon": "egg",
+      "description": "Found an egg-cellent read",
+      "condition": "bookTitle contains 'easter' or bookTitle contains 'egg'",
+      "xpReward": 100
+    },
+    {
+      "id": "rainbowReader",
+      "label": "Rainbow Reader",
+      "icon": "rainbow",
+      "description": "Read across the color spectrum",
+      "condition": "uniqueGenres >= 7",
+      "xpReward": 150
+    },
+    {
+      "id": "completionist100",
+      "label": "Century Club",
+      "icon": "trophy",
+      "description": "Exactly 100 books — no more, no less",
+      "condition": "totalLogs == 100",
+      "xpReward": 200
+    },
+    {
+      "id": "criticsPet",
+      "label": "Critic's Pet",
+      "icon": "message-square",
+      "description": "Review longer than the book's title, every time",
+      "condition": "consecutiveLogsWithReviewLongerThanTitle >= 10",
+      "xpReward": 200
+    }
+  ]
+}

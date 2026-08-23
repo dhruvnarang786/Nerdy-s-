@@ -6,8 +6,8 @@ import { JWT_SECRET } from '../config.js';
 
 const router = express.Router();
 
-function generateToken(userId) {
-    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '30d' });
+function generateToken(userId, extra = {}) {
+    return jwt.sign({ userId, ...extra }, JWT_SECRET, { expiresIn: '30d' });
 }
 
 // Verify a Google Identity Services (GSI) credential JWT
@@ -105,7 +105,7 @@ router.post('/google', async (req, res) => {
         if (!credential) return res.status(400).json({ error: 'Google credential required' });
 
         const payload = await verifyGoogleToken(credential);
-        const { email, name, sub: googleId } = payload;
+        const { email, name, picture, sub: googleId } = payload;
 
         if (!email) return res.status(400).json({ error: 'No email from Google' });
 
@@ -120,11 +120,13 @@ router.post('/google', async (req, res) => {
                 .replace(/[^a-z0-9]/g, '')
                 .slice(0, 20) || 'user';
 
-            // Ensure username is unique by appending part of googleId if needed
+            // Ensure username is unique by checking DB and appending random suffix if needed
             let username = baseUsername;
-            const existingUsername = await prisma.user.findUnique({ where: { username } });
-            if (existingUsername) {
-                username = `${baseUsername}${googleId.slice(-4)}`;
+            let counter = 0;
+            while (await prisma.user.findUnique({ where: { username } })) {
+                counter++;
+                const suffix = counter === 1 ? googleId.slice(-4) : Math.random().toString(36).substring(2, 6);
+                username = `${baseUsername.slice(0, 15)}${suffix}`;
             }
 
             user = await prisma.user.create({
@@ -138,9 +140,9 @@ router.post('/google', async (req, res) => {
             });
         }
 
-        const token = generateToken(user.id);
+        const token = generateToken(user.id, { avatar: picture || null });
         res.json({
-            user: { id: user.id, username: user.username, email: user.email },
+            user: { id: user.id, username: user.username, email: user.email, avatar: picture || null },
             token
         });
     } catch (err) {
@@ -163,7 +165,7 @@ router.get('/me', async (req, res) => {
             select: { id: true, username: true, email: true, createdAt: true }
         });
         if (!user) return res.status(404).json({ error: 'User not found' });
-        res.json({ user });
+        res.json({ user: { ...user, avatar: payload.avatar || null } });
     } catch {
         res.status(401).json({ error: 'Invalid token' });
     }
