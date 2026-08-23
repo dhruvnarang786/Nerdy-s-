@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Star, TrendingUp, Clock, Activity, Flame, Crown, Heart, MessageCircle } from 'lucide-react';
+import { Star, TrendingUp, Clock, Activity, Flame, Crown, Heart, MessageCircle } from 'lucide-react';
 import { searchBooks, getBookDetails, type Book } from '@/lib/apiClient';
 import { getAllLogs } from '@/lib/storage';
 import { useAuth } from '@/lib/AuthContext';
@@ -31,21 +31,21 @@ const POPULAR_LISTS = [
 
 // Fallback books with Open Library covers — shown when Google Books API is rate-limited
 const FALLBACK_SHOWCASE: Book[] = [
-    { id: 'OL82563W', title: 'The Night Circus', author: 'Erin Morgenstern', coverUrl: 'https://covers.openlibrary.org/b/olid/OL25429920M-M.jpg', description: '', rating: 0, publishedDate: '', pages: 0, genre: [] },
-    { id: 'OL17930368W', title: 'Project Hail Mary', author: 'Andy Weir', coverUrl: 'https://covers.openlibrary.org/b/olid/OL28384937M-M.jpg', description: '', rating: 0, publishedDate: '', pages: 0, genre: [] },
-    { id: 'OL20897277W', title: 'Tomorrow, and Tomorrow, and Tomorrow', author: 'Gabrielle Zevin', coverUrl: 'https://covers.openlibrary.org/b/olid/OL37823790M-M.jpg', description: '', rating: 0, publishedDate: '', pages: 0, genre: [] },
-    { id: 'OL19631252W', title: 'Piranesi', author: 'Susanna Clarke', coverUrl: 'https://covers.openlibrary.org/b/olid/OL28553425M-M.jpg', description: '', rating: 0, publishedDate: '', pages: 0, genre: [] },
-    { id: 'OL20644253W', title: 'The Midnight Library', author: 'Matt Haig', coverUrl: 'https://covers.openlibrary.org/b/olid/OL28423208M-M.jpg', description: '', rating: 0, publishedDate: '', pages: 0, genre: [] },
-    { id: 'OL27258W', title: 'Dune', author: 'Frank Herbert', coverUrl: 'https://covers.openlibrary.org/b/olid/OL34621109M-M.jpg', description: '', rating: 0, publishedDate: '', pages: 0, genre: [] },
-    { id: 'OL82536W', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', coverUrl: 'https://covers.openlibrary.org/b/olid/OL22570024M-M.jpg', description: '', rating: 0, publishedDate: '', pages: 0, genre: [] },
-    { id: 'OL45804W', title: 'Pride and Prejudice', author: 'Jane Austen', coverUrl: 'https://covers.openlibrary.org/b/olid/OL7177684M-M.jpg', description: '', rating: 0, publishedDate: '', pages: 0, genre: [] },
-    { id: 'OL27479W', title: '1984', author: 'George Orwell', coverUrl: 'https://covers.openlibrary.org/b/olid/OL46903932M-M.jpg', description: '', rating: 0, publishedDate: '', pages: 0, genre: [] },
-    { id: 'OL23919W', title: 'Harry Potter and the Sorcerer\'s Stone', author: 'J.K. Rowling', coverUrl: 'https://covers.openlibrary.org/b/olid/OL22856696M-M.jpg', description: '', rating: 0, publishedDate: '', pages: 0, genre: [] },
-    { id: 'OL27516W', title: 'The Hobbit', author: 'J.R.R. Tolkien', coverUrl: 'https://covers.openlibrary.org/b/olid/OL33891507M-M.jpg', description: '', rating: 0, publishedDate: '', pages: 0, genre: [] },
-    { id: 'OL12345W', title: 'Atomic Habits', author: 'James Clear', coverUrl: 'https://covers.openlibrary.org/b/olid/OL27912450M-M.jpg', description: '', rating: 0, publishedDate: '', pages: 0, genre: [] },
-    { id: 'OL81613W', title: 'The Alchemist', author: 'Paulo Coelho', coverUrl: 'https://covers.openlibrary.org/b/olid/OL7358422M-M.jpg', description: '', rating: 0, publishedDate: '', pages: 0, genre: [] },
-    { id: 'OL15125W', title: 'To Kill a Mockingbird', author: 'Harper Lee', coverUrl: 'https://covers.openlibrary.org/b/olid/OL46874127M-M.jpg', description: '', rating: 0, publishedDate: '', pages: 0, genre: [] },
-    { id: 'OL6769228W', title: 'The Hunger Games', author: 'Suzanne Collins', coverUrl: 'https://covers.openlibrary.org/b/olid/OL22597972M-M.jpg', description: '', rating: 0, publishedDate: '', pages: 0, genre: [] },
+    { id: 'OL82563W', title: 'The Night Circus', author: 'Erin Morgenstern', coverUrl: 'https://covers.openlibrary.org/b/olid/OL25429920M-M.jpg', description: 'A breathtaking tale of two young magicians pitted against each other in a competition linked to a mysterious travelling circus that only appears at night. Rich with enchantment and wonder.', rating: 4.5, publishedDate: '2011', pages: 387, genre: ['Fantasy', 'Romance'] },
+    { id: 'OL17930368W', title: 'Project Hail Mary', author: 'Andy Weir', coverUrl: 'https://covers.openlibrary.org/b/olid/OL28384937M-M.jpg', description: 'A lone astronaut must save humanity from extinction in this interstellar adventure. Waking up with amnesia millions of miles from home, he must piece together his mission and find a way back.', rating: 4.7, publishedDate: '2021', pages: 476, genre: ['Sci-Fi', 'Adventure'] },
+    { id: 'OL20897277W', title: 'Tomorrow, and Tomorrow, and Tomorrow', author: 'Gabrielle Zevin', coverUrl: 'https://covers.openlibrary.org/b/olid/OL37823790M-M.jpg', description: 'Two friends, connected by their love of video games, embark on a decades-long creative partnership that tests the boundaries of love, friendship, and art.', rating: 4.3, publishedDate: '2022', pages: 416, genre: ['Literary Fiction'] },
+    { id: 'OL19631252W', title: 'Piranesi', author: 'Susanna Clarke', coverUrl: 'https://covers.openlibrary.org/b/olid/OL28553425M-M.jpg', description: 'In a mysterious house of infinite halls and ocean tides, Piranesi lives alone, cataloguing its wonders. But when messages from a stranger appear, reality begins to unravel.', rating: 4.2, publishedDate: '2020', pages: 272, genre: ['Fantasy', 'Mystery'] },
+    { id: 'OL20644253W', title: 'The Midnight Library', author: 'Matt Haig', coverUrl: 'https://covers.openlibrary.org/b/olid/OL28423208M-M.jpg', description: 'Between life and death lies a library where every book offers a different life Nora could have lived. A moving exploration of regret, hope, and the choices that define us.', rating: 4.1, publishedDate: '2020', pages: 304, genre: ['Fiction', 'Philosophy'] },
+    { id: 'OL27258W', title: 'Dune', author: 'Frank Herbert', coverUrl: 'https://covers.openlibrary.org/b/olid/OL34621109M-M.jpg', description: 'Set on the desert planet Arrakis, this epic saga follows Paul Atreides as he navigates politics, religion, and ecology in a fight for control of the universe\'s most valuable substance.', rating: 4.6, publishedDate: '1965', pages: 688, genre: ['Sci-Fi', 'Epic'] },
+    { id: 'OL82536W', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', coverUrl: 'https://covers.openlibrary.org/b/olid/OL22570024M-M.jpg', description: 'A portrait of the Jazz Age in all its decadence and excess. Jay Gatsby\'s obsessive pursuit of Daisy Buchanan reveals the dark underside of the American Dream.', rating: 4.0, publishedDate: '1925', pages: 180, genre: ['Classic', 'Literary Fiction'] },
+    { id: 'OL45804W', title: 'Pride and Prejudice', author: 'Jane Austen', coverUrl: 'https://covers.openlibrary.org/b/olid/OL7177684M-M.jpg', description: 'The witty and headstrong Elizabeth Bennet clashes with the proud Mr. Darcy in this timeless romance that skewers social class and celebrates the triumph of love over vanity.', rating: 4.5, publishedDate: '1813', pages: 432, genre: ['Classic', 'Romance'] },
+    { id: 'OL27479W', title: '1984', author: 'George Orwell', coverUrl: 'https://covers.openlibrary.org/b/olid/OL46903932M-M.jpg', description: 'In a totalitarian society ruled by Big Brother, Winston Smith dares to dream of freedom. A chilling prophecy about surveillance, propaganda, and the power of language.', rating: 4.4, publishedDate: '1949', pages: 328, genre: ['Dystopian', 'Classic'] },
+    { id: 'OL23919W', title: 'Harry Potter and the Sorcerer\'s Stone', author: 'J.K. Rowling', coverUrl: 'https://covers.openlibrary.org/b/olid/OL22856696M-M.jpg', description: 'An orphaned boy discovers he is a wizard and enters Hogwarts School, where he finds friendship, magic, and a dark mystery connected to his past. The book that launched a generation of readers.', rating: 4.7, publishedDate: '1997', pages: 309, genre: ['Fantasy', 'Young Adult'] },
+    { id: 'OL27516W', title: 'The Hobbit', author: 'J.R.R. Tolkien', coverUrl: 'https://covers.openlibrary.org/b/olid/OL33891507M-M.jpg', description: 'Bilbo Baggins is swept into an epic quest to reclaim a lost kingdom from a fearsome dragon. A timeless adventure of courage, friendship, and the unexpected hero within us all.', rating: 4.5, publishedDate: '1937', pages: 310, genre: ['Fantasy', 'Adventure'] },
+    { id: 'OL12345W', title: 'Atomic Habits', author: 'James Clear', coverUrl: 'https://covers.openlibrary.org/b/olid/OL27912450M-M.jpg', description: 'A revolutionary guide to building good habits and breaking bad ones. Small changes, remarkable results — learn how tiny behavioral shifts can transform your life completely.', rating: 4.6, publishedDate: '2018', pages: 320, genre: ['Self-Help', 'Productivity'] },
+    { id: 'OL81613W', title: 'The Alchemist', author: 'Paulo Coelho', coverUrl: 'https://covers.openlibrary.org/b/olid/OL7358422M-M.jpg', description: 'A shepherd boy\'s journey from Spain to Egypt in search of treasure becomes a profound allegory about following your dreams and listening to your heart.', rating: 4.2, publishedDate: '1988', pages: 197, genre: ['Fiction', 'Philosophy'] },
+    { id: 'OL15125W', title: 'To Kill a Mockingbird', author: 'Harper Lee', coverUrl: 'https://covers.openlibrary.org/b/olid/OL46874127M-M.jpg', description: 'Through the eyes of young Scout Finch, this Pulitzer Prize-winning novel explores racial injustice and moral growth in the American South during the 1930s.', rating: 4.6, publishedDate: '1960', pages: 336, genre: ['Classic', 'Literary Fiction'] },
+    { id: 'OL6769228W', title: 'The Hunger Games', author: 'Suzanne Collins', coverUrl: 'https://covers.openlibrary.org/b/olid/OL22597972M-M.jpg', description: 'In a dystopian future, Katniss Everdeen volunteers to take her sister\'s place in a televised fight to the death. A gripping tale of survival, rebellion, and defiance.', rating: 4.4, publishedDate: '2008', pages: 374, genre: ['Dystopian', 'Young Adult'] },
 ];
 
 function getDailyBook(books: Book[]): Book | null {
@@ -136,12 +136,14 @@ export function Home() {
             {/* ── BOOK OF THE DAY (featured banner) ──────────────── */}
             {heroBook && (
                 <section className="lb-botd-banner animate-fade-in-up delay-100">
-                    <div className="lb-botd-badge">
-                        <Crown size={14} />
-                        BOOK OF THE DAY
+                    <div className="lb-botd-badge-center">
+                        <div className="lb-botd-badge">
+                            <Crown size={14} />
+                            BOOK OF THE DAY
+                        </div>
                     </div>
-                    <div className="lb-botd-content">
-                        <Link to={`/book/${heroBook.id}`} className="lb-botd-cover-wrap">
+                    <Link to={`/book/${heroBook.id}`} className="lb-botd-content">
+                        <div className="lb-botd-cover-wrap">
                             <img
                                 src={getBookCoverUrl(heroBook.id, heroBook.coverUrl)}
                                 alt={heroBook.title}
@@ -150,18 +152,29 @@ export function Home() {
                                     e.currentTarget.src = FALLBACK_COVER;
                                 }}
                             />
-                        </Link>
-                        <div className="lb-botd-info">
-                            <Link to={`/book/${heroBook.id}`} className="lb-botd-title">{heroBook.title}</Link>
-                            <p className="lb-botd-author">by {heroBook.author}</p>
-                            {heroBook.description && (
-                                <p className="lb-botd-desc">{heroBook.description.slice(0, 150)}...</p>
-                            )}
-                            <Link to={`/book/${heroBook.id}`} className="lb-botd-cta">
-                                View Details <ArrowRight size={14} />
-                            </Link>
                         </div>
-                    </div>
+                        <div className="lb-botd-info">
+                            <h2 className="lb-botd-title">{heroBook.title}</h2>
+                            <p className="lb-botd-author">by {heroBook.author}</p>
+                            <p className="lb-botd-desc">
+                                {heroBook.description
+                                    ? heroBook.description.slice(0, 280) + (heroBook.description.length > 280 ? '...' : '')
+                                    : `Discover today's featured pick — a must-read that our community is loving right now. Dive into ${heroBook.title} and see what all the buzz is about.`
+                                }
+                            </p>
+                            <div className="lb-botd-meta-row">
+                                {heroBook.genre && heroBook.genre.length > 0 && heroBook.genre.map((g, i) => (
+                                    <span key={i} className="lb-botd-genre-tag">{g}</span>
+                                ))}
+                                {heroBook.pages > 0 && <span className="lb-botd-meta-item">{heroBook.pages} pages</span>}
+                                {heroBook.rating > 0 && (
+                                    <span className="lb-botd-meta-item">
+                                        <Star size={13} className="lb-botd-star" /> {heroBook.rating}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </Link>
                 </section>
             )}
 
